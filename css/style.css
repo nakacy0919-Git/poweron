@@ -1,0 +1,295 @@
+/* ==========================================
+   フォントのおしゃれ化（Google Fontsの読み込み）
+========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+/* 英文をおしゃれでスタイリッシュなフォントに（本文・文字起こし・HUD・Lesson番号のみ） */
+.eng-sentence, 
+#recognizedTextDisplay, 
+.target-text-display,
+.hud-value,
+.num {
+    font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    letter-spacing: 0.5px;
+}
+
+/* 日本語訳をモダンで読みやすいフォントに（和訳テキストと背景のみ） */
+.jpn-sentence, 
+.jpn-container-style {
+    font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif !important;
+    letter-spacing: 0.5px;
+}
+/* ------------------------------------------- */
+
+/* =========================================
+   基本設定とベースレイアウト
+========================================= */
+html, body { 
+    height: 100%; width: 100%; overflow: hidden; margin: 0; padding: 0; 
+    background-color: #f5f5f5; box-sizing: border-box; 
+}
+body { 
+    display: flex; flex-direction: column; align-items: center; padding: 4px; 
+}
+
+/* --- ナビゲーション（上部レッスンボタン） --- */
+.nav-container { 
+    width: 100%; height: 5vh; min-height: 32px; display: grid; grid-template-columns: repeat(10, 1fr); 
+    gap: 1px; margin-bottom: 8px; flex-shrink: 0; z-index: 100;
+}
+.nav-btn { 
+    position: relative; font-size: 1.2rem; font-weight: 900; color: #888; background: #f8f9fa; 
+    border: 2px solid #ddd; border-radius: 12px; padding: 10px 15px; cursor: pointer; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease; 
+}
+.nav-btn .num { font-size: 2.2rem; vertical-align: middle; }
+.nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.nav-btn.active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.25); border-color: transparent; color: #333; }
+.nav-btn.active::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+.nav-btn.active.color-blue   { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.nav-btn.active.color-orange { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.nav-btn.active.color-purple { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+.nav-btn.active.color-green  { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); }
+.nav-btn.active.color-pink   { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+
+/* =========================================
+   メインコンテナとエリア分割
+========================================= */
+.app-container { 
+    width: 100%; flex-grow: 1; display: flex; box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+    border-radius: 8px; overflow: hidden; position: relative; background-color: white;
+}
+
+/* --- 左側の広いエリア（背景画像対応） --- */
+.main-screen { 
+    position: relative !important; display: flex !important; flex-direction: column !important; 
+    flex-grow: 1 !important; overflow: hidden !important; box-sizing: border-box !important; 
+    padding-top: 15px !important; min-width: 20%; 
+    
+    /* ↓ 背景画像がきれいに収まるための追加設定 ↓ */
+    background-color: #fff;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    transition: background-image 0.4s ease-in-out; /* 画像がフワッと切り替わる */
+}
+
+/* リサイズバー */
+#drag-handle { 
+    width: 18px; background-color: #bbbbbb; cursor: col-resize; display: flex; 
+    justify-content: center; align-items: center; flex-shrink: 0; z-index: 100; 
+}
+
+/* --- 右側サイドバー（コントロールパネル） --- */
+.sidebar { 
+    width: 250px; min-width: 200px; max-width: 60%; background-color: #f3e5f5; 
+    padding: 10px 15px; display: flex; flex-direction: column; gap: 8px; 
+    flex-shrink: 0; height: 100%; overflow-y: auto; box-sizing: border-box;
+}
+.sidebar-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.selector-container select { 
+    width: 100%; padding: 8px 10px; border-radius: 10px; border: 2px solid #ddd; 
+    font-size: 1rem; font-weight: bold; color: #555; margin-bottom: 5px; cursor: pointer;
+}
+
+/* サイドバー内のボタン共通 */
+.btn { border: none; cursor: pointer; transition: 0.2s; }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Play Audioボタン */
+#btnMainAudio {
+    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+    padding: 12px 10px; font-size: 1.2rem; font-weight: bold; border-radius: 12px; color: #333;
+    position: relative; margin-bottom: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#btnMainAudio::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+
+/* 巻き戻し・ループボタン */
+.audio-controls, .loop-controls { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.ctrl-btn, .loop-btn { 
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #333; border: 1px solid #bbb; 
+    border-radius: 4px; flex: 1; padding: 8px 5px; font-size: 1rem; cursor: pointer; font-weight: bold; 
+}
+.loop-controls button { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.loop-active { background: #ffccbc !important; color: #d84315 !important; border: 2px solid #ff7043 !important; }
+hr { border: 0; border-top: 2px dashed #ce93d8; width: 100%; margin: 5px 0; }
+
+/* 右側各種モード切替ボタン */
+:root { --theme-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.stylish-btn {
+    position: relative; background: var(--theme-gradient) !important; color: #333 !important; 
+    border-radius: 12px !important; padding: 18px 8px !important; margin-bottom: 12px !important; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex !important; flex-direction: column !important; 
+    align-items: center !important; justify-content: center !important; line-height: 1.2 !important;
+}
+.stylish-btn::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+.stylish-btn:active { transform: scale(0.97); box-shadow: 0 2px 3px rgba(0,0,0,0.1); }
+
+/* =========================================
+   メインコンテンツエリア（オーバーレイ）
+========================================= */
+#mainOverlay { 
+    position: relative !important; width: 100% !important; height: 100% !important; 
+    display: flex !important; flex-direction: column !important; box-sizing: border-box !important; 
+    padding: 0 20px 20px 20px !important; background: transparent; z-index: 10; overflow-y: auto; 
+}
+.overlay-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;
+}
+.overlay-title { font-size: 24px; font-weight: bold; color: #333; }
+.close-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+
+/* 文字サイズ変更ボタン */
+.font-size-btn {
+    background: #fff !important; color: #333 !important; border: 1px solid #ccc !important;
+    padding: 4px 10px !important; font-size: 1rem !important; border-radius: 4px !important;
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-left: 5px;
+}
+.font-size-btn:active { background: #e0e0e0 !important; }
+
+/* =========================================
+   テキスト表示とハイライト
+========================================= */
+#textContainer { display: flex; flex-direction: column; gap: 20px; }
+.target-text-display { 
+    font-size: 26px; color: #333; line-height: 1.8; background: rgba(255,255,255,0.9); 
+    padding: 30px; border-radius: 8px; border: 1px solid #ddd; 
+}
+.eng-sentence, .jpn-sentence { cursor: pointer; border-radius: 4px; transition: background-color 0.2s ease; }
+.eng-sentence:hover, .jpn-sentence:hover { background-color: rgba(0, 0, 0, 0.05); }
+.active-highlight { background-color: #fff3cd !important; box-shadow: 0 0 0 2px #fff3cd; }
+
+/* 和文専用おしゃれ背景 */
+.jpn-container-style {
+    background: linear-gradient(135deg, rgba(253,251,251,0.95) 0%, rgba(235,237,238,0.95) 100%); padding: 20px; 
+    border-radius: 12px; border-left: 6px solid #b0bec5; box-shadow: inset 0 2px 5px rgba(0,0,0,0.03); 
+    line-height: 1.6; margin-top: 20px;
+}
+
+/* =========================================
+   スピーチ結果（Reading Check / Shadowing）
+========================================= */
+#speechResultWindow { 
+    flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; 
+    padding-bottom: 20px; box-sizing: border-box;
+}
+
+/* POPなゲーム風スコアHUD */
+.game-hud {
+    position: relative !important; z-index: 10 !important; margin-top: 10px !important; 
+    margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; 
+    display: flex; gap: 15px; align-items: center; flex-wrap: wrap; background: rgba(43,43,43,0.95); 
+    padding: 12px 20px; border-radius: 20px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); border: 2px solid #444; 
+}
+.hud-badge {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 5px 15px; border-radius: 12px; border: 2px solid #fff; transform: translateY(-2px); min-width: 100px;
+}
+.hud-acc { background: linear-gradient(135deg, #00f2fe, #4facfe); box-shadow: 0 4px 0 #0088cc; }
+.hud-wpm { background: linear-gradient(135deg, #ff0844, #ffb199); box-shadow: 0 4px 0 #cc0033; }
+.hud-title { font-size: 0.7rem; font-weight: 900; color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); letter-spacing: 1px; }
+.hud-value { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); line-height: 1.1; }
+.level-select-small { padding: 5px; font-size: 0.9rem; border-radius: 6px; margin-left: 10px; cursor: pointer; }
+
+/* 文字起こしエリアの枠組み */
+.transcription-container {
+    position: relative !important; flex-grow: 1 !important; width: 100% !important; 
+    display: flex !important; flex-direction: column !important; box-sizing: border-box !important; 
+    overflow: hidden !important; min-height: 250px;
+}
+
+/* 本文のSNS風デザイン強化（背景を半透明白にして画像を透けさせる） */
+.sns-box-large {
+    width: 100% !important; height: 100% !important; box-sizing: border-box !important; 
+    overflow-y: auto !important; margin: 0 !important; background: rgba(255,255,255,0.92) !important; 
+    border-radius: 20px !important; box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important; 
+    border: 1px solid #f0f0f0 !important; padding: 30px !important; position: relative;
+}
+
+.matched-word { color: #1976D2; font-weight: bold; background-color: #E3F2FD; border-radius: 4px; padding: 2px 4px; }
+.unmatched-word { color: #555; }
+
+/* STARTボタン */
+.floating-btn {
+    position: absolute !important; bottom: 30px !important; right: 35px !important; z-index: 9999 !important; 
+    width: 90px; height: 90px; border-radius: 50% !important; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; 
+    color: #333 !important; font-weight: 900 !important; font-size: 1.1rem !important; border: none !important; 
+    box-shadow: 0 8px 20px rgba(255, 154, 158, 0.6) !important; cursor: pointer; transition: all 0.2s ease; 
+    display: flex; align-items: center; justify-content: center;
+}
+.floating-btn:hover { transform: scale(1.08); }
+.floating-btn.recording {
+    background: linear-gradient(135deg, #ff4b4b 0%, #ff0000 100%) !important; color: white !important; 
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important; animation: pulse 1.5s infinite;
+}
+.stop-floating-btn {
+    background: linear-gradient(135deg, #4b4bff 0%, #0000ff 100%) !important; color: white !important; 
+    box-shadow: 0 8px 20px rgba(0, 0, 255, 0.4) !important;
+}
+
+/* =========================================
+   語彙ポップアップとアニメーション
+========================================= */
+.vocab-highlight { color: #d32f2f; font-weight: bold; cursor: pointer; border-bottom: 2px dashed #d32f2f; transition: 0.2s; }
+.vocab-highlight:hover { background-color: #ffebee; }
+#vocabPopup { 
+    position: absolute; display: none; background: #fff; border: 4px solid #ab47bc; border-radius: 12px; 
+    padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 100; text-align: center; 
+    min-width: 280px; transition: all 0.3s ease; 
+}
+.popup-word { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 5px; }
+.popup-pron { font-size: 20px; color: #666; margin-bottom: 10px; font-family: sans-serif;}
+.popup-mean { font-size: 22px; color: #d32f2f; font-weight: bold; margin-bottom: 15px;}
+.popup-recognized { font-size: 16px; color: #1976D2; font-weight: bold; margin-bottom: 15px; min-height: 24px; background: #E3F2FD; border-radius: 4px; padding: 4px; display: none; }
+.popup-controls { display: flex; justify-content: center; gap: 15px; align-items: center; }
+.popup-mic-btn { background: #d32f2f; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: 0.3s; }
+.popup-mic-btn.recording { background: #4caf50; animation: pulse 1s infinite; }
+.popup-close { background: #eee; border: 1px solid #ccc; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; height: 40px;}
+
+@keyframes windowSuccess { 0% { border-color: #ab47bc; box-shadow: 0 10px 30px rgba(0,0,0,0.3); } 20% { border-color: #ffeb3b; box-shadow: 0 0 50px #ffeb3b, inset 0 0 20px #ffeb3b; transform: scale(1.02); } 100% { border-color: #ab47bc; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: scale(1); } }
+.success-anim-window { animation: windowSuccess 1.5s ease; border-color: #ab47bc !important; }
+.success-anim { animation: windowSuccess 0.8s ease; border-color: #4caf50 !important; }
+.confetti { position: fixed; top: -10px; width: 12px; height: 12px; z-index: 9999; animation: fall linear forwards; opacity: 0.9; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+@keyframes pulse { 0% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); } 50% { box-shadow: 0 6px 20px rgba(76,175,80,0.8); } 100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); } }
+
+/* ==========================================
+   【強制修正】右側パネルボタンの文字を大きく、見やすく、おしゃれに！
+   ========================================== */
+.stylish-btn .main-txt { 
+    font-size: 1.4rem !important; /* メインの英語を大きく！ */
+    font-weight: 900 !important;  /* しっかりとした太字に！ */
+    font-family: 'Nunito', 'Segoe UI', sans-serif !important; /* スタイリッシュな丸文字 */
+    letter-spacing: 0.5px !important;
+}
+
+.stylish-btn .sub-txt { 
+    font-size: 0.85rem !important; /* 日本語の補助テキストも見やすく */
+    font-weight: 700 !important;
+    margin-top: 4px !important; 
+    opacity: 0.9 !important;
+    font-family: 'Noto Sans JP', sans-serif !important; /* 読みやすい日本語フォント */
+    letter-spacing: 0.5px !important;
+}
+/* ==========================================
+   【修正】セレクトボックス（Part / Paragraph）の縦幅を倍増！
+   ========================================== */
+#sidebar select {
+    padding: 18px 15px !important; /* 縦幅を倍にして操作性アップ */
+    font-size: 1.1rem !important;  /* 文字サイズも大きく */
+    height: auto !important;
+    border-radius: 10px !important;
+    background-color: #ffffff !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>English Learning App 2026 Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="nav-container">
+        <button class="nav-btn color-blue active" onclick="selectLesson(1, this)">Lesson <span class="num">1</span></button>
+        <button class="nav-btn color-orange" onclick="selectLesson(2, this)">Lesson <span class="num">2</span></button>
+        <button class="nav-btn color-purple" onclick="selectLesson(3, this)">Lesson <span class="num">3</span></button>
+        <button class="nav-btn color-green" onclick="selectLesson(4, this)">Lesson <span class="num">4</span></button>
+        <button class="nav-btn color-pink" onclick="selectLesson(5, this)">Lesson <span class="num">5</span></button>
+        <button class="nav-btn color-blue" onclick="selectLesson(6, this)">Lesson <span class="num">6</span></button>
+        <button class="nav-btn color-orange" onclick="selectLesson(7, this)">Lesson <span class="num">7</span></button>
+        <button class="nav-btn color-purple" onclick="selectLesson(8, this)">Lesson <span class="num">8</span></button>
+        <button class="nav-btn color-green" onclick="selectLesson(9, this)">Lesson <span class="num">9</span></button>
+        <button class="nav-btn color-pink" onclick="selectLesson(10, this)">Lesson <span class="num">10</span></button>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <div class="main-screen" id="mainScreen">
+            
+            <div id="mainOverlay">
+                <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px;">
+                    <div style="display:flex; align-items:center; gap: 15px; flex-wrap:wrap;">
+                        <span class="overlay-title" id="overlayTitle" style="margin:0;">📖 Title</span>
+                        <div id="fontControls" style="display:none; align-items:center; gap: 15px;">
+                            <div style="display:flex; align-items:center; gap: 5px;" id="engFontControl">
+                                <span style="font-size:0.9rem; font-weight:bold;">英文:</span>
+                                <button class="font-size-btn" onclick="changeFontSize('eng', 2)">＋</button>
+                                <button class="font-size-btn" onclick="changeFontSize('eng', -2)">－</button>
+                            </div>
+                            <div style="display:flex; align-items:center; gap: 5px;" id="jpnFontControl">
+                                <span style="font-size:0.9rem; font-weight:bold;">和文:</span>
+                                <button class="font-size-btn" onclick="changeFontSize('jpn', 2)">＋</button>
+                                <button class="font-size-btn" onclick="changeFontSize('jpn', -2)">－</button>
+                            </div>
+                            <div style="display:flex; align-items:center; gap: 5px;" id="recFontControl">
+                                <span style="font-size:0.9rem; font-weight:bold; color:#ff007f;">文字サイズ調整:</span>
+                                <button class="font-size-btn" onclick="changeFontSize('rec', 2)">＋</button>
+                                <button class="font-size-btn" onclick="changeFontSize('rec', -2)">－</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="close-btn" onclick="resetAppMode()">Close</button>
+                </div>
+
+                <div class="target-text-display sns-box" id="targetTextDisplay" style="display: none;">※データがありません</div>
+
+                <div id="speechResultWindow" style="display:none; flex-grow: 1; flex-direction: column; width: 100%; height: 100%;">
+                    <!-- HUD（スコアボード） -->
+                    <div id="gameHud" class="game-hud">
+                        <div class="hud-badge hud-acc">
+                            <span class="hud-title">ACCURACY</span>
+                            <span class="hud-value" id="hudAccValue">0<span style="font-size:1rem;">%</span></span>
+                        </div>
+                        <div class="hud-badge hud-wpm">
+                            <span class="hud-title">WPM</span>
+                            <span class="hud-value" id="hudWpmValue">0</span>
+                        </div>
+                        <select class="level-select-small" id="difficultySelect" onchange="recalculateMatch()">
+                            <option value="sweet">判定: 甘め (順不同)</option>
+                            <option value="strict">判定: 厳しめ (順通り)</option>
+                        </select>
+                        <div style="margin-left:auto; color:#fff; font-size:0.8rem; opacity:0.8;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
+                    </div>
+                    
+                    <!-- 文字起こしエリアとSTARTボタン -->
+                    <div class="transcription-container">
+                        <div class="recognized-text sns-box-large" id="recognizedTextDisplay"></div>
+                        
+                        <div id="readingMicContainer" style="display:none;">
+                            <button class="start-record-btn floating-btn" id="micBtn" onclick="toggleReadingRecording()">START</button>
+                        </div>
+                        <div id="shadowingMicContainer" style="display:none;">
+                            <button class="start-record-btn floating-btn" id="bigShadowBtn" onclick="startShadowing()">START</button>
+                            <button class="start-record-btn floating-btn stop-floating-btn" id="stopShadowBtn" onclick="stopShadowing()" style="display:none;">FINISH</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 単語ポップアップ -->
+            <div id="vocabPopup" style="display:none;">
+                <div class="popup-word" id="popupWord">Word</div>
+                <div class="popup-pron" id="popupPron">/pron/</div>
+                <div class="popup-mean" id="popupMean">意味</div>
+                <div class="popup-recognized" id="popupRecognized">認識: </div>
+                <div class="popup-controls">
+                    <button class="popup-mic-btn" id="popupMicBtn" onclick="togglePopupMic()">🎤</button>
+                    <button class="popup-close" onclick="closeVocabPopup()">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="drag-handle"></div>
+
+        <div class="sidebar compact-sidebar" id="sidebar">
+            <div class="sidebar-group">
+                <div class="selector-container">
+                    <select id="partSelect" onchange="onScopeChange()"><option value="1">Part 1</option><option value="2">Part 2</option><option value="3">Part 3</option><option value="4">Part 4</option></select>
+                    <select id="paraSelect" onchange="onScopeChange()"><option value="full">Full Text</option><option value="p1">Paragraph 1</option><option value="p2">Paragraph 2</option><option value="p3">Paragraph 3</option></select>
+                </div>
+                <button class="btn btn-audio-main compact-main-btn" id="btnMainAudio" onclick="toggleMainAudio()">▶ Play Audio</button>
+                <div class="audio-controls compact-ctrls">
+                    <button class="ctrl-btn" onclick="seekAudio(-5)">⏪ 5s</button>
+                    <button class="ctrl-btn" onclick="stopAudio()">⏹ Stop</button>
+                    <button class="ctrl-btn" onclick="seekAudio(5)">5s ⏩</button>
+                </div>
+                <div class="loop-controls compact-ctrls">
+                    <button id="btn-loop-start" class="loop-btn" onclick="setLoopStart()">Start</button>
+                    <button id="btn-loop-end" class="loop-btn" onclick="setLoopEnd()">End</button>
+                    <button class="loop-btn" onclick="clearLoop()">Clear</button>
+                </div>
+            </div>
+            <hr style="margin: 5px 0;">
+            <div class="sidebar-group right-controls">
+                <button class="btn btn-script stylish-btn" onclick="toggleTextMode('script')" id="btnScript">
+                    <span class="main-txt">Script</span><span class="sub-txt">本文を表示</span>
+                </button>
+                <button class="btn btn-japanese stylish-btn" onclick="toggleTextMode('japanese')" id="btnJapanese">
+                    <span class="main-txt">Japanese</span><span class="sub-txt">日本語訳を表示</span>
+                </button>
+                <button class="btn btn-vocab stylish-btn" onclick="resetAppMode()">
+                    <span class="main-txt" style="margin-top:6px;">Vocabulary</span>
+                </button>
+                <hr style="margin: 5px 0;">
+                <button class="btn btn-compre stylish-btn" onclick="openSpeechOverlay('reading')">
+                    <span class="main-txt">Reading Check</span><span class="sub-txt">音読練習</span>
+                </button>
+                <button class="btn btn-shadowing stylish-btn" onclick="openSpeechOverlay('shadowing')">
+                    <span class="main-txt">Shadowing</span><span class="sub-txt">シャドーイング</span>
+                </button>
+                <button class="btn btn-clear stylish-btn" onclick="resetAppMode()">
+                    <span class="main-txt" style="margin-top:6px;">ALL CLEAR</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="mainAudioPlayer"></audio>
+    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+
+    <script src="lessons/lessonData.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
