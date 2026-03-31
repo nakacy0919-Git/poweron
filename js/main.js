@@ -127,3 +127,92 @@ document.addEventListener('DOMContentLoaded', () => {
     const paraSelectEl = document.getElementById('paraSelect');
     if (paraSelectEl) paraSelectEl.addEventListener('change', onScopeChange);
 });
+// ==========================================
+// リサイズバー修復 ＆ WPM自動計算
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 【1. リサイズバー（ドラッグハンドル）の修復】
+    const dragHandle = document.getElementById('drag-handle');
+    const sidebar = document.getElementById('sidebar');
+    let isResizing = false;
+
+    // マウス・タッチ操作の開始
+    const startResize = (e) => { 
+        isResizing = true; 
+        document.body.style.cursor = 'col-resize'; 
+        document.body.style.userSelect = 'none'; // ドラッグ中の文字選択を防ぐ
+        if(e.preventDefault && e.type !== 'touchstart') e.preventDefault(); 
+    };
+    
+    // ドラッグ中の幅変更処理
+    const doResize = (clientX) => {
+        if (!isResizing) return;
+        const newWidth = window.innerWidth - clientX - 18; // ハンドル幅を考慮
+        // サイドバーの幅を制限（150px 〜 画面の70%まで）
+        if (newWidth >= 150 && newWidth <= window.innerWidth * 0.7) {
+            sidebar.style.width = newWidth + 'px';
+            sidebar.style.minWidth = newWidth + 'px';
+            sidebar.style.maxWidth = newWidth + 'px';
+        }
+    };
+
+    // 操作の終了
+    const stopResize = () => { 
+        isResizing = false; 
+        document.body.style.cursor = 'default'; 
+        document.body.style.userSelect = 'auto'; 
+    };
+
+    if (dragHandle) {
+        dragHandle.addEventListener('mousedown', startResize);
+        dragHandle.addEventListener('touchstart', startResize, {passive: false});
+    }
+    document.addEventListener('mousemove', (e) => doResize(e.clientX));
+    document.addEventListener('touchmove', (e) => doResize(e.touches[0].clientX));
+    document.addEventListener('mouseup', stopResize);
+    document.addEventListener('touchend', stopResize);
+
+
+    // 【2. WPM（話すスピード）の自動計算機能】
+    let wpmStartTime = 0;
+    let wpmInterval = null;
+    
+    const startWPM = () => {
+        wpmStartTime = Date.now();
+        clearInterval(wpmInterval);
+        // 1秒ごとにWPMを計算して画面（HUD）に反映
+        wpmInterval = setInterval(() => {
+            const textEl = document.getElementById('recognizedTextDisplay');
+            if (!textEl || !wpmStartTime) return;
+            
+            // 読み取られた単語の数をカウント
+            const wordCount = textEl.innerText.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const elapsedMin = (Date.now() - wpmStartTime) / 60000; // 経過時間（分）
+            
+            if (elapsedMin > 0) {
+                const wpmEl = document.getElementById('hudWpmValue');
+                if (wpmEl) wpmEl.innerText = Math.round(wordCount / elapsedMin);
+            }
+        }, 1000);
+    };
+    
+    const stopWPM = () => clearInterval(wpmInterval);
+
+    // Reading Check の STARTボタンに検知を仕込む
+    const micBtn = document.getElementById('micBtn');
+    if (micBtn) {
+        micBtn.addEventListener('click', () => {
+            // ボタンが「START」から「STOP(recording状態)」に切り替わる時
+            if (!micBtn.classList.contains('recording')) startWPM(); 
+            else stopWPM();
+        });
+    }
+
+    // Shadowing の START/FINISHボタンに検知を仕込む
+    const bigShadowBtn = document.getElementById('bigShadowBtn');
+    const stopShadowBtn = document.getElementById('stopShadowBtn');
+    if (bigShadowBtn) bigShadowBtn.addEventListener('click', startWPM);
+    if (stopShadowBtn) stopShadowBtn.addEventListener('click', stopWPM);
+});

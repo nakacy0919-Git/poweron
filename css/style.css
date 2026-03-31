@@ -325,3 +325,71 @@ hr { border: 0; border-top: 2px dashed #ce93d8; width: 100%; margin: 4px 0; }
 
 /* 4択ボタンホバー */
 .quiz-choice-btn:hover { background: #f0f4f8 !important; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important; }
+
+/* ==========================================
+   UI微調整パッチ（ボタン縮小・サイドバー完全フィット）
+========================================== */
+
+/* 1. 上部のLesson 1-10 ボタンをスリム化 */
+.nav-container { 
+    height: auto !important; 
+    min-height: 30px !important; 
+    margin-bottom: 4px !important; 
+}
+.nav-btn { 
+    padding: 2px 2px !important; 
+    font-size: 0.8rem !important; 
+    border-radius: 8px !important; 
+}
+.nav-btn .num { 
+    font-size: 1.3rem !important; 
+}
+
+/* 2. 右側サイドバーを「スクロールなし」で1画面に収める */
+.sidebar { 
+    padding: 5px 10px !important; 
+    gap: 3px !important; 
+}
+.sidebar-group { 
+    gap: 3px !important; 
+    margin-bottom: 0 !important;
+}
+
+/* 以前巨大化したセレクトボックスを元のスマートなサイズに戻す */
+.selector-container select { 
+    padding: 6px 10px !important; 
+    font-size: 1rem !important; 
+    margin-bottom: 2px !important;
+}
+
+/* Audioボタンの縮小 */
+#btnMainAudio { 
+    padding: 6px !important; 
+    font-size: 1.1rem !important; 
+    margin-bottom: 2px !important;
+}
+.ctrl-btn, .loop-btn {
+    padding: 4px !important;
+    font-size: 0.9rem !important;
+}
+hr { margin: 3px 0 !important; }
+
+/* Reading Check等のモード切替ボタンの縮小 */
+.stylish-btn { 
+    padding: 4px !important; 
+    min-height: 38px !important; 
+    margin-bottom: 3px !important; 
+}
+.stylish-btn .main-txt { font-size: 1rem !important; }
+.stylish-btn .sub-txt { font-size: 0.65rem !important; margin-top: 0 !important; }
+
+/* 3. 不要な「@Lesson_Text」をCSSで強制非表示 */
+.overlay-title span { display: none !important; }
+.overlay-title br { display: none !important; }
+
+/* ==========================================
+   邪魔なタイトル表示を完全に削除（スペース確保）
+========================================== */
+#overlayTitle {
+    display: none !important;
+}
