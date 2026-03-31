@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>English Learning App 2026 Pro</title>
+    <!-- iPadのホーム画面に追加した際、URLバーを消して全画面アプリ化する魔法のタグ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
+    <title>PowerSlide Power On Ⅲ</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,7 +30,7 @@
             <div id="mainOverlay">
                 <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px;">
                     <div style="display:flex; align-items:center; gap: 15px; flex-wrap:wrap;">
-                        <span class="overlay-title" id="overlayTitle" style="margin:0;">📖 Title</span>
+                        <span class="overlay-title" id="overlayTitle" style="margin:0;"></span>
                         <div id="fontControls" style="display:none; align-items:center; gap: 15px;">
                             <div style="display:flex; align-items:center; gap: 5px;" id="engFontControl">
                                 <span style="font-size:0.9rem; font-weight:bold;">英文:</span>
@@ -124,7 +128,7 @@
                 <button class="btn btn-japanese stylish-btn" onclick="toggleTextMode('japanese')" id="btnJapanese">
                     <span class="main-txt">Japanese</span><span class="sub-txt">日本語訳を表示</span>
                 </button>
-                <button class="btn btn-vocab stylish-btn" onclick="resetAppMode()">
+                <button class="btn btn-vocab stylish-btn" onclick="startVocabQuiz()">
                     <span class="main-txt" style="margin-top:6px;">Vocabulary</span>
                 </button>
                 <hr style="margin: 5px 0;">
@@ -150,5 +154,6 @@
     <script src="js/ui.js"></script>
     <script src="js/speech.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>  <!-- ★この行を追加！ -->
 </body>
 </html>

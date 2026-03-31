@@ -293,3 +293,124 @@ hr { border: 0; border-top: 2px dashed #ce93d8; width: 100%; margin: 5px 0; }
     cursor: pointer !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
 }
+/* ==========================================
+   Quiz モジュール用追加スタイル (大型化＆おしゃれフォント)
+========================================== */
+.quiz-menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    font-family: 'Nunito', 'Noto Sans JP', sans-serif !important;
+}
+
+.quiz-menu-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.quiz-mode-btn {
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    font-size: 2rem;
+    font-weight: 900;
+    font-family: 'Nunito', 'Noto Sans JP', sans-serif !important;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.quiz-mode-btn:hover { transform: scale(1.03); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
+.quiz-mode-btn:active { transform: scale(0.97); }
+
+.btn-mode-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.btn-mode-2 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333 !important; }
+
+.quiz-mode-subtxt {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* タイマーバー */
+.timer-container {
+    width: 100%;
+    height: 15px;
+    background: #eee;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.timer-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff4b4b, #ff8a8a);
+    transition: width 0.1s linear;
+}
+
+/* 4択ボタンホバー */
+.quiz-choice-btn:hover {
+    background: #f0f4f8 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+}
+/* ==========================================
+   iPad (Safari) 完全フィット＆ネイティブアプリ化
+========================================== */
+@media only screen and (min-width: 768px) and (max-width: 1366px) {
+    /* 1. 画面全体を固定し、Safariのアドレスバーのズレを完全に防ぐ */
+    html, body {
+        width: 100vw !important;
+        height: 100dvh !important; /* ★ 100dvh: Safariの表示領域に完全に一致させる魔法の単位 */
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important; /* 画面全体の無駄なスクロールを禁止 */
+        overscroll-behavior-y: none !important; /* 画面を上下に引っ張ったときの「ゴムひも効果」を無効化 */
+        touch-action: none !important; /* 予期せぬスワイプ動作(戻る等)を禁止 */
+    }
+
+    /* 2. PCと同じ「横並び」レイアウトを強制維持する */
+    body {
+        display: flex !important;
+        flex-direction: row !important;
+    }
+
+    /* 3. コンテンツエリア（右側の広い画面）の調整 */
+    /* ※枠自体は固定し、文字が長い時"だけ"中身を滑らかにスクロールさせる */
+    #mainOverlay, #targetTextDisplay, #speechResultWindow {
+        height: 100% !important;
+        max-height: 100dvh !important;
+        overflow-y: auto !important; 
+        -webkit-overflow-scrolling: touch !important; /* iPad特有の滑らかなスクロール */
+        overscroll-behavior-y: contain !important; /* 内部のスクロールが外側に影響するのを防ぐ */
+        touch-action: auto !important; /* ここだけは指でのスクロールを許可 */
+    }
+
+    /* 4. クイズ画面がiPadの画面からはみ出さないように美しく微調整 */
+    .quiz-menu-container {
+        padding: 20px !important;
+        gap: 15px !important;
+    }
+    .quiz-mode-btn {
+        width: 100% !important;
+        padding: 20px !important;
+        font-size: 1.6rem !important;
+    }
+    #quizSpeechBox {
+        font-size: 2.5rem !important;
+        min-height: 80px !important;
+    }
+}
