@@ -129,42 +129,33 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// リサイズバー修復 ＆ WPM自動計算
+// 最終安定版：リサイズバー ＆ 確定WPM（正確なCWPM） ＆ 正確Accuracy
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 【1. リサイズバー（ドラッグハンドル）の修復】
+    // 【1. リサイズバー機能】
     const dragHandle = document.getElementById('drag-handle');
     const sidebar = document.getElementById('sidebar');
     let isResizing = false;
 
-    // マウス・タッチ操作の開始
     const startResize = (e) => { 
         isResizing = true; 
         document.body.style.cursor = 'col-resize'; 
-        document.body.style.userSelect = 'none'; // ドラッグ中の文字選択を防ぐ
+        document.body.style.userSelect = 'none';
         if(e.preventDefault && e.type !== 'touchstart') e.preventDefault(); 
     };
     
-    // ドラッグ中の幅変更処理
     const doResize = (clientX) => {
         if (!isResizing) return;
-        const newWidth = window.innerWidth - clientX - 18; // ハンドル幅を考慮
-        // サイドバーの幅を制限（150px 〜 画面の70%まで）
+        const newWidth = window.innerWidth - clientX - 18;
         if (newWidth >= 150 && newWidth <= window.innerWidth * 0.7) {
             sidebar.style.width = newWidth + 'px';
             sidebar.style.minWidth = newWidth + 'px';
-            sidebar.style.maxWidth = newWidth + 'px';
         }
     };
 
-    // 操作の終了
-    const stopResize = () => { 
-        isResizing = false; 
-        document.body.style.cursor = 'default'; 
-        document.body.style.userSelect = 'auto'; 
-    };
+    const stopResize = () => { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; };
 
     if (dragHandle) {
         dragHandle.addEventListener('mousedown', startResize);
@@ -176,66 +167,71 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', stopResize);
 
 
-    // 【3. WPM（話すスピード）の自動計算機能（正確な停止＆ロック機能付き）】
-    let wpmStartTime = 0;
+    // 【2. WPM & Accuracy 確定計測システム（修正版）】
+    let sessionStartTime = 0;
     let wpmInterval = null;
-    
-    // WPMを計算する関数
-    const calculateWPM = () => {
-        const textEl = document.getElementById('recognizedTextDisplay');
-        if (!textEl || !wpmStartTime) return;
+
+    // 数値を計算して画面に表示する関数
+    const updateStats = (isFinal = false) => {
+        const textDisplay = document.getElementById('recognizedTextDisplay');
+        if (!textDisplay || !sessionStartTime) return;
+
+        // ★画面上の「青く光った正解単語」の数を取得
+        const matchedWordsCount = textDisplay.querySelectorAll('.matched-word').length;
         
-        // 読み取られた単語の数を正確にカウント（空白を除外）
-        const text = textEl.innerText.trim();
-        const wordCount = text ? text.split(/\s+/).length : 0;
-        
-        const elapsedMin = (Date.now() - wpmStartTime) / 60000; // 経過時間（分）
-        
-        if (elapsedMin > 0) {
-            const wpmEl = document.getElementById('hudWpmValue');
-            if (wpmEl) wpmEl.innerText = Math.round(wordCount / elapsedMin);
+        // --- Accuracyの計算 (青い単語の数 / お手本の全単語数) ---
+        // ※お手本の単語はspanタグで包まれている前提
+        const allWordsCount = textDisplay.querySelectorAll('span').length;
+        if (allWordsCount > 0) {
+            const acc = Math.round((matchedWordsCount / allWordsCount) * 100);
+            document.getElementById('hudAccValue').innerText = acc + "%";
+        }
+
+        // --- WPMの計算 (青い単語の数 ÷ 経過時間) ---
+        // ※お手本の残りの文章に騙されず、実際に正解した単語のペースだけを測る
+        const currentTime = Date.now();
+        const elapsedMs = currentTime - sessionStartTime;
+        const elapsedMin = elapsedMs / 60000;
+
+        if (elapsedMin > 0.05) { // 開始直後の3秒間は暴走を防ぐため計算を待つ
+            const wpm = Math.round(matchedWordsCount / elapsedMin);
+            document.getElementById('hudWpmValue').innerText = wpm;
         }
     };
 
-    // 計測スタート
-    const startWPM = () => {
-        wpmStartTime = Date.now();
+    // 計測開始
+    const startSession = () => {
+        sessionStartTime = Date.now();
+        document.getElementById('hudAccValue').innerText = "0%";
+        document.getElementById('hudWpmValue').innerText = "0";
         clearInterval(wpmInterval);
-        document.getElementById('hudWpmValue').innerText = "0"; // ゼロにリセット
-        wpmInterval = setInterval(calculateWPM, 1000); // 1秒ごとに更新
-    };
-    
-    // 計測ストップ（数値をロック）
-    const stopWPM = () => {
-        clearInterval(wpmInterval); // タイマーの息の根を完全に止める
-        calculateWPM(); // 最後に一回だけ最終計算をして数値を確定させる
+        wpmInterval = setInterval(() => updateStats(false), 1000); // 1秒ごとに更新
     };
 
-    // --- マイクのON/OFFを「完全自動検知」してタイマーを連動させる ---
+    // 計測終了（数値をロック）
+    const stopSession = () => {
+        clearInterval(wpmInterval); // タイマーを即座に停止
+        updateStats(true); // 最終確定値を計算してロック
+        sessionStartTime = 0; // 開始時間をリセット
+    };
 
-    // Reading Check用：マイクボタンの色（recordingクラス）の変化を監視
+    // --- 各モードのボタン操作に連動 ---
+
+    // Reading Check用
     const micBtn = document.getElementById('micBtn');
     if (micBtn) {
-        const observer = new MutationObserver(() => {
-            if (micBtn.classList.contains('recording')) {
-                startWPM(); // 赤く光ったら計測開始
-            } else {
-                stopWPM();  // 光が消えたら計測停止してロック
-            }
+        const obs = new MutationObserver(() => {
+            if (micBtn.classList.contains('recording')) startSession();
+            else stopSession();
         });
-        observer.observe(micBtn, { attributes: true, attributeFilter: ['class'] });
+        obs.observe(micBtn, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // Shadowing用：FINISHボタンの表示/非表示を監視
+    // Shadowing用
+    const bigShadowBtn = document.getElementById('bigShadowBtn');
     const stopShadowBtn = document.getElementById('stopShadowBtn');
-    if (stopShadowBtn) {
-        const observer2 = new MutationObserver(() => {
-            if (stopShadowBtn.style.display !== 'none') {
-                startWPM(); // FINISHボタンが出現したら計測開始
-            } else {
-                stopWPM();  // FINISHボタンが消えたら計測停止してロック
-            }
-        });
-        observer2.observe(stopShadowBtn, { attributes: true, attributeFilter: ['style'] });
+    if (bigShadowBtn && stopShadowBtn) {
+        bigShadowBtn.addEventListener('click', startSession);
+        stopShadowBtn.addEventListener('click', stopSession);
     }
-}); // ←★ ここがスッポリ抜けてエラーになっていました！
+});
