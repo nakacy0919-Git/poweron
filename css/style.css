@@ -393,3 +393,10 @@ hr { margin: 3px 0 !important; }
 #overlayTitle {
     display: none !important;
 }
+
+/* ==========================================
+   Reading Check / Shadowing 上部の不要なタイトル行を強制削除
+========================================== */
+#recognizedTextDisplay > div > div[style*="border-bottom: 2px solid #f0f0f0"] {
+    display: none !important;
+}

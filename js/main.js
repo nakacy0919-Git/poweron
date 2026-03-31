@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const paraSelectEl = document.getElementById('paraSelect');
     if (paraSelectEl) paraSelectEl.addEventListener('change', onScopeChange);
 });
+
 // ==========================================
 // リサイズバー修復 ＆ WPM自動計算
 // ==========================================
@@ -175,44 +176,66 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', stopResize);
 
 
-    // 【2. WPM（話すスピード）の自動計算機能】
+    // 【3. WPM（話すスピード）の自動計算機能（正確な停止＆ロック機能付き）】
     let wpmStartTime = 0;
     let wpmInterval = null;
     
+    // WPMを計算する関数
+    const calculateWPM = () => {
+        const textEl = document.getElementById('recognizedTextDisplay');
+        if (!textEl || !wpmStartTime) return;
+        
+        // 読み取られた単語の数を正確にカウント（空白を除外）
+        const text = textEl.innerText.trim();
+        const wordCount = text ? text.split(/\s+/).length : 0;
+        
+        const elapsedMin = (Date.now() - wpmStartTime) / 60000; // 経過時間（分）
+        
+        if (elapsedMin > 0) {
+            const wpmEl = document.getElementById('hudWpmValue');
+            if (wpmEl) wpmEl.innerText = Math.round(wordCount / elapsedMin);
+        }
+    };
+
+    // 計測スタート
     const startWPM = () => {
         wpmStartTime = Date.now();
         clearInterval(wpmInterval);
-        // 1秒ごとにWPMを計算して画面（HUD）に反映
-        wpmInterval = setInterval(() => {
-            const textEl = document.getElementById('recognizedTextDisplay');
-            if (!textEl || !wpmStartTime) return;
-            
-            // 読み取られた単語の数をカウント
-            const wordCount = textEl.innerText.trim().split(/\s+/).filter(w => w.length > 0).length;
-            const elapsedMin = (Date.now() - wpmStartTime) / 60000; // 経過時間（分）
-            
-            if (elapsedMin > 0) {
-                const wpmEl = document.getElementById('hudWpmValue');
-                if (wpmEl) wpmEl.innerText = Math.round(wordCount / elapsedMin);
-            }
-        }, 1000);
+        document.getElementById('hudWpmValue').innerText = "0"; // ゼロにリセット
+        wpmInterval = setInterval(calculateWPM, 1000); // 1秒ごとに更新
     };
     
-    const stopWPM = () => clearInterval(wpmInterval);
+    // 計測ストップ（数値をロック）
+    const stopWPM = () => {
+        clearInterval(wpmInterval); // タイマーの息の根を完全に止める
+        calculateWPM(); // 最後に一回だけ最終計算をして数値を確定させる
+    };
 
-    // Reading Check の STARTボタンに検知を仕込む
+    // --- マイクのON/OFFを「完全自動検知」してタイマーを連動させる ---
+
+    // Reading Check用：マイクボタンの色（recordingクラス）の変化を監視
     const micBtn = document.getElementById('micBtn');
     if (micBtn) {
-        micBtn.addEventListener('click', () => {
-            // ボタンが「START」から「STOP(recording状態)」に切り替わる時
-            if (!micBtn.classList.contains('recording')) startWPM(); 
-            else stopWPM();
+        const observer = new MutationObserver(() => {
+            if (micBtn.classList.contains('recording')) {
+                startWPM(); // 赤く光ったら計測開始
+            } else {
+                stopWPM();  // 光が消えたら計測停止してロック
+            }
         });
+        observer.observe(micBtn, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // Shadowing の START/FINISHボタンに検知を仕込む
-    const bigShadowBtn = document.getElementById('bigShadowBtn');
+    // Shadowing用：FINISHボタンの表示/非表示を監視
     const stopShadowBtn = document.getElementById('stopShadowBtn');
-    if (bigShadowBtn) bigShadowBtn.addEventListener('click', startWPM);
-    if (stopShadowBtn) stopShadowBtn.addEventListener('click', stopWPM);
-});
+    if (stopShadowBtn) {
+        const observer2 = new MutationObserver(() => {
+            if (stopShadowBtn.style.display !== 'none') {
+                startWPM(); // FINISHボタンが出現したら計測開始
+            } else {
+                stopWPM();  // FINISHボタンが消えたら計測停止してロック
+            }
+        });
+        observer2.observe(stopShadowBtn, { attributes: true, attributeFilter: ['style'] });
+    }
+}); // ←★ ここがスッポリ抜けてエラーになっていました！

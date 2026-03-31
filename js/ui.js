@@ -58,7 +58,7 @@ function toggleTextMode(mode) {
     if(recFont) recFont.style.display = 'none';
     
     const title = document.getElementById('overlayTitle');
-    if(title) title.innerText = "📄 Text Viewer";
+    if(title) title.innerText = "";
     
     renderDualText();
 }
