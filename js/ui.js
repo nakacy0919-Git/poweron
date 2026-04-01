@@ -162,8 +162,10 @@ function showVocab(event, displayWord, dictWord) {
     if (!vocabData) return;
     
     document.getElementById('popupWord').innerText = displayWord;
-    document.getElementById('popupPron').innerText = vocabData.pron || "";
-    document.getElementById('popupMean').innerText = vocabData.mean || "";
+    // ★修正：pronunciation と pron の両方に対応
+    document.getElementById('popupPron').innerText = vocabData.pronunciation || vocabData.pron || "";
+    // ★修正：meaning と mean の両方に対応
+    document.getElementById('popupMean').innerText = vocabData.meaning || vocabData.mean || "";
     document.getElementById('popupRecognized').style.display = 'none';
     
     const popup = document.getElementById('vocabPopup');
