@@ -13,10 +13,8 @@ function selectLesson(num, btnElement) {
     ];
     document.documentElement.style.setProperty('--theme-gradient', gradients[(num - 1) % 5]);
 
-    // ★追加：背景画像と「白い透明シート」の設定
     const mainScreen = document.getElementById('mainScreen');
     if (mainScreen) {
-        // rgba(255, 255, 255, 0.85) の "0.85" の数字で白シートの濃さを調整できます（0.0が透明 ～ 1.0が真っ白）
         mainScreen.style.backgroundImage = `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('img/L${num}.webp')`;
     }
 
@@ -62,15 +60,17 @@ function onScopeChange() {
     const para = document.getElementById('paraSelect')?.value || "full";
     currentKey = `L${String(currentLesson).padStart(2, '0')}_P${part}_${para}`;
     
-    if (audioPlayer) audioPlayer.src = `lessons/lesson${currentLesson}/part${part}/audio/${currentKey}.mp3`;
+    if (typeof audioPlayer !== 'undefined' && audioPlayer) {
+        audioPlayer.src = `lessons/lesson${currentLesson}/part${part}/audio/${currentKey}.mp3`;
+    }
     
-    clearLoop();
-    closeVocabPopup();
+    if (typeof clearLoop === 'function') clearLoop();
+    if (typeof closeVocabPopup === 'function') closeVocabPopup();
 
-    if (currentMode === 'shadowing' || currentMode === 'reading') {
-        openSpeechOverlay(currentMode);
-    } else if (isScriptOpen || isJapaneseOpen) {
-        renderDualText();
+    if (typeof currentMode !== 'undefined' && (currentMode === 'shadowing' || currentMode === 'reading')) {
+        if (typeof openSpeechOverlay === 'function') openSpeechOverlay(currentMode);
+    } else if (typeof isScriptOpen !== 'undefined' && (isScriptOpen || isJapaneseOpen)) {
+        if (typeof renderDualText === 'function') renderDualText();
     }
 }
 
@@ -87,11 +87,17 @@ function resetAppMode() {
     const fontControls = document.getElementById('fontControls');
     if(fontControls) fontControls.style.display = 'none';
     
-    closeVocabPopup(); stopAudio(); clearLoop();
+    if (typeof closeVocabPopup === 'function') closeVocabPopup();
+    if (typeof stopAudio === 'function') stopAudio();
+    if (typeof clearLoop === 'function') clearLoop();
 
-    if (isMainRecording) {
-        if (currentMode === 'shadowing') stopShadowing();
-        else stopReadingRecording();
+    // ★修正：isMainRecording のエラー回避と、正しい関数名への噛み合わせ
+    if (typeof isMainRecording !== 'undefined' && isMainRecording) {
+        if (currentMode === 'shadowing') {
+            if (typeof stopShadowing === 'function') stopShadowing();
+        } else {
+            if (typeof toggleReadingRecording === 'function') toggleReadingRecording(); // 修正！
+        }
     }
 
     currentMode = ''; isScriptOpen = false; isJapaneseOpen = false;
@@ -166,58 +172,46 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseup', stopResize);
     document.addEventListener('touchend', stopResize);
 
-
-    // 【2. WPM & Accuracy 確定計測システム（修正版）】
+    // 【2. WPM & Accuracy 確定計測システム】
     let sessionStartTime = 0;
     let wpmInterval = null;
 
-    // 数値を計算して画面に表示する関数
     const updateStats = (isFinal = false) => {
         const textDisplay = document.getElementById('recognizedTextDisplay');
         if (!textDisplay || !sessionStartTime) return;
 
-        // ★画面上の「青く光った正解単語」の数を取得
         const matchedWordsCount = textDisplay.querySelectorAll('.matched-word').length;
         
-        // --- Accuracyの計算 (青い単語の数 / お手本の全単語数) ---
-        // ※お手本の単語はspanタグで包まれている前提
         const allWordsCount = textDisplay.querySelectorAll('span').length;
         if (allWordsCount > 0) {
             const acc = Math.round((matchedWordsCount / allWordsCount) * 100);
             document.getElementById('hudAccValue').innerText = acc + "%";
         }
 
-        // --- WPMの計算 (青い単語の数 ÷ 経過時間) ---
-        // ※お手本の残りの文章に騙されず、実際に正解した単語のペースだけを測る
         const currentTime = Date.now();
         const elapsedMs = currentTime - sessionStartTime;
         const elapsedMin = elapsedMs / 60000;
 
-        if (elapsedMin > 0.05) { // 開始直後の3秒間は暴走を防ぐため計算を待つ
+        if (elapsedMin > 0.05) { 
             const wpm = Math.round(matchedWordsCount / elapsedMin);
             document.getElementById('hudWpmValue').innerText = wpm;
         }
     };
 
-    // 計測開始
     const startSession = () => {
         sessionStartTime = Date.now();
         document.getElementById('hudAccValue').innerText = "0%";
         document.getElementById('hudWpmValue').innerText = "0";
         clearInterval(wpmInterval);
-        wpmInterval = setInterval(() => updateStats(false), 1000); // 1秒ごとに更新
+        wpmInterval = setInterval(() => updateStats(false), 1000); 
     };
 
-    // 計測終了（数値をロック）
     const stopSession = () => {
-        clearInterval(wpmInterval); // タイマーを即座に停止
-        updateStats(true); // 最終確定値を計算してロック
-        sessionStartTime = 0; // 開始時間をリセット
+        clearInterval(wpmInterval); 
+        updateStats(true); 
+        sessionStartTime = 0; 
     };
 
-    // --- 各モードのボタン操作に連動 ---
-
-    // Reading Check用
     const micBtn = document.getElementById('micBtn');
     if (micBtn) {
         const obs = new MutationObserver(() => {
@@ -227,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
         obs.observe(micBtn, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // Shadowing用
     const bigShadowBtn = document.getElementById('bigShadowBtn');
     const stopShadowBtn = document.getElementById('stopShadowBtn');
     if (bigShadowBtn && stopShadowBtn) {

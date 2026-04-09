@@ -1,16 +1,16 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（iPad完全対応版）
+// speech.js: 音声認識とスコア計算（iPad完全対応版 / エラー修正済）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let mainRecognition;
-let isMainRecording = false;
 
-// ★ マイクの精度向上・履歴保持のための変数
-let finalTranscript = ''; 
-let lastSpokenText = '';
-let currentScore = 0;
-let recordStartTime = 0;
-let targetText = '';
+// ★「var」を使うことで、どこから読み込まれても重複エラーが起きなくなります！
+var mainRecognition;
+var isMainRecording = false;
+var finalTranscript = ''; 
+var lastSpokenText = '';
+var currentScore = 0;
+var recordStartTime = 0;
+var targetText = '';
 
 if (window.SpeechRecognition) {
     mainRecognition = new SpeechRecognition();
@@ -18,12 +18,11 @@ if (window.SpeechRecognition) {
     mainRecognition.interimResults = true;
     mainRecognition.continuous = true;
     
-    // ★ 追加：iPad等でマイクが許可されなかった場合のエラー処理
+    // マイクのエラー処理（iPadでブロックされた場合）
     mainRecognition.onerror = (e) => {
         if (e.error === 'not-allowed' || e.error === 'denied') {
             isMainRecording = false;
             
-            // ボタンの見た目を元に戻す
             const micBtn = document.getElementById('micBtn');
             if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
             const bShadow = document.getElementById('bigShadowBtn');
@@ -31,16 +30,15 @@ if (window.SpeechRecognition) {
             if(bShadow) bShadow.style.display = 'flex';
             if(sShadow) sShadow.style.display = 'none';
 
-            // メイン画面に警告メッセージをデカデカと表示！
             const recDisplay = document.getElementById('recognizedTextDisplay');
             if (recDisplay) {
                 recDisplay.innerHTML = `
                 <div style="padding: 20px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
                     <div style="font-size: 1.2rem; color: #d32f2f; font-weight: bold; margin-bottom: 10px;">⚠️ マイクへのアクセスがブロックされています</div>
                     <div style="line-height: 1.6; color: #333; font-size: 1rem; font-weight: 500;">
-                        お使いのブラウザ（Safariなど）でマイクが許可されていません。<br><br>
+                        お使いのブラウザでマイクが許可されていません。<br><br>
                         【解決方法】<br>
-                        画面上部のURLバーにある「ぁあ（aA）」マークを押して「Webサイトの設定」からマイクを許可するか、iPad本体の「設定」アプリからSafariのマイクアクセスを許可してください。
+                        URLバーの「ぁあ（aA）」マークを押してマイクを許可するか、設定アプリからSafariのマイクアクセスを許可してください。
                     </div>
                 </div>`;
             }
@@ -49,7 +47,6 @@ if (window.SpeechRecognition) {
 
     mainRecognition.onresult = (e) => { 
         let interimTranscript = '';
-        // 話した言葉を「確定分」と「推測中」に分けてしっかり蓄積・保持する（精度アップ）
         for (let i = e.resultIndex; i < e.results.length; i++) {
             if (e.results[i].isFinal) {
                 finalTranscript += e.results[i][0].transcript + ' ';
@@ -62,7 +59,6 @@ if (window.SpeechRecognition) {
     };
 
     mainRecognition.onend = () => {
-        // マイクがオンのまま途切れたら自動再起動するが、エラーで止まった場合は再起動しない
         if (isMainRecording) {
             setTimeout(() => { try { if (isMainRecording) mainRecognition.start(); } catch(err){} }, 250);
         }
@@ -88,7 +84,6 @@ function openSpeechOverlay(mode) {
     const fontControls = document.getElementById('fontControls');
     if(fontControls) fontControls.style.display = 'flex';
     
-    // ★ Reading Checkの時は英文サイズの調整ボタンも表示する
     const engFont = document.getElementById('engFontControl');
     if(engFont) engFont.style.display = mode === 'reading' ? 'flex' : 'none';
     
@@ -101,9 +96,8 @@ function openSpeechOverlay(mode) {
     const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
     targetText = safeScripts[currentKey] || "※データ未登録";
     
-    // ★ デフォルトのフォントサイズを「大きく・見やすく」設定
-    if (engFontSize < 28) engFontSize = 28;
-    if (recFontSize < 32) recFontSize = 32;
+    if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
+    if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
     
     const accEl = document.getElementById('hudAccValue');
     if(accEl) accEl.innerHTML = `0<span style="font-size:1rem;">%</span>`;
@@ -138,12 +132,12 @@ function toggleReadingRecording() {
     if (isMainRecording) { 
         isMainRecording = false; mainRecognition.stop();
         if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
-        checkCelebration(); 
+        if (typeof checkCelebration === 'function') checkCelebration(); 
         processSpeechMatch(lastSpokenText); 
     } else {
         recordStartTime = Date.now(); 
         isMainRecording = true; 
-        lastSpokenText = ""; finalTranscript = ""; // 録音開始時にテキスト履歴をリセット
+        lastSpokenText = ""; finalTranscript = ""; 
         mainRecognition.start(); 
         if (micBtn) { micBtn.classList.add('recording'); micBtn.innerHTML = "STOP"; }
         processSpeechMatch(""); 
@@ -161,22 +155,29 @@ function startShadowing() {
     
     recordStartTime = Date.now(); 
     isMainRecording = true; 
-    lastSpokenText = ""; finalTranscript = ""; // 録音開始時にテキスト履歴をリセット
+    lastSpokenText = ""; finalTranscript = ""; 
     mainRecognition.start();
     
-    if (!loopState.active && audioPlayer) audioPlayer.currentTime = 0;
-    if (audioPlayer) audioPlayer.play().then(() => updateAudioButtonUI(true)).catch(e => console.error(e));
+    if (typeof loopState !== 'undefined' && !loopState.active && typeof audioPlayer !== 'undefined' && audioPlayer) {
+        audioPlayer.currentTime = 0;
+    }
+    if (typeof audioPlayer !== 'undefined' && audioPlayer) {
+        audioPlayer.play().then(() => {
+            if (typeof updateAudioButtonUI === 'function') updateAudioButtonUI(true);
+        }).catch(e => console.error(e));
+    }
 
     processSpeechMatch(""); 
 }
 
 function stopShadowing() {
-    isMainRecording = false; mainRecognition.stop(); stopAudio();
+    isMainRecording = false; mainRecognition.stop(); 
+    if (typeof stopAudio === 'function') stopAudio();
     const bShadow = document.getElementById('bigShadowBtn');
     const sShadow = document.getElementById('stopShadowBtn');
     if(bShadow) bShadow.style.display = 'flex';
     if(sShadow) sShadow.style.display = 'none';
-    checkCelebration(); 
+    if (typeof checkCelebration === 'function') checkCelebration(); 
     processSpeechMatch(lastSpokenText);
 }
 
@@ -189,6 +190,7 @@ function processSpeechMatch(spokenText) {
     const diffSelect = document.getElementById('difficultySelect');
     const isStrict = diffSelect ? diffSelect.value === 'strict' : false;
     
+    // iPad特有の記号を完全に無視する最強のクリーナー
     const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
     
     const targetWordsArray = targetText.split(/\s+/).filter(w => w).map(cleanString);
@@ -199,7 +201,6 @@ function processSpeechMatch(spokenText) {
     let searchIndex = 0; 
     let targetPool = [...targetWordsArray]; 
     
-    // ★ 修正：話した言葉（Your Voice）側をループして、合っていれば青く装飾する！
     spokenOriginalWords.forEach((originalWord) => {
         let cleanSpoken = cleanString(originalWord); 
         if (!cleanSpoken) {
@@ -235,9 +236,7 @@ function processSpeechMatch(spokenText) {
     const recDisplay = document.getElementById('recognizedTextDisplay');
     if (recDisplay) {
         let modeTitle = currentMode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
-        
-        // フォントサイズを即座に反映させるための仕掛け
-        recDisplay.style.fontSize = recFontSize + 'px'; 
+        recDisplay.style.fontSize = typeof recFontSize !== 'undefined' ? recFontSize + 'px' : '32px'; 
         
         let innerHtml = `
             <div style="padding-bottom: 120px;">
@@ -249,16 +248,14 @@ function processSpeechMatch(spokenText) {
                     </div>
                 </div>`;
 
-        // ★ Reading Check の時のみ「お手本(Target Text)」を表示。青くならない純粋なテキスト。
         if (currentMode === 'reading') {
             innerHtml += `
                 <div style="margin-bottom: 20px; padding: 20px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
                     <div style="font-size: 0.85rem; color: #4facfe; font-weight: bold; margin-bottom: 8px;">TARGET TEXT（お手本）</div>
-                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontSize}px;">${targetText}</div>
+                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${typeof engFontSize !== 'undefined' ? engFontSize : 32}px;">${targetText}</div>
                 </div>`;
         }
 
-        // ★ Your Voice エリア：ここでマッチした単語が青くなる！
         innerHtml += `
                 <div style="padding: 20px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #ff4b4b; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
                     <div style="font-size: 0.85rem; color: #ff4b4b; font-weight: bold; margin-bottom: 8px;">YOUR VOICE（あなたの発音・文字起こし / 読めた単語は青色に変わります）</div>
@@ -277,10 +274,10 @@ function processSpeechMatch(spokenText) {
         accEl.style.color = currentScore >= 80 ? '#4caf50' : (currentScore >= 50 ? '#fff' : '#ffb3b3');
     }
 
-   if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
+    if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
         let elapsedMinutes = (Date.now() - recordStartTime) / 60000;
         if (elapsedMinutes < 0.01) elapsedMinutes = 0.01;
         const wpmEl = document.getElementById('hudWpmValue');
         if (wpmEl) wpmEl.innerText = Math.round(spokenOriginalWords.length / elapsedMinutes);
     }
-} // ← processSpeechMatch 関数の最後の閉じカッコ
+}
