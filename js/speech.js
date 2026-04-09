@@ -1,16 +1,13 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（iPad完全対応版 / エラー修正済）
+// speech.js: 音声認識とスコア計算（iPad完全対応 / 真の最終版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// ★「var」を使うことで、どこから読み込まれても重複エラーが起きなくなります！
-var mainRecognition;
-var isMainRecording = false;
-var finalTranscript = ''; 
-var lastSpokenText = '';
-var currentScore = 0;
-var recordStartTime = 0;
-var targetText = '';
+// ★超重要：speech.js「専用」の変数だけを宣言します。
+// （lastSpokenText, currentScore, currentMode等はmain.js側にあるため記述しません）
+let mainRecognition;
+let isMainRecording = false;
+let finalTranscript = ''; 
 
 if (window.SpeechRecognition) {
     mainRecognition = new SpeechRecognition();
@@ -66,7 +63,7 @@ if (window.SpeechRecognition) {
 }
 
 function openSpeechOverlay(mode) {
-    resetAppMode();
+    if (typeof resetAppMode === 'function') resetAppMode();
     currentMode = mode;
     
     const mainOverlay = document.getElementById('mainOverlay');
@@ -90,11 +87,12 @@ function openSpeechOverlay(mode) {
     const jpnFont = document.getElementById('jpnFontControl');
     if(jpnFont) jpnFont.style.display = 'none';
     
-    const recFont = document.getElementById('recFontControl');
-    if(recFont) recFont.style.display = 'flex';
+    const recFontControl = document.getElementById('recFontControl');
+    if(recFontControl) recFontControl.style.display = 'flex';
     
     const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
-    targetText = safeScripts[currentKey] || "※データ未登録";
+    const activeKey = (typeof currentKey !== 'undefined') ? currentKey : "";
+    targetText = safeScripts[activeKey] || "※データ未登録";
     
     if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
     if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
@@ -236,7 +234,10 @@ function processSpeechMatch(spokenText) {
     const recDisplay = document.getElementById('recognizedTextDisplay');
     if (recDisplay) {
         let modeTitle = currentMode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
-        recDisplay.style.fontSize = typeof recFontSize !== 'undefined' ? recFontSize + 'px' : '32px'; 
+        
+        // フォントサイズの安全な適用
+        let fontSizeToUse = typeof recFontSize !== 'undefined' ? recFontSize : 32;
+        recDisplay.style.fontSize = fontSizeToUse + 'px'; 
         
         let innerHtml = `
             <div style="padding-bottom: 120px;">
@@ -249,10 +250,11 @@ function processSpeechMatch(spokenText) {
                 </div>`;
 
         if (currentMode === 'reading') {
+            let engFontToUse = typeof engFontSize !== 'undefined' ? engFontSize : 32;
             innerHtml += `
                 <div style="margin-bottom: 20px; padding: 20px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
                     <div style="font-size: 0.85rem; color: #4facfe; font-weight: bold; margin-bottom: 8px;">TARGET TEXT（お手本）</div>
-                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${typeof engFontSize !== 'undefined' ? engFontSize : 32}px;">${targetText}</div>
+                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontToUse}px;">${targetText}</div>
                 </div>`;
         }
 
