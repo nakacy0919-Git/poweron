@@ -204,20 +204,48 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
     popupRecognition.lang = 'en-US';
     popupRecognition.interimResults = false;
     
-    popupRecognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript.trim().toLowerCase();
-        const targetWord = document.getElementById('popupWord').innerText.toLowerCase();
+    // ★追加：マイクの許可が降りなかった場合（エラー時）の処理
+    popupRecognition.onerror = (e) => {
+        isPopupRecording = false;
+        const btn = document.getElementById('popupMicBtn');
+        if (btn) btn.classList.remove('recording');
+
         const recDisplay = document.getElementById('popupRecognized');
+        recDisplay.style.display = 'block';
+
+        if (e.error === 'not-allowed' || e.error === 'denied') {
+            // マイクが拒否された場合の案内メッセージ
+            recDisplay.innerHTML = `<span style="color:#d32f2f; font-size:14px; line-height:1.4; display:block; margin-top:5px;">マイクがブロックされています。<br>URLバーの「ぁあ」や設定アプリからマイクを許可してください。</span>`;
+        } else {
+            recDisplay.innerHTML = `<span style="color:#d32f2f; font-size:14px;">エラーが発生しました(${e.error})。もう一度お試しください。</span>`;
+        }
+    };
+
+    popupRecognition.onresult = (e) => {
+        // 画面に表示するための生の認識結果
+        const rawTranscript = e.results[0][0].transcript.trim().toLowerCase();
         
+        // ★修正：iPad特有の勝手につくピリオドやカンマなどの記号を徹底的に除去して判定
+        const transcript = rawTranscript.replace(/[^a-z0-9\s]/gi, '').trim();
+        const targetWord = document.getElementById('popupWord').innerText.toLowerCase().replace(/[^a-z0-9\s]/gi, '').trim();
+        
+        const recDisplay = document.getElementById('popupRecognized');
         recDisplay.style.display = 'block';
         
-        // 発音した言葉の中に、目標の単語が含まれていればOK！
-        if (transcript.includes(targetWord) || targetWord.includes(transcript)) {
-            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${transcript}</span> (OK!)`;
+        // 判定ロジック：記号を除去した状態で比較（短すぎる誤判定も防止）
+        let isMatch = false;
+        if (transcript === targetWord) {
+            isMatch = true;
+        } else if (transcript.includes(targetWord) || (targetWord.includes(transcript) && transcript.length >= 3)) {
+            isMatch = true;
+        }
+
+        if (isMatch) {
+            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${rawTranscript}</span> (OK!)`;
             let success = document.getElementById('successSound');
             if(success) success.play().catch(err=>{});
         } else {
-            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${transcript}</span> (Try again)`;
+            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${rawTranscript}</span> (Try again)`;
         }
     };
     
@@ -239,10 +267,17 @@ function togglePopupMic() {
     } else {
         const recDisplay = document.getElementById('popupRecognized');
         recDisplay.style.display = 'block';
-        recDisplay.innerText = 'Listening... (発音してください)';
-        popupRecognition.start();
-        isPopupRecording = true;
-        btn.classList.add('recording');
+        // HTMLタグを除去して「Listening...」だけ表示
+        recDisplay.innerHTML = 'Listening... (発音してください)';
+        
+        try {
+            popupRecognition.start();
+            isPopupRecording = true;
+            btn.classList.add('recording');
+        } catch(err) {
+            // すでに起動中などのエラー回避
+            console.log(err);
+        }
     }
 }
 

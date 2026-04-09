@@ -1,5 +1,5 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（最終進化版）
+// speech.js: 音声認識とスコア計算（iPad完全対応版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let mainRecognition;
@@ -7,6 +7,10 @@ let isMainRecording = false;
 
 // ★ マイクの精度向上・履歴保持のための変数
 let finalTranscript = ''; 
+let lastSpokenText = '';
+let currentScore = 0;
+let recordStartTime = 0;
+let targetText = '';
 
 if (window.SpeechRecognition) {
     mainRecognition = new SpeechRecognition();
@@ -14,6 +18,35 @@ if (window.SpeechRecognition) {
     mainRecognition.interimResults = true;
     mainRecognition.continuous = true;
     
+    // ★ 追加：iPad等でマイクが許可されなかった場合のエラー処理
+    mainRecognition.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'denied') {
+            isMainRecording = false;
+            
+            // ボタンの見た目を元に戻す
+            const micBtn = document.getElementById('micBtn');
+            if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
+            const bShadow = document.getElementById('bigShadowBtn');
+            const sShadow = document.getElementById('stopShadowBtn');
+            if(bShadow) bShadow.style.display = 'flex';
+            if(sShadow) sShadow.style.display = 'none';
+
+            // メイン画面に警告メッセージをデカデカと表示！
+            const recDisplay = document.getElementById('recognizedTextDisplay');
+            if (recDisplay) {
+                recDisplay.innerHTML = `
+                <div style="padding: 20px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+                    <div style="font-size: 1.2rem; color: #d32f2f; font-weight: bold; margin-bottom: 10px;">⚠️ マイクへのアクセスがブロックされています</div>
+                    <div style="line-height: 1.6; color: #333; font-size: 1rem; font-weight: 500;">
+                        お使いのブラウザ（Safariなど）でマイクが許可されていません。<br><br>
+                        【解決方法】<br>
+                        画面上部のURLバーにある「ぁあ（aA）」マークを押して「Webサイトの設定」からマイクを許可するか、iPad本体の「設定」アプリからSafariのマイクアクセスを許可してください。
+                    </div>
+                </div>`;
+            }
+        }
+    };
+
     mainRecognition.onresult = (e) => { 
         let interimTranscript = '';
         // 話した言葉を「確定分」と「推測中」に分けてしっかり蓄積・保持する（精度アップ）
@@ -29,6 +62,7 @@ if (window.SpeechRecognition) {
     };
 
     mainRecognition.onend = () => {
+        // マイクがオンのまま途切れたら自動再起動するが、エラーで止まった場合は再起動しない
         if (isMainRecording) {
             setTimeout(() => { try { if (isMainRecording) mainRecognition.start(); } catch(err){} }, 250);
         }
@@ -155,7 +189,7 @@ function processSpeechMatch(spokenText) {
     const diffSelect = document.getElementById('difficultySelect');
     const isStrict = diffSelect ? diffSelect.value === 'strict' : false;
     
-    const cleanString = (str) => str.toLowerCase().replace(/[.,!?'’"“”\-]/g, '');
+    const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
     
     const targetWordsArray = targetText.split(/\s+/).filter(w => w).map(cleanString);
     const spokenOriginalWords = spokenText.split(/\s+/).filter(w => w); 
@@ -243,10 +277,10 @@ function processSpeechMatch(spokenText) {
         accEl.style.color = currentScore >= 80 ? '#4caf50' : (currentScore >= 50 ? '#fff' : '#ffb3b3');
     }
 
-    if (recordStartTime > 0 && spokenWordsArray.length > 0) {
+   if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
         let elapsedMinutes = (Date.now() - recordStartTime) / 60000;
         if (elapsedMinutes < 0.01) elapsedMinutes = 0.01;
         const wpmEl = document.getElementById('hudWpmValue');
-        if (wpmEl) wpmEl.innerText = Math.round(spokenWordsArray.length / elapsedMinutes);
+        if (wpmEl) wpmEl.innerText = Math.round(spokenOriginalWords.length / elapsedMinutes);
     }
-}
+} // ← processSpeechMatch 関数の最後の閉じカッコ
