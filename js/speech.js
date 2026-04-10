@@ -1,10 +1,9 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（iPad完全対応 / 真の最終版）
+// speech.js: 音声認識とスコア計算（iPad完全対応 / UI極み版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// ★超重要：speech.js「専用」の変数だけを宣言します。
-// （lastSpokenText, currentScore, currentMode等はmain.js側にあるため記述しません）
+// ★ speech.js「専用」の変数
 let mainRecognition;
 let isMainRecording = false;
 let finalTranscript = ''; 
@@ -15,7 +14,6 @@ if (window.SpeechRecognition) {
     mainRecognition.interimResults = true;
     mainRecognition.continuous = true;
     
-    // マイクのエラー処理（iPadでブロックされた場合）
     mainRecognition.onerror = (e) => {
         if (e.error === 'not-allowed' || e.error === 'denied') {
             isMainRecording = false;
@@ -69,8 +67,12 @@ function openSpeechOverlay(mode) {
     const mainOverlay = document.getElementById('mainOverlay');
     if(mainOverlay) mainOverlay.style.display = 'flex';
     
+    // ★ 全体を上へ引き上げる調整
     const speechResult = document.getElementById('speechResultWindow');
-    if(speechResult) speechResult.style.display = 'flex';
+    if(speechResult) {
+        speechResult.style.display = 'flex';
+        speechResult.style.paddingTop = '10px'; // バー全体を上部に近づける
+    }
     
     const targetDisplay = document.getElementById('targetTextDisplay');
     if(targetDisplay) targetDisplay.style.display = 'none';
@@ -78,17 +80,9 @@ function openSpeechOverlay(mode) {
     const title = document.getElementById('overlayTitle');
     if(title) title.innerText = mode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
     
+    // ★ 外部のフォントコントロールは完全に隠す（埋め込みボタンを使うため）
     const fontControls = document.getElementById('fontControls');
-    if(fontControls) fontControls.style.display = 'flex';
-    
-    const engFont = document.getElementById('engFontControl');
-    if(engFont) engFont.style.display = mode === 'reading' ? 'flex' : 'none';
-    
-    const jpnFont = document.getElementById('jpnFontControl');
-    if(jpnFont) jpnFont.style.display = 'none';
-    
-    const recFontControl = document.getElementById('recFontControl');
-    if(recFontControl) recFontControl.style.display = 'flex';
+    if(fontControls) fontControls.style.display = 'none';
     
     const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
     const activeKey = (typeof currentKey !== 'undefined') ? currentKey : "";
@@ -188,7 +182,6 @@ function processSpeechMatch(spokenText) {
     const diffSelect = document.getElementById('difficultySelect');
     const isStrict = diffSelect ? diffSelect.value === 'strict' : false;
     
-    // iPad特有の記号を完全に無視する最強のクリーナー
     const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
     
     const targetWordsArray = targetText.split(/\s+/).filter(w => w).map(cleanString);
@@ -235,33 +228,50 @@ function processSpeechMatch(spokenText) {
     if (recDisplay) {
         let modeTitle = currentMode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
         
-        // フォントサイズの安全な適用
-        let fontSizeToUse = typeof recFontSize !== 'undefined' ? recFontSize : 32;
-        recDisplay.style.fontSize = fontSizeToUse + 'px'; 
+        // 元の固定フォント設定を解除（各セクションごとにサイズを独立させるため）
+        recDisplay.style.fontSize = ''; 
         
+        // ★ HUDとテキストの隙間を詰める（全体を引き上げる）
         let innerHtml = `
-            <div style="padding-bottom: 120px;">
-                <div style="display:flex; align-items:center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">
-                    <div style="font-size:2rem; margin-right:15px; background:#e0f2fe; border-radius:50%; width:60px; height:60px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${currentMode === 'reading' ? '📖' : '🎧'}</div>
+            <div style="padding-bottom: 120px; margin-top: -15px;">
+                <div style="display:flex; align-items:center; margin-bottom: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                    <div style="font-size:1.8rem; margin-right:15px; background:#e0f2fe; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${currentMode === 'reading' ? '📖' : '🎧'}</div>
                     <div>
                         <div style="font-weight:900; font-size:1.1rem; color:#333;">${modeTitle}</div>
-                        <div style="font-size:0.8rem; color:#888; font-weight:bold;">@Lesson_Text</div>
+                        <div style="font-size:0.75rem; color:#888; font-weight:bold;">@Lesson_Text</div>
                     </div>
                 </div>`;
 
         if (currentMode === 'reading') {
             let engFontToUse = typeof engFontSize !== 'undefined' ? engFontSize : 32;
             innerHtml += `
-                <div style="margin-bottom: 20px; padding: 20px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="font-size: 0.85rem; color: #4facfe; font-weight: bold; margin-bottom: 8px;">TARGET TEXT（お手本）</div>
-                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontToUse}px;">${targetText}</div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                        <div style="font-size: 0.9rem; color: #4facfe; font-weight: bold;">TARGET TEXT（お手本）</div>
+                        
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                        </div>
+                        
+                    </div>
+                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontToUse}px; transition: font-size 0.2s ease;">${targetText}</div>
                 </div>`;
         }
 
+        let fontSizeToUse = typeof recFontSize !== 'undefined' ? recFontSize : 32;
         innerHtml += `
-                <div style="padding: 20px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #ff4b4b; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="font-size: 0.85rem; color: #ff4b4b; font-weight: bold; margin-bottom: 8px;">YOUR VOICE（あなたの発音・文字起こし / 読めた単語は青色に変わります）</div>
-                    <div style="line-height: 1.6; color: ${spokenText ? '#333' : '#aaa'}; font-weight: 500;">
+                <div style="padding: 15px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #ff4b4b; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                        <div style="font-size: 0.9rem; color: #ff4b4b; font-weight: bold;">YOUR VOICE（あなたの発音）</div>
+                        
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                        </div>
+                        
+                    </div>
+                    <div style="line-height: 1.6; color: ${spokenText ? '#333' : '#aaa'}; font-weight: 500; font-size: ${fontSizeToUse}px; transition: font-size 0.2s ease;">
                         ${spokenText ? htmlOutput.join(' ') : (isMainRecording ? 'Listening... (マイクに向かってお話しください)' : '※右下のSTARTボタンを押して開始してください')}
                     </div>
                 </div>
@@ -283,3 +293,95 @@ function processSpeechMatch(spokenText) {
         if (wpmEl) wpmEl.innerText = Math.round(spokenOriginalWords.length / elapsedMinutes);
     }
 }
+// ==========================================
+// ★ 成績提出システム（GAS連携＆不正対策）
+// ==========================================
+// ↓↓↓ 先ほどコピーしたURLをここに貼り付けてください ↓↓↓
+const GAS_URL = "https://script.google.com/macros/s/AKfycby6AC39tWELS-GeGn0cuWfMNKunMb-Rp4RBZ-_L2VGjbCm9f-9PK54iG1q5K3lSlhI2BQ/exec"; 
+
+// 提出ポップアップを開く関数
+function openSubmitModal() {
+    if (currentScore === 0) return alert("まだスコアがありません。一度練習を行ってから提出してください。");
+    
+    // 現在のスコアをポップアップに反映
+    document.getElementById('submitAcc').innerText = currentScore;
+    document.getElementById('submitWpm').innerText = document.getElementById('hudWpmValue').innerText;
+    
+    // 前回入力した名前などがブラウザに残っていれば自動入力する（生徒の手間を省く）
+    document.getElementById('studentClass').value = localStorage.getItem('savedClass') || "";
+    document.getElementById('studentNumber').value = localStorage.getItem('savedNum') || "";
+    document.getElementById('studentName').value = localStorage.getItem('savedName') || "";
+    
+    document.getElementById('submitModal').style.display = 'flex';
+}
+
+// 実際にGASへデータを送信する関数
+function sendScoreToGAS() {
+    const sClass = document.getElementById('studentClass').value.trim();
+    const sNum = document.getElementById('studentNumber').value.trim();
+    const sName = document.getElementById('studentName').value.trim();
+    const wpmVal = parseInt(document.getElementById('submitWpm').innerText) || 0;
+    
+    if (!sClass || !sNum || !sName) return alert("クラス、出席番号、氏名をすべて入力してください。");
+    if (!GAS_URL.startsWith("https://script.google.com/")) return alert("先生の設定エラー：GASのURLが正しく設定されていません。");
+
+    // 次回のために名前などを保存しておく
+    localStorage.setItem('savedClass', sClass);
+    localStorage.setItem('savedNum', sNum);
+    localStorage.setItem('savedName', sName);
+
+    const btn = document.getElementById('finalSubmitBtn');
+    btn.innerText = "送信中...";
+    btn.disabled = true;
+    btn.style.background = "#999";
+
+    // 不正対策（チェックサムと所要時間の計算）
+    let elapsedSeconds = recordStartTime > 0 ? Math.round((Date.now() - recordStartTime) / 1000) : 0;
+    let cheatCode = (currentScore * 123) + sName.length;
+
+    // 送信するデータのパッケージを作成
+    const payload = {
+        className: sClass,
+        studentNumber: sNum,
+        name: sName,
+        mode: currentMode === 'reading' ? 'Reading Check' : 'Shadowing',
+        score: currentScore,
+        wpm: wpmVal,
+        timeTaken: elapsedSeconds,
+        checksum: cheatCode
+    };
+
+    // GASに向かってデータをブン投げる（POST送信）
+    fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === "success") {
+            alert("✅ スコアの提出が完了しました！先生にデータが送られました。");
+            document.getElementById('submitModal').style.display = 'none';
+        } else {
+            alert("❌ 送信に失敗しました: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("❌ 通信エラーが発生しました。インターネット接続を確認してもう一度お試しください。");
+    })
+    .finally(() => {
+        btn.innerText = "このスコアで送信する";
+        btn.disabled = false;
+        btn.style.background = "#4caf50";
+    });
+}
+
+// ★ 画面の右下に「提出ボタン」を自動で表示させる仕掛け
+document.addEventListener('DOMContentLoaded', () => {
+    const submitBtnHtml = `
+        <button onclick="openSubmitModal()" style="position:fixed; bottom:20px; right:20px; background:#ff4081; color:white; border:none; border-radius:50px; padding:15px 25px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:1000; transition:transform 0.2s;">
+            📤 成績を提出する
+        </button>
+    `;
+    document.body.insertAdjacentHTML('beforeend', submitBtnHtml);
+});
