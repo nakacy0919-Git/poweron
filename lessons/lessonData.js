@@ -744,3 +744,100 @@ const lessonVocab = {
         { word: "cross-species", targetStrings: ["cross-species"], meaning: "異種間の", pronunciation: "krɒs ˈspiː.ʃiːz" }
     ]
 };
+// ==========================================
+// ★ レベルアップ教材データ（英検準1級・1級）
+// ==========================================
+
+// ------------------------------------------
+// 【英検準1級レベル】
+// ------------------------------------------
+const lessonScriptsPre1 = {
+    // --- Part 1 (元データの p1, p2, p3 に対応) ---
+    "L01_P1_p1": "Contemporary libraries are undergoing a major transformation. They now serve purposes far beyond merely lending books.",
+    "L01_P1_p2": "For instance, Musashino Place in Tokyo has a specific floor exclusively for youths aged 20 and under. They can interact or play board games while having refreshments. On the same floor, it also features studios for band rehearsals, dance, cooking, and sports.",
+    "L01_P1_p3": "The Sapporo Municipal Library and Information Center is unique. You can read books there, but you cannot borrow them to ensure they are available for other patrons. The library offers resources tailored specifically for professional work and daily life. Visitors can reserve rooms to conduct business meetings while consulting the latest materials. They can also attend seminars hosted by the library to acquire new insights or address practical issues related to business or everyday life.",
+    "L01_P1_full": "Contemporary libraries are undergoing a major transformation. They now serve purposes far beyond merely lending books. For instance, Musashino Place in Tokyo has a specific floor exclusively for youths aged 20 and under. They can interact or play board games while having refreshments. On the same floor, it also features studios for band rehearsals, dance, cooking, and sports. The Sapporo Municipal Library and Information Center is unique. You can read books there, but you cannot borrow them to ensure they are available for other patrons. The library offers resources tailored specifically for professional work and daily life. Visitors can reserve rooms to conduct business meetings while consulting the latest materials. They can also attend seminars hosted by the library to acquire new insights or address practical issues related to business or everyday life.",
+
+    // --- Part 2 (元データの p1, p2 に対応) ---
+    "L01_P2_p1": "The New York Public Library is a prominent example of this trend. It strives to provide equal access to knowledge and information for all individuals, regardless of their ethnic or financial backgrounds. For example, it provides complimentary online tutoring for students. It hosts career fairs and assists people in writing resumes or preparing for job interviews. Furthermore, it offers volunteer opportunities for adolescents, allowing them to acquire practical skills, foster leadership, and build networks within their community.",
+    "L01_P2_p2": "Libraries have traditionally been facilities for individuals to acquire knowledge. Currently, they are also dynamic spaces where people can engage with others through various activities and collaborative learning. According to an American scholar, while good libraries provide extensive services, excellent libraries foster communities. What kind of library do you envision in your neighborhood?",
+    "L01_P2_full": "The New York Public Library is a prominent example of this trend. It strives to provide equal access to knowledge and information for all individuals, regardless of their ethnic or financial backgrounds. For example, it provides complimentary online tutoring for students. It hosts career fairs and assists people in writing resumes or preparing for job interviews. Furthermore, it offers volunteer opportunities for adolescents, allowing them to acquire practical skills, foster leadership, and build networks within their community. Libraries have traditionally been facilities for individuals to acquire knowledge. Currently, they are also dynamic spaces where people can engage with others through various activities and collaborative learning. According to an American scholar, while good libraries provide extensive services, excellent libraries foster communities. What kind of library do you envision in your neighborhood?"
+};
+
+const lessonVocabPre1 = {
+    // アプリが L01_P1 や L01_P2 で検索するため、両方に同じ単語リストを用意します
+    "L01_P1": { 
+        "undergoing": { pron: "/ˌʌndərˈɡoʊɪŋ/", mean: "～を経験する、経る", note: "are changingの高度な表現" },
+        "transformation": { pron: "/ˌtrænsfərˈmeɪʃən/", mean: "変容、変化", note: "大きな変化を表すフォーマルな語" },
+        "merely": { pron: "/ˈmɪrli/", mean: "単に（～にすぎない）", note: "justの準1級頻出表現" },
+        "interact": { pron: "/ˌɪntərˈækt/", mean: "交流する", note: "chatの言い換え" },
+        "consulting": { pron: "/kənˈsʌltɪŋ/", mean: "参照する、調べる", note: "referring toのフォーマルな表現" },
+        "address": { pron: "/əˈdrɛs/", mean: "対処する、取り組む", note: "solveの言い換え" }
+    },
+    "L01_P2": {
+        "adolescents": { pron: "/ˌædəˈlɛsnts/", mean: "10代の若者", note: "teenagersの学術的な表現" },
+        "envision": { pron: "/ɪnˈvɪʒən/", mean: "思い描く、構想する", note: "wantの高度な表現" }
+    }
+};
+
+// ------------------------------------------
+// 【英検1級レベル】
+// ------------------------------------------
+const lessonScriptsGrade1 = {
+    // --- Part 1 ---
+    "L01_P1_p1": "Contemporary libraries are undergoing a profound metamorphosis, transcending their conventional function as mere repositories for circulating printed materials.",
+    "L01_P1_p2": "Musashino Place in Tokyo, for instance, designates a specific tier exclusively for a demographic of youths under twenty. Here, patrons can socialize or immerse themselves in board games over refreshments. The identical level also boasts fully equipped studios for musical rehearsals, dance, culinary arts, and athletic endeavors.",
+    "L01_P1_p3": "The Sapporo Municipal Library and Information Center presents a distinctive paradigm. While browsing is permitted, the circulation of materials is strictly prohibited to guarantee equitable availability for all visitors. The institution curates literature and resources explicitly tailored to professional endeavors and practical living. Patrons can reserve conference facilities to execute business meetings while referencing up-to-date archives. Furthermore, they can participate in library-sponsored seminars designed to impart novel insights and resolve intricate challenges spanning corporate and domestic spheres.",
+    "L01_P1_full": "Contemporary libraries are undergoing a profound metamorphosis, transcending their conventional function as mere repositories for circulating printed materials. Musashino Place in Tokyo, for instance, designates a specific tier exclusively for a demographic of youths under twenty. Here, patrons can socialize or immerse themselves in board games over refreshments. The identical level also boasts fully equipped studios for musical rehearsals, dance, culinary arts, and athletic endeavors. The Sapporo Municipal Library and Information Center presents a distinctive paradigm. While browsing is permitted, the circulation of materials is strictly prohibited to guarantee equitable availability for all visitors. The institution curates literature and resources explicitly tailored to professional endeavors and practical living. Patrons can reserve conference facilities to execute business meetings while referencing up-to-date archives. Furthermore, they can participate in library-sponsored seminars designed to impart novel insights and resolve intricate challenges spanning corporate and domestic spheres.",
+
+    // --- Part 2 ---
+    "L01_P2_p1": "The New York Public Library stands as a preeminent exemplar of this institutional evolution. It is committed to ensuring equitable access to knowledge and information for everyone, irrespective of their ethnic or socioeconomic heritage. As an illustration, it facilitates complimentary online pedagogical support for students. It convenes career expos and mentors candidates in drafting compelling resumes or preparing for rigorous employment interviews. Moreover, it orchestrates volunteer initiatives for adolescents, empowering them to cultivate vocational competencies, nurture leadership acumen, and forge robust alliances within their community.",
+    "L01_P2_p2": "Historically, libraries have functioned as solitary sanctuaries for intellectual acquisition. Today, they have morphed into dynamic hubs where individuals can engage synergistically with their peers through collaborative initiatives and shared enlightenment. As noted by an American academic, whereas competent libraries augment their collections with services, exceptional libraries cultivate thriving communities. What vision do you hold for the library in your immediate vicinity?",
+    "L01_P2_full": "The New York Public Library stands as a preeminent exemplar of this institutional evolution. It is committed to ensuring equitable access to knowledge and information for everyone, irrespective of their ethnic or socioeconomic heritage. As an illustration, it facilitates complimentary online pedagogical support for students. It convenes career expos and mentors candidates in drafting compelling resumes or preparing for rigorous employment interviews. Moreover, it orchestrates volunteer initiatives for adolescents, empowering them to cultivate vocational competencies, nurture leadership acumen, and forge robust alliances within their community. Historically, libraries have functioned as solitary sanctuaries for intellectual acquisition. Today, they have morphed into dynamic hubs where individuals can engage synergistically with their peers through collaborative initiatives and shared enlightenment. As noted by an American academic, whereas competent libraries augment their collections with services, exceptional libraries cultivate thriving communities. What vision do you hold for the library in your immediate vicinity?"
+};
+
+const lessonVocabGrade1 = {
+    "L01_P1": { 
+        "metamorphosis": { pron: "/ˌmɛtəˈmɔːrfəsɪs/", mean: "変形、変態、劇的な変化", note: "changingの極めて学術的・抽象的な表現" },
+        "transcending": { pron: "/trænˈsɛndɪŋ/", mean: "超越する", note: "do more thanの1級特有表現" },
+        "culinary": { pron: "/ˈkʌlɪnɛri/", mean: "料理の、台所の", note: "cookingを専門的にした表現(culinary arts)" },
+        "paradigm": { pron: "/ˈpærədaɪm/", mean: "パラダイム、枠組み、模範", note: "uniqueを抽象化した表現(distinctive paradigm)" }
+    },
+    "L01_P2": {
+        "socioeconomic": { pron: "/ˌsoʊsioʊˌɛkəˈnɑmɪk/", mean: "社会経済的な", note: "economic backgroundの論文等での標準的表現" },
+        "vocational": { pron: "/voʊˈkeɪʃənl/", mean: "職業の、仕事の", note: "work skillsを高度にした表現(vocational competencies)" },
+        "forge": { pron: "/fɔːrdʒ/", mean: "（関係などを）築く、鍛え上げる", note: "単なるmake connectionsより力強い1級頻出単語" },
+        "vicinity": { pron: "/vəˈsɪnəti/", mean: "近所、周辺", note: "neighborhoodのフォーマルな名詞" }
+    }
+};
+// ------------------------------------------
+// 【英検準1級レベル】の専用和訳データ
+// ------------------------------------------
+const lessonTranslationsPre1 = {
+    // --- Part 1 ---
+    "L01_P1_p1": "現代の図書館は大きな変容を遂げています。現在では、単に本を貸し出す以上の目的を果たしています。",
+    "L01_P1_p2": "例えば、東京の武蔵野プレイスには、20歳以下の若者専用の特定のフロアがあります。彼らは軽食をとりながら交流したり、ボードゲームで遊んだりすることができます。同じフロアには、バンドの予行演習、ダンス、料理、スポーツのためのスタジオも備えられています。",
+    "L01_P1_p3": "札幌市図書・情報館は独特です。そこで本を読むことはできますが、他の利用者が確実に利用できるようにするため、本を借りることはできません。同図書館は、専門的な仕事や日常生活に特化した資料を提供しています。来館者は部屋を予約し、最新の資料を参照しながらビジネス会議を行うことができます。また、ビジネスや日常生活に関連する実践的な問題に対処したり、新たな知見を獲得したりするために、図書館が主催するセミナーに参加することもできます。",
+    "L01_P1_full": "現代の図書館は大きな変容を遂げています。現在では、単に本を貸し出す以上の目的を果たしています。<br><br>例えば、東京の武蔵野プレイスには、20歳以下の若者専用の特定のフロアがあります。彼らは軽食をとりながら交流したり、ボードゲームで遊んだりすることができます。同じフロアには、バンドの予行演習、ダンス、料理、スポーツのためのスタジオも備えられています。<br><br>札幌市図書・情報館は独特です。そこで本を読むことはできますが、他の利用者が確実に利用できるようにするため、本を借りることはできません。同図書館は、専門的な仕事や日常生活に特化した資料を提供しています。来館者は部屋を予約し、最新の資料を参照しながらビジネス会議を行うことができます。また、ビジネスや日常生活に関連する実践的な問題に対処したり、新たな知見を獲得したりするために、図書館が主催するセミナーに参加することもできます。",
+
+    // --- Part 2 ---
+    "L01_P2_p1": "ニューヨーク公共図書館は、この傾向の顕著な例です。同館は、民族的または経済的背景にかかわらず、すべての個人に対して知識と情報への平等なアクセスを提供することに努めています。例えば、学生向けに無料のオンライン個別指導を提供しています。就職フェアを開催し、履歴書の作成や就職面接の準備をする人々を支援します。さらに、10代の若者にボランティアの機会を提供し、実践的なスキルを習得し、リーダーシップを育成し、地域社会内でネットワークを構築できるようにしています。",
+    "L01_P2_p2": "伝統的に、図書館は個人が知識を獲得するための施設でした。現在、図書館は人々がさまざまな活動や協働学習を通じて他者と関わることができる、ダイナミックな空間でもあります。あるアメリカの学者によれば、優れた図書館が幅広いサービスを提供する一方で、卓越した図書館はコミュニティを育成するとのことです。あなたは近所にどのような図書館を思い描きますか？",
+    "L01_P2_full": "ニューヨーク公共図書館は、この傾向の顕著な例です。同館は、民族的または経済的背景にかかわらず、すべての個人に対して知識と情報への平等なアクセスを提供することに努めています。例えば、学生向けに無料のオンライン個別指導を提供しています。就職フェアを開催し、履歴書の作成や就職面接の準備をする人々を支援します。さらに、10代の若者にボランティアの機会を提供し、実践的なスキルを習得し、リーダーシップを育成し、地域社会内でネットワークを構築できるようにしています。<br><br>伝統的に、図書館は個人が知識を獲得するための施設でした。現在、図書館は人々がさまざまな活動や協働学習を通じて他者と関わることができる、ダイナミックな空間でもあります。あるアメリカの学者によれば、優れた図書館が幅広いサービスを提供する一方で、卓越した図書館はコミュニティを育成するとのことです。あなたは近所にどのような図書館を思い描きますか？"
+};
+
+// ------------------------------------------
+// 【英検1級レベル】の専用和訳データ
+// ------------------------------------------
+const lessonTranslationsGrade1 = {
+    // --- Part 1 ---
+    "L01_P1_p1": "現代の図書館は、印刷物を貸し出すための単なる貯蔵庫としての従来の機能を越え、劇的な変容を遂げています。",
+    "L01_P1_p2": "例えば、東京の武蔵野プレイスでは、20歳未満の若年層の人口集団に特化した特定の階を設けています。ここで利用者は、軽食をとりながら親睦を深めたり、ボードゲームに没頭したりすることができます。同一の階には、音楽の予行演習、ダンス、料理術、そして運動の試みのための設備が完全に整ったスタジオも誇っています。",
+    "L01_P1_p3": "札幌市図書・情報館は、独特なパラダイム（枠組み）を提示しています。閲覧は許可されていますが、すべての来館者への公平な利用機会を保証するため、資料の貸し出しは厳しく禁じられています。同機関は、専門的な試みや実践的な生活に明確に合わせて調整された文献や資料を収集・整理しています。利用者は会議施設を予約し、最新の記録文書を参照しながらビジネス会議を遂行することができます。さらに、企業や家庭の領域にまたがる複雑な課題を解決し、斬新な見識を授けるために設計された、図書館主催のセミナーに参加することもできます。",
+    "L01_P1_full": "現代の図書館は、印刷物を貸し出すための単なる貯蔵庫としての従来の機能を越え、劇的な変容を遂げています。<br><br>例えば、東京の武蔵野プレイスでは、20歳未満の若年層の人口集団に特化した特定の階を設けています。ここで利用者は、軽食をとりながら親睦を深めたり、ボードゲームに没頭したりすることができます。同一の階には、音楽の予行演習、ダンス、料理術、そして運動の試みのための設備が完全に整ったスタジオも誇っています。<br><br>札幌市図書・情報館は、独特なパラダイム（枠組み）を提示しています。閲覧は許可されていますが、すべての来館者への公平な利用機会を保証するため、資料の貸し出しは厳しく禁じられています。同機関は、専門的な試みや実践的な生活に明確に合わせて調整された文献や資料を収集・整理しています。利用者は会議施設を予約し、最新の記録文書を参照しながらビジネス会議を遂行することができます。さらに、企業や家庭の領域にまたがる複雑な課題を解決し、斬新な見識を授けるために設計された、図書館主催のセミナーに参加することもできます。",
+
+    // --- Part 2 ---
+    "L01_P2_p1": "ニューヨーク公共図書館は、この制度的進化の卓越した模範として機能しています。同館は、民族的または社会経済的遺産（背景）に関係なく、すべての人が知識と情報に公平にアクセスできるようにすることに尽力しています。一例として、学生に対する無料のオンライン教育支援を促進しています。就職博覧会を招集し、説得力のある履歴書の作成や、厳しい就職面接の準備において候補者を指導します。さらに、10代の若者向けのボランティア活動を組織し、彼らが職業的適性を養い、リーダーシップの洞察力を育み、地域社会内で強固な提携関係を構築できるように権限を与えています。",
+    "L01_P2_p2": "歴史的に、図書館は知的な獲得のための孤独な聖域として機能してきました。今日、それらは個人が協働的な取り組みや共有された啓発を通じて、仲間と相乗的に関わり合うことができるダイナミックな拠点へと変貌を遂げました。あるアメリカの学者が言及しているように、有能な図書館がサービスで蔵書を増強するのに対し、卓越した図書館は繁栄するコミュニティを育成します。あなたは、近隣の図書館に対してどのような展望を抱いていますか？",
+    "L01_P2_full": "ニューヨーク公共図書館は、この制度的進化の卓越した模範として機能しています。同館は、民族的または社会経済的遺産（背景）に関係なく、すべての人が知識と情報に公平にアクセスできるようにすることに尽力しています。一例として、学生に対する無料のオンライン教育支援を促進しています。就職博覧会を招集し、説得力のある履歴書の作成や、厳しい就職面接の準備において候補者を指導します。さらに、10代の若者向けのボランティア活動を組織し、彼らが職業的適性を養い、リーダーシップの洞察力を育み、地域社会内で強固な提携関係を構築できるように権限を与えています。<br><br>歴史的に、図書館は知的な獲得のための孤独な聖域として機能してきました。今日、それらは個人が協働的な取り組みや共有された啓発を通じて、仲間と相乗的に関わり合うことができるダイナミックな拠点へと変貌を遂げました。あるアメリカの学者が言及しているように、有能な図書館がサービスで蔵書を増強するのに対し、卓越した図書館は繁栄するコミュニティを育成します。あなたは、近隣の図書館に対してどのような展望を抱いていますか？"
+};

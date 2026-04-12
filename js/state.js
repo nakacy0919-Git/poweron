@@ -29,3 +29,5 @@ const lessonStructure = {
 // オーディオ要素
 let audioPlayer = document.getElementById('mainAudioPlayer');
 let successSound = document.getElementById('successSound');
+// 現在選択されているレベルを記憶する変数（初期値は標準）
+let currentLevel = 'standard';

@@ -102,9 +102,15 @@ function openSpeechOverlay(mode) {
     const submitBtn = document.getElementById('floatingSubmitBtn');
     if (submitBtn) submitBtn.style.display = 'none';
     
-    const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
+    // --- ★ レベル対応：引き出しを切り替える ---
+    let safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
+    if (typeof currentLevel !== 'undefined') {
+        if (currentLevel === 'pre1' && typeof lessonScriptsPre1 !== 'undefined') safeScripts = lessonScriptsPre1;
+        if (currentLevel === 'grade1' && typeof lessonScriptsGrade1 !== 'undefined') safeScripts = lessonScriptsGrade1;
+    }
     const activeKey = (typeof currentKey !== 'undefined') ? currentKey : "";
     targetText = safeScripts[activeKey] || "※データ未登録";
+    // ---------------------------------------------
     
     if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
     if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;

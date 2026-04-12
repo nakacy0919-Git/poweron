@@ -112,7 +112,15 @@
                 </div>
             </div>
             <hr style="margin: 5px 0;">
-            <div class="sidebar-group right-controls">
+           <div class="sidebar-group right-controls">
+                <div style="margin-bottom: 10px;">
+                    <select id="levelSelect" onchange="changeLevel(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #4facfe; font-weight: bold; color: #0288d1; background: #e1f5fe; cursor: pointer; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-size: 0.95rem;">
+                        <option value="standard">🔰 Standard (標準)</option>
+                        <option value="pre1">🎯 英検準1級レベル</option>
+                        <option value="grade1">👑 英検1級レベル</option>
+                    </select>
+                </div>
+
                 <button class="btn btn-script stylish-btn" onclick="toggleTextMode('script')" id="btnScript">
                     <span class="main-txt">Script</span><span class="sub-txt">本文を表示</span>
                 </button>

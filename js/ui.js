@@ -6,6 +6,16 @@
 engFontSize = 32;
 jpnFontSize = 24;
 
+// ★ 追加：レベルを切り替えて画面を即座に更新する関数
+function changeLevel(level) {
+    currentLevel = level;
+    // 画面が開いていれば、新しいレベルの文章で即座に再描画する
+    if (typeof currentMode !== 'undefined') {
+        if (currentMode === 'text') renderDualText();
+        else if (currentMode === 'reading' || currentMode === 'shadowing') openSpeechOverlay(currentMode);
+    }
+}
+
 function changeFontSize(type, step) {
     if (type === 'eng') {
         engFontSize = Math.max(14, Math.min(60, engFontSize + step));
@@ -66,13 +76,26 @@ function toggleTextMode(mode) {
 }
 
 // ★ 本文の中に登録された単語（New Words）を赤くハイライトさせる処理（美UI組み込み済）
+// ★ 本文の中に登録された単語（New Words）を赤くハイライトさせる処理（美UI組み込み済）
 function renderDualText() {
     const display = document.getElementById('targetTextDisplay');
     if (!display) return;
 
-    const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
-    const safeTranslations = (typeof lessonTranslations !== 'undefined') ? lessonTranslations : {};
-    const safeVocab = (typeof lessonVocab !== 'undefined') ? lessonVocab : {};
+    // --- 引き出しの切り替え ---
+    let safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
+    let safeTranslations = (typeof lessonTranslations !== 'undefined') ? lessonTranslations : {};
+    let safeVocab = (typeof lessonVocab !== 'undefined') ? lessonVocab : {};
+
+    if (currentLevel === 'pre1') {
+        if (typeof lessonScriptsPre1 !== 'undefined') safeScripts = lessonScriptsPre1;
+        if (typeof lessonTranslationsPre1 !== 'undefined') safeTranslations = lessonTranslationsPre1; // ★追加：和訳も準1級へ
+        if (typeof lessonVocabPre1 !== 'undefined') safeVocab = lessonVocabPre1;
+    } else if (currentLevel === 'grade1') {
+        if (typeof lessonScriptsGrade1 !== 'undefined') safeScripts = lessonScriptsGrade1;
+        if (typeof lessonTranslationsGrade1 !== 'undefined') safeTranslations = lessonTranslationsGrade1; // ★追加：和訳も1級へ
+        if (typeof lessonVocabGrade1 !== 'undefined') safeVocab = lessonVocabGrade1;
+    }
+    // ---------------------------------------------
 
     let rawEng = safeScripts[currentKey] || "※英語データ未登録";
     let rawJpn = safeTranslations[currentKey] || "※和訳データ未登録";
@@ -81,6 +104,7 @@ function renderDualText() {
     const currentVocab = safeVocab[currentKey] || safeVocab[baseKey]; 
 
     let html = `<div id="textContainer" style="display:flex; flex-direction:column; gap:20px; padding-top:5px;">`;
+    // ...（この下の if (isScriptOpen) { ... 等はそのまま残します）
 
     if (isScriptOpen) {
         let engHtml = rawEng;
@@ -169,10 +193,16 @@ function highlightSentence(event, idx) {
 function showVocab(event, displayWord, dictWord) {
     if (event) event.stopPropagation();
     
-    const safeVocab = (typeof lessonVocab !== 'undefined') ? lessonVocab : {};
+    // --- ★ レベル対応：引き出しを切り替える ---
+    let safeVocab = (typeof lessonVocab !== 'undefined') ? lessonVocab : {};
+    if (currentLevel === 'pre1' && typeof lessonVocabPre1 !== 'undefined') safeVocab = lessonVocabPre1;
+    if (currentLevel === 'grade1' && typeof lessonVocabGrade1 !== 'undefined') safeVocab = lessonVocabGrade1;
+    // ---------------------------------------------
+
     const baseKey = currentKey.split('_').slice(0, 2).join('_');
     const currentVocab = safeVocab[currentKey] || safeVocab[baseKey];
     if (!currentVocab) return;
+    // ...（この下はそのまま残します）
     
     let vocabData = null;
     if (Array.isArray(currentVocab)) {
