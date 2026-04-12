@@ -28,35 +28,32 @@
         <div class="main-screen" id="mainScreen">
             
             <div id="mainOverlay">
-                <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px;">
-                    <div style="display:flex; align-items:center; gap: 15px; flex-wrap:wrap;">
-                        <span class="overlay-title" id="overlayTitle" style="margin:0;"></span>
-                        <div id="fontControls" style="display:none; align-items:center; gap: 15px;">
-                            <div style="display:flex; align-items:center; gap: 5px;" id="engFontControl">
-                                <span style="font-size:0.9rem; font-weight:bold;">英文:</span>
-                                <button class="font-size-btn" onclick="changeFontSize('eng', 2)">＋</button>
-                                <button class="font-size-btn" onclick="changeFontSize('eng', -2)">－</button>
-                            </div>
-                            <div style="display:flex; align-items:center; gap: 5px;" id="jpnFontControl">
-                                <span style="font-size:0.9rem; font-weight:bold;">和文:</span>
-                                <button class="font-size-btn" onclick="changeFontSize('jpn', 2)">＋</button>
-                                <button class="font-size-btn" onclick="changeFontSize('jpn', -2)">－</button>
-                            </div>
-                            <div style="display:flex; align-items:center; gap: 5px;" id="recFontControl">
-                                <span style="font-size:0.9rem; font-weight:bold; color:#ff007f;">文字サイズ調整:</span>
-                                <button class="font-size-btn" onclick="changeFontSize('rec', 2)">＋</button>
-                                <button class="font-size-btn" onclick="changeFontSize('rec', -2)">－</button>
-                            </div>
-                        </div>
+                <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 5px; margin-bottom: 5px; border-bottom: none;">
+                    <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
+                    <button class="close-btn" onclick="resetAppMode()" style="background:transparent; border:none; font-size:1.8rem; color:#888; cursor:pointer; padding:0 10px; line-height:1; transition:0.2s;" onmouseover="this.style.color='#ff4b4b'" onmouseout="this.style.color='#888'">✖</button>
+                </div>
+
+                <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
+                    <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
+                        <button class="font-size-btn" onclick="changeFontSize('eng', -2)" style="padding:4px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                        <button class="font-size-btn" onclick="changeFontSize('eng', 2)" style="padding:4px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
                     </div>
-                    <button class="close-btn" onclick="resetAppMode()">Close</button>
+                    <div style="display:none; align-items:center; gap: 8px;" id="jpnFontControl">
+                        <button class="font-size-btn" onclick="changeFontSize('jpn', -2)" style="padding:4px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                        <button class="font-size-btn" onclick="changeFontSize('jpn', 2)" style="padding:4px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                    </div>
+                    <div style="display:none; align-items:center; gap: 8px;" id="recFontControl">
+                        <span style="font-size:0.9rem; font-weight:bold; color:#ff007f;">文字サイズ:</span>
+                        <button class="font-size-btn" onclick="changeFontSize('rec', -2)" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                        <button class="font-size-btn" onclick="changeFontSize('rec', 2)" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                    </div>
                 </div>
 
                 <div class="target-text-display sns-box" id="targetTextDisplay" style="display: none;">※データがありません</div>
 
                 <div id="speechResultWindow" style="display:none; flex-grow: 1; flex-direction: column; width: 100%; height: 100%;">
                     <!-- HUD（スコアボード） -->
-                    <div id="gameHud" class="game-hud">
+                   <div id="gameHud" class="game-hud">
                         <div class="hud-badge hud-acc">
                             <span class="hud-title">ACCURACY</span>
                             <span class="hud-value" id="hudAccValue">0<span style="font-size:1rem;">%</span></span>
@@ -65,10 +62,6 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
-                        <select class="level-select-small" id="difficultySelect" onchange="recalculateMatch()">
-                            <option value="sweet">判定: 甘め (順不同)</option>
-                            <option value="strict">判定: 厳しめ (順通り)</option>
-                        </select>
                         <div style="margin-left:auto; color:#fff; font-size:0.8rem; opacity:0.8;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
@@ -148,7 +141,11 @@
    <div id="submitModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:center;">
             <h3 style="margin-top:0; color:#333;">📤 成績の提出</h3>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:20px;">ベストスコアを先生に送信します。</p>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:10px;">ベストスコアを先生に送信します。</p>
+            
+            <div style="background:#fff9c4; padding:8px; border-radius:6px; margin-bottom:15px; font-size:0.9rem; font-weight:bold; color:#f57f17;">
+                📍 練習範囲: <span id="submitScopeDisplay">未取得</span>
+            </div>
             
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" id="studentClass" placeholder="クラス (例: 1A)" style="width:50%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:16px;">
@@ -171,13 +168,17 @@
         </div>
     </div>
 
-    <audio id="mainAudioPlayer"></audio>
+    <button id="floatingSubmitBtn" onclick="openSubmitModal()" style="display:none; position:fixed; bottom:20px; right:20px; background:#ff4081; color:white; border:none; border-radius:50px; padding:15px 25px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:1000; transition:transform 0.2s;">
+        📤 この成績を提出
+    </button>
+
+   <audio id="mainAudioPlayer"></audio>
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 
     <script src="lessons/lessonData.js"></script>
     <script src="js/state.js"></script>
     <script src="js/audio.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="js/quiz.js"></script> <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
     <script src="js/speech.js"></script>
 </body>

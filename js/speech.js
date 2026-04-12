@@ -1,12 +1,17 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（iPad完全対応 / UI極み版）
+// speech.js: 音声認識とスコア計算（変数重複エラー完全解消版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// ★ speech.js「専用」の変数
+// ★ state.js等とダブってエラーになる変数の宣言を完全に削除しました！
+// speech.js専用の変数だけを宣言します。
 let mainRecognition;
 let isMainRecording = false;
 let finalTranscript = ''; 
+let currentInterim = ''; // 息継ぎなしフリーズ救出用
+
+// ★先生のGAS URL
+const GAS_URL = "https://script.google.com/macros/s/AKfycby6AC39tWELS-GeGn0cuWfMNKunMb-Rp4RBZ-_L2VGjbCm9f-9PK54iG1q5K3lSlhI2BQ/exec"; 
 
 if (window.SpeechRecognition) {
     mainRecognition = new SpeechRecognition();
@@ -24,6 +29,9 @@ if (window.SpeechRecognition) {
             const sShadow = document.getElementById('stopShadowBtn');
             if(bShadow) bShadow.style.display = 'flex';
             if(sShadow) sShadow.style.display = 'none';
+            
+            const submitBtn = document.getElementById('floatingSubmitBtn');
+            if (submitBtn) submitBtn.style.display = 'none';
 
             const recDisplay = document.getElementById('recognizedTextDisplay');
             if (recDisplay) {
@@ -49,12 +57,21 @@ if (window.SpeechRecognition) {
                 interimTranscript += e.results[i][0].transcript;
             }
         }
+        currentInterim = interimTranscript; 
         lastSpokenText = finalTranscript + interimTranscript;
         processSpeechMatch(lastSpokenText); 
     };
 
     mainRecognition.onend = () => {
         if (isMainRecording) {
+            // ブラウザが強制終了した時、消えかかっている文字を救出
+            if (currentInterim.trim() !== '') {
+                finalTranscript += currentInterim + ' ';
+                currentInterim = ''; 
+                lastSpokenText = finalTranscript;
+                processSpeechMatch(lastSpokenText);
+            }
+            
             setTimeout(() => { try { if (isMainRecording) mainRecognition.start(); } catch(err){} }, 250);
         }
     };
@@ -67,11 +84,10 @@ function openSpeechOverlay(mode) {
     const mainOverlay = document.getElementById('mainOverlay');
     if(mainOverlay) mainOverlay.style.display = 'flex';
     
-    // ★ 全体を上へ引き上げる調整
     const speechResult = document.getElementById('speechResultWindow');
     if(speechResult) {
         speechResult.style.display = 'flex';
-        speechResult.style.paddingTop = '10px'; // バー全体を上部に近づける
+        speechResult.style.paddingTop = '10px'; 
     }
     
     const targetDisplay = document.getElementById('targetTextDisplay');
@@ -80,9 +96,11 @@ function openSpeechOverlay(mode) {
     const title = document.getElementById('overlayTitle');
     if(title) title.innerText = mode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
     
-    // ★ 外部のフォントコントロールは完全に隠す（埋め込みボタンを使うため）
     const fontControls = document.getElementById('fontControls');
     if(fontControls) fontControls.style.display = 'none';
+    
+    const submitBtn = document.getElementById('floatingSubmitBtn');
+    if (submitBtn) submitBtn.style.display = 'none';
     
     const safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
     const activeKey = (typeof currentKey !== 'undefined') ? currentKey : "";
@@ -92,25 +110,31 @@ function openSpeechOverlay(mode) {
     if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
     
     const accEl = document.getElementById('hudAccValue');
-    if(accEl) accEl.innerHTML = `0<span style="font-size:1rem;">%</span>`;
+    if(accEl) {
+        accEl.innerHTML = `0<span style="font-size:1rem;">%</span>`;
+        accEl.style.color = '#ffffff'; 
+    }
     
     const wpmEl = document.getElementById('hudWpmValue');
     if(wpmEl) wpmEl.innerText = "0";
     
-    currentScore = 0; lastSpokenText = ""; finalTranscript = ""; recordStartTime = 0;
+    currentScore = 0; lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; recordStartTime = 0;
 
     const rMic = document.getElementById('readingMicContainer');
     const sMic = document.getElementById('shadowingMicContainer');
     const bShadow = document.getElementById('bigShadowBtn');
     const sShadow = document.getElementById('stopShadowBtn');
 
+    const micBtn = document.getElementById('micBtn');
+    if(micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
+    if(bShadow) { bShadow.style.display = 'flex'; bShadow.innerHTML = "START"; }
+    if(sShadow) sShadow.style.display = 'none';
+
     processSpeechMatch(""); 
 
     if (mode === 'shadowing') {
         if(rMic) rMic.style.display = 'none';
         if(sMic) sMic.style.display = 'block';
-        if(bShadow) bShadow.style.display = 'flex';
-        if(sShadow) sShadow.style.display = 'none';
     } else {
         if(rMic) rMic.style.display = 'block';
         if(sMic) sMic.style.display = 'none';
@@ -120,18 +144,23 @@ function openSpeechOverlay(mode) {
 function toggleReadingRecording() {
     if (!mainRecognition) return alert("ブラウザが音声認識に未対応です(Chrome推奨)。");
     const micBtn = document.getElementById('micBtn');
+    const submitBtn = document.getElementById('floatingSubmitBtn');
     
     if (isMainRecording) { 
         isMainRecording = false; mainRecognition.stop();
-        if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
+        if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "RETRY"; }
+        if (submitBtn && currentScore > 0) submitBtn.style.display = 'block';
+        
         if (typeof checkCelebration === 'function') checkCelebration(); 
         processSpeechMatch(lastSpokenText); 
     } else {
         recordStartTime = Date.now(); 
         isMainRecording = true; 
-        lastSpokenText = ""; finalTranscript = ""; 
+        lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; 
         mainRecognition.start(); 
         if (micBtn) { micBtn.classList.add('recording'); micBtn.innerHTML = "STOP"; }
+        if (submitBtn) submitBtn.style.display = 'none';
+        
         processSpeechMatch(""); 
     }
 }
@@ -143,11 +172,14 @@ function startShadowing() {
     const bShadow = document.getElementById('bigShadowBtn');
     const sShadow = document.getElementById('stopShadowBtn');
     if(bShadow) bShadow.style.display = 'none';
-    if(sShadow) sShadow.style.display = 'flex';
+    if(sShadow) { sShadow.style.display = 'flex'; sShadow.innerHTML = "FINISH"; }
+    
+    const submitBtn = document.getElementById('floatingSubmitBtn');
+    if (submitBtn) submitBtn.style.display = 'none';
     
     recordStartTime = Date.now(); 
     isMainRecording = true; 
-    lastSpokenText = ""; finalTranscript = ""; 
+    lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; 
     mainRecognition.start();
     
     if (typeof loopState !== 'undefined' && !loopState.active && typeof audioPlayer !== 'undefined' && audioPlayer) {
@@ -165,10 +197,15 @@ function startShadowing() {
 function stopShadowing() {
     isMainRecording = false; mainRecognition.stop(); 
     if (typeof stopAudio === 'function') stopAudio();
+    
     const bShadow = document.getElementById('bigShadowBtn');
     const sShadow = document.getElementById('stopShadowBtn');
-    if(bShadow) bShadow.style.display = 'flex';
+    if(bShadow) { bShadow.style.display = 'flex'; bShadow.innerHTML = "RETRY"; }
     if(sShadow) sShadow.style.display = 'none';
+    
+    const submitBtn = document.getElementById('floatingSubmitBtn');
+    if (submitBtn && currentScore > 0) submitBtn.style.display = 'block';
+    
     if (typeof checkCelebration === 'function') checkCelebration(); 
     processSpeechMatch(lastSpokenText);
 }
@@ -179,8 +216,9 @@ function recalculateMatch() {
 
 function processSpeechMatch(spokenText) {
     if (!targetText) return;
-    const diffSelect = document.getElementById('difficultySelect');
-    const isStrict = diffSelect ? diffSelect.value === 'strict' : false;
+    
+    // ★ 判定モードを固定（false: 順不同の甘め / true: 順通りの厳しめ）
+    const isStrict = false;
     
     const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
     
@@ -227,11 +265,8 @@ function processSpeechMatch(spokenText) {
     const recDisplay = document.getElementById('recognizedTextDisplay');
     if (recDisplay) {
         let modeTitle = currentMode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
-        
-        // 元の固定フォント設定を解除（各セクションごとにサイズを独立させるため）
         recDisplay.style.fontSize = ''; 
         
-        // ★ HUDとテキストの隙間を詰める（全体を引き上げる）
         let innerHtml = `
             <div style="padding-bottom: 120px; margin-top: -15px;">
                 <div style="display:flex; align-items:center; margin-bottom: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
@@ -253,7 +288,6 @@ function processSpeechMatch(spokenText) {
                             <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
                             <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
                         </div>
-                        
                     </div>
                     <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontToUse}px; transition: font-size 0.2s ease;">${targetText}</div>
                 </div>`;
@@ -269,7 +303,6 @@ function processSpeechMatch(spokenText) {
                             <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
                             <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
                         </div>
-                        
                     </div>
                     <div style="line-height: 1.6; color: ${spokenText ? '#333' : '#aaa'}; font-weight: 500; font-size: ${fontSizeToUse}px; transition: font-size 0.2s ease;">
                         ${spokenText ? htmlOutput.join(' ') : (isMainRecording ? 'Listening... (マイクに向かってお話しください)' : '※右下のSTARTボタンを押して開始してください')}
@@ -283,7 +316,7 @@ function processSpeechMatch(spokenText) {
     const accEl = document.getElementById('hudAccValue');
     if (accEl) {
         accEl.innerHTML = `${currentScore}<span style="font-size:1rem;">%</span>`;
-        accEl.style.color = currentScore >= 80 ? '#4caf50' : (currentScore >= 50 ? '#fff' : '#ffb3b3');
+        accEl.style.color = currentScore >= 70 ? '#ffd700' : '#ffffff'; 
     }
 
     if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
@@ -293,21 +326,29 @@ function processSpeechMatch(spokenText) {
         if (wpmEl) wpmEl.innerText = Math.round(spokenOriginalWords.length / elapsedMinutes);
     }
 }
-// ==========================================
-// ★ 成績提出システム（GAS連携＆不正対策）
-// ==========================================
-// ↓↓↓ 先ほどコピーしたURLをここに貼り付けてください ↓↓↓
-const GAS_URL = "https://script.google.com/macros/s/AKfycby6AC39tWELS-GeGn0cuWfMNKunMb-Rp4RBZ-_L2VGjbCm9f-9PK54iG1q5K3lSlhI2BQ/exec"; 
 
-// 提出ポップアップを開く関数
+// ==========================================
+// ★ 成績提出システム（画面の数字と100%完全一致保証版）
+// ==========================================
 function openSubmitModal() {
-    if (currentScore === 0) return alert("まだスコアがありません。一度練習を行ってから提出してください。");
+    // 1. 裏の変数は無視！「いま画面(HUD)に表示されている数字」をそのまま取得する
+    const hudScore = parseInt(document.getElementById('hudAccValue').innerText) || 0;
+    const hudWpm = parseInt(document.getElementById('hudWpmValue').innerText) || 0;
+
+    if (hudScore === 0) return alert("まだスコアがありません。一度練習を行ってから提出してください。");
     
-    // 現在のスコアをポップアップに反映
-    document.getElementById('submitAcc').innerText = currentScore;
-    document.getElementById('submitWpm').innerText = document.getElementById('hudWpmValue').innerText;
+    // 2. 取得した画面の数字をポップアップ画面にコピー
+    document.getElementById('submitAcc').innerText = hudScore;
+    document.getElementById('submitWpm').innerText = hudWpm;
     
-    // 前回入力した名前などがブラウザに残っていれば自動入力する（生徒の手間を省く）
+    const lNum = typeof currentLesson !== 'undefined' ? currentLesson : "?";
+    const pSelect = document.getElementById('partSelect');
+    const pNum = pSelect && pSelect.options.length > 0 ? pSelect.options[pSelect.selectedIndex].text : "?";
+    const paraSelect = document.getElementById('paraSelect');
+    const paraNum = paraSelect && paraSelect.options.length > 0 ? paraSelect.options[paraSelect.selectedIndex].text : "?";
+    
+    document.getElementById('submitScopeDisplay').innerText = `Lesson ${lNum} / ${pNum} / ${paraNum}`;
+    
     document.getElementById('studentClass').value = localStorage.getItem('savedClass') || "";
     document.getElementById('studentNumber').value = localStorage.getItem('savedNum') || "";
     document.getElementById('studentName').value = localStorage.getItem('savedName') || "";
@@ -315,17 +356,18 @@ function openSubmitModal() {
     document.getElementById('submitModal').style.display = 'flex';
 }
 
-// 実際にGASへデータを送信する関数
 function sendScoreToGAS() {
     const sClass = document.getElementById('studentClass').value.trim();
     const sNum = document.getElementById('studentNumber').value.trim();
     const sName = document.getElementById('studentName').value.trim();
-    const wpmVal = parseInt(document.getElementById('submitWpm').innerText) || 0;
+    
+    // 3. 送信する瞬間も、「ポップアップ画面の数字」を直接読み取る（絶対にズレない）
+    const finalScore = parseInt(document.getElementById('submitAcc').innerText) || 0;
+    const finalWpm = parseInt(document.getElementById('submitWpm').innerText) || 0;
     
     if (!sClass || !sNum || !sName) return alert("クラス、出席番号、氏名をすべて入力してください。");
-    if (!GAS_URL.startsWith("https://script.google.com/")) return alert("先生の設定エラー：GASのURLが正しく設定されていません。");
+    if (!GAS_URL || !GAS_URL.startsWith("https://script.google.com/")) return alert("先生の設定エラー：GASのURLが正しく設定されていません。");
 
-    // 次回のために名前などを保存しておく
     localStorage.setItem('savedClass', sClass);
     localStorage.setItem('savedNum', sNum);
     localStorage.setItem('savedName', sName);
@@ -335,23 +377,23 @@ function sendScoreToGAS() {
     btn.disabled = true;
     btn.style.background = "#999";
 
-    // 不正対策（チェックサムと所要時間の計算）
     let elapsedSeconds = recordStartTime > 0 ? Math.round((Date.now() - recordStartTime) / 1000) : 0;
-    let cheatCode = (currentScore * 123) + sName.length;
+    
+    // 4. 不正チェック用の暗号も、画面の数字(finalScore)を使って計算
+    let cheatCode = (finalScore * 123) + sName.length;
 
-    // 送信するデータのパッケージを作成
+    // 5. 送信するデータパック
     const payload = {
         className: sClass,
         studentNumber: sNum,
         name: sName,
         mode: currentMode === 'reading' ? 'Reading Check' : 'Shadowing',
-        score: currentScore,
-        wpm: wpmVal,
+        score: finalScore, // ★画面の数字をそのまま送る
+        wpm: finalWpm,     // ★画面の数字をそのまま送る
         timeTaken: elapsedSeconds,
         checksum: cheatCode
     };
 
-    // GASに向かってデータをブン投げる（POST送信）
     fetch(GAS_URL, {
         method: "POST",
         body: JSON.stringify(payload)
@@ -361,6 +403,7 @@ function sendScoreToGAS() {
         if (data.result === "success") {
             alert("✅ スコアの提出が完了しました！先生にデータが送られました。");
             document.getElementById('submitModal').style.display = 'none';
+            document.getElementById('floatingSubmitBtn').style.display = 'none'; 
         } else {
             alert("❌ 送信に失敗しました: " + data.message);
         }
@@ -375,13 +418,3 @@ function sendScoreToGAS() {
         btn.style.background = "#4caf50";
     });
 }
-
-// ★ 画面の右下に「提出ボタン」を自動で表示させる仕掛け
-document.addEventListener('DOMContentLoaded', () => {
-    const submitBtnHtml = `
-        <button onclick="openSubmitModal()" style="position:fixed; bottom:20px; right:20px; background:#ff4081; color:white; border:none; border-radius:50px; padding:15px 25px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:1000; transition:transform 0.2s;">
-            📤 成績を提出する
-        </button>
-    `;
-    document.body.insertAdjacentHTML('beforeend', submitBtnHtml);
-});

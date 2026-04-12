@@ -1,8 +1,8 @@
 // ==========================================
-// ui.js: 画面描画、フォント変更、ポップアップ・単語機能の完全復活版
+// ui.js: 画面描画、フォント変更、ポップアップ・単語機能の完全復活＆美UI版
 // ==========================================
 
-// ★ デフォルトのフォントサイズを「見やすく・大きく」強制上書き！
+// ★ デフォルトのフォントサイズ
 engFontSize = 32;
 jpnFontSize = 24;
 
@@ -43,27 +43,29 @@ function toggleTextMode(mode) {
     if(speechResult) speechResult.style.display = 'none';
     
     const targetDisplay = document.getElementById('targetTextDisplay');
-    if(targetDisplay) targetDisplay.style.display = 'block';
+    if(targetDisplay) {
+        targetDisplay.style.display = 'block';
+        targetDisplay.style.padding = '0'; 
+        targetDisplay.style.background = 'transparent';
+        targetDisplay.style.boxShadow = 'none';
+        targetDisplay.style.border = 'none';
+    }
     
+    // ★ 古い上部のフォントコントロールは完全に隠す
     const fontControls = document.getElementById('fontControls');
-    if(fontControls) fontControls.style.display = 'flex';
-    
-    const engFont = document.getElementById('engFontControl');
-    if(engFont) engFont.style.display = isScriptOpen ? 'flex' : 'none';
-    
-    const jpnFont = document.getElementById('jpnFontControl');
-    if(jpnFont) jpnFont.style.display = isJapaneseOpen ? 'flex' : 'none';
-    
-    const recFont = document.getElementById('recFontControl');
-    if(recFont) recFont.style.display = 'none';
+    if(fontControls) fontControls.style.display = 'none';
     
     const title = document.getElementById('overlayTitle');
-    if(title) title.innerText = "";
+    if(title) {
+        if (isScriptOpen && isJapaneseOpen) title.innerText = '📜 Script & 🇯🇵 Japanese';
+        else if (isScriptOpen) title.innerText = '📜 Script';
+        else if (isJapaneseOpen) title.innerText = '🇯🇵 Japanese';
+    }
     
     renderDualText();
 }
 
-// ★ 復活：本文の中に登録された単語（New Words）を赤くハイライトさせる処理
+// ★ 本文の中に登録された単語（New Words）を赤くハイライトさせる処理（美UI組み込み済）
 function renderDualText() {
     const display = document.getElementById('targetTextDisplay');
     if (!display) return;
@@ -75,26 +77,22 @@ function renderDualText() {
     let rawEng = safeScripts[currentKey] || "※英語データ未登録";
     let rawJpn = safeTranslations[currentKey] || "※和訳データ未登録";
     
-    // ★ 修正：Part全体（L01_P1）に紐づく単語データも確実に拾えるように検索キーを拡張！
     const baseKey = currentKey.split('_').slice(0, 2).join('_'); 
     const currentVocab = safeVocab[currentKey] || safeVocab[baseKey]; 
 
-    let html = `<div id="textContainer" style="display:flex; flex-direction:column; gap:20px;">`;
+    let html = `<div id="textContainer" style="display:flex; flex-direction:column; gap:20px; padding-top:5px;">`;
 
     if (isScriptOpen) {
         let engHtml = rawEng;
         
-        // 登録されている単語があれば、赤文字（vocab-highlight）に変換する
         if (currentVocab) {
             let vocabList = [];
-            // 単語データが配列でもオブジェクトでもエラーにならないように吸収
             if (Array.isArray(currentVocab)) {
                 vocabList = currentVocab;
             } else {
                 vocabList = Object.keys(currentVocab).map(k => ({ word: k, ...currentVocab[k] }));
             }
 
-            // 長い単語から順番に処理する（短い単語が長い単語の一部を誤って置換するのを防ぐ）
             vocabList.sort((a, b) => b.word.length - a.word.length);
 
             vocabList.forEach(v => {
@@ -105,20 +103,44 @@ function renderDualText() {
         }
 
         const engSentences = engHtml.match(/.*?([.?!]\s*|$)/g)?.filter(s => s.trim().length > 0) || [engHtml];
-        html += `<div id="engContainer" style="font-size:${engFontSize}px; line-height:1.6;">`;
+        
+        // ★ 美しいUI枠（A- A+ ボタン埋め込み）
+        html += `
+        <div style="padding: 20px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div style="font-size: 1.1rem; color: #4facfe; font-weight: bold;">TARGET TEXT（本文）</div>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', -2);" style="padding:6px 14px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                    <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2);" style="padding:6px 14px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                </div>
+            </div>
+            <div id="engContainer" style="font-size:${engFontSize}px; line-height:1.8; color:#333; transition: font-size 0.2s ease;">`;
+        
         engSentences.forEach((s, i) => { 
             html += `<span class="eng-sentence" id="eng-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${s}</span>`; 
         });
-        html += `</div>`;
+        html += `</div></div>`;
     }
 
     if (isJapaneseOpen) {
         const jpnSentences = rawJpn.match(/.*?([。？！]\s*|$)/g)?.filter(s => s.replace(/<br>/g, '').trim().length > 0) || [rawJpn];
-        html += `<div id="jpnContainer" class="jpn-container-style" style="font-size:${jpnFontSize}px;">`;
+        
+        // ★ 美しいUI枠（A- A+ ボタン埋め込み）
+        html += `
+        <div style="padding: 20px; background: #fffbf2; border-radius: 12px; border-left: 5px solid #ff9800; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div style="font-size: 1.1rem; color: #ff9800; font-weight: bold;">JAPANESE（日本語訳）</div>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="if(typeof changeFontSize==='function') changeFontSize('jpn', -2);" style="padding:6px 14px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                    <button onclick="if(typeof changeFontSize==='function') changeFontSize('jpn', 2);" style="padding:6px 14px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                </div>
+            </div>
+            <div id="jpnContainer" class="jpn-container-style" style="font-size:${jpnFontSize}px; line-height:1.8; color:#333; transition: font-size 0.2s ease;">`;
+        
         jpnSentences.forEach((s, i) => { 
             html += `<span class="jpn-sentence" id="jpn-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${s}</span>`; 
         });
-        html += `</div>`;
+        html += `</div></div>`;
     }
     html += `</div>`;
     display.innerHTML = html;
@@ -126,7 +148,7 @@ function renderDualText() {
 
 // 1文のハイライト（単語のタップと競合しないように修正）
 function highlightSentence(event, idx) {
-    if (event) event.stopPropagation(); // 単語タップ時に文全体のハイライトが反応するのを防ぐ
+    if (event) event.stopPropagation();
 
     if (!isScriptOpen || !isJapaneseOpen) return;
     const eng = document.getElementById(`eng-s-${idx}`);
@@ -141,7 +163,7 @@ function highlightSentence(event, idx) {
 }
 
 // ==========================================
-// ★ 復活：ポップアップとマイクによる発音チェック機能
+// ★ ポップアップとマイクによる発音チェック機能
 // ==========================================
 
 function showVocab(event, displayWord, dictWord) {
@@ -162,16 +184,13 @@ function showVocab(event, displayWord, dictWord) {
     if (!vocabData) return;
     
     document.getElementById('popupWord').innerText = displayWord;
-    // ★修正：pronunciation と pron の両方に対応
     document.getElementById('popupPron').innerText = vocabData.pronunciation || vocabData.pron || "";
-    // ★修正：meaning と mean の両方に対応
     document.getElementById('popupMean').innerText = vocabData.meaning || vocabData.mean || "";
     document.getElementById('popupRecognized').style.display = 'none';
     
     const popup = document.getElementById('vocabPopup');
     popup.style.display = 'block';
     
-    // タップした位置のすぐ下に表示
     let x = event.pageX;
     let y = event.pageY + 25;
     if (x + popup.offsetWidth > window.innerWidth) x = window.innerWidth - popup.offsetWidth - 10;
@@ -179,7 +198,6 @@ function showVocab(event, displayWord, dictWord) {
     popup.style.left = x + 'px';
     popup.style.top = y + 'px';
 
-    // ★ 開いた瞬間に、ネイティブ音声で自動読み上げ
     playWordAudio(displayWord);
 }
 
@@ -204,7 +222,6 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
     popupRecognition.lang = 'en-US';
     popupRecognition.interimResults = false;
     
-    // ★追加：マイクの許可が降りなかった場合（エラー時）の処理
     popupRecognition.onerror = (e) => {
         isPopupRecording = false;
         const btn = document.getElementById('popupMicBtn');
@@ -214,7 +231,6 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         recDisplay.style.display = 'block';
 
         if (e.error === 'not-allowed' || e.error === 'denied') {
-            // マイクが拒否された場合の案内メッセージ
             recDisplay.innerHTML = `<span style="color:#d32f2f; font-size:14px; line-height:1.4; display:block; margin-top:5px;">マイクがブロックされています。<br>URLバーの「ぁあ」や設定アプリからマイクを許可してください。</span>`;
         } else {
             recDisplay.innerHTML = `<span style="color:#d32f2f; font-size:14px;">エラーが発生しました(${e.error})。もう一度お試しください。</span>`;
@@ -222,17 +238,13 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
     };
 
     popupRecognition.onresult = (e) => {
-        // 画面に表示するための生の認識結果
         const rawTranscript = e.results[0][0].transcript.trim().toLowerCase();
-        
-        // ★修正：iPad特有の勝手につくピリオドやカンマなどの記号を徹底的に除去して判定
         const transcript = rawTranscript.replace(/[^a-z0-9\s]/gi, '').trim();
         const targetWord = document.getElementById('popupWord').innerText.toLowerCase().replace(/[^a-z0-9\s]/gi, '').trim();
         
         const recDisplay = document.getElementById('popupRecognized');
         recDisplay.style.display = 'block';
         
-        // 判定ロジック：記号を除去した状態で比較（短すぎる誤判定も防止）
         let isMatch = false;
         if (transcript === targetWord) {
             isMatch = true;
@@ -267,7 +279,6 @@ function togglePopupMic() {
     } else {
         const recDisplay = document.getElementById('popupRecognized');
         recDisplay.style.display = 'block';
-        // HTMLタグを除去して「Listening...」だけ表示
         recDisplay.innerHTML = 'Listening... (発音してください)';
         
         try {
@@ -275,7 +286,6 @@ function togglePopupMic() {
             isPopupRecording = true;
             btn.classList.add('recording');
         } catch(err) {
-            // すでに起動中などのエラー回避
             console.log(err);
         }
     }
@@ -300,7 +310,7 @@ function fireConfetti() {
 
 function checkCelebration() {
     if (currentScore >= 80) {
-        if (successSound) successSound.play().catch(e => console.log(e));
+        if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e => console.log(e));
         fireConfetti();
     }
 }
