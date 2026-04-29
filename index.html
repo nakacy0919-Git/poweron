@@ -3,12 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- iPadのホーム画面に追加した際、URLバーを消して全画面アプリ化する魔法のタグ -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
     <title>PowerSlide Power On Ⅲ</title>
     <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .mobile-only-menu {
+            display: none; /* PCでは隠す */
+        }
+
+        /* 画面幅が768px以下（スマホ・縦向きタブレット）の時だけ発動するルール */
+        @media (max-width: 768px) {
+            /* 1. PC用の不要な左ナビやサイドバーをすべて消す */
+            .nav-container,
+            .sidebar, 
+            #drag-handle,
+            #windowHeader, 
+            #fontControls {
+                display: none !important;
+            }
+
+            /* 2. メイン画面を画面いっぱいに広げる */
+            .app-container {
+                flex-direction: column;
+                height: 100vh;
+                padding: 0;
+            }
+            .main-screen {
+                width: 100% !important;
+                height: 100vh !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+            }
+            
+            /* スマホ時は常にメイン画面を開く状態にする */
+            #mainOverlay {
+                display: flex !important;
+                flex-direction: column;
+                height: 100%;
+                width: 100%;
+                background: #f4f7f6;
+            }
+
+            /* 3. スマホ専用トップメニューを表示する */
+            .mobile-only-menu {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                background: #4facfe;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 100;
+            }
+            .mobile-only-menu select {
+                padding: 8px;
+                border-radius: 6px;
+                border: none;
+                font-weight: bold;
+                color: #333;
+                width: 48%; /* 押しやすいように少し広げる */
+                font-size: 16px; /* スマホでのズーム防止 */
+            }
+
+            /* 4. 空白をなくし、音読画面を全画面に広げる */
+            #targetTextDisplay {
+                display: none !important; /* 空白の原因になっていた箱を消す */
+            }
+            
+            #speechResultWindow {
+                display: flex !important;
+                height: 100% !important; /* 画面いっぱいに広げる */
+                overflow-y: auto;
+            }
+            
+            .transcription-container {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                padding-bottom: 90px; /* 下のボタンが文字に被らないように余白を確保 */
+            }
+
+            .recognized-text {
+                flex-grow: 1;
+                margin-top: 0 !important;
+                padding: 15px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                height: auto !important;
+                font-size: 1.2rem !important; /* スマホでも見やすい文字サイズ */
+                line-height: 1.6;
+            }
+
+            /* 5. マイクボタンを画面の一番下に固定する */
+            #readingMicContainer, #shadowingMicContainer {
+                position: fixed; 
+                bottom: 20px; /* ★画面の一番下に配置 */
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                background: rgba(255,255,255,0.95);
+                padding: 8px;
+                border-radius: 50px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                display: flex !important;
+            }
+            
+            /* シャドーイング用のマイクはスマホでは裏側に隠す */
+            #shadowingMicContainer { display: none !important; }
+
+            .start-record-btn {
+                font-size: 1.2rem;
+                padding: 15px 40px; /* 親指で押しやすいように大きく */
+                font-weight: bold;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="nav-container">
@@ -28,9 +140,30 @@
         <div class="main-screen" id="mainScreen">
             
             <div id="mainOverlay">
+                <div id="mobileTopMenu" class="mobile-only-menu">
+                    <select id="mobileLessonSelect" onchange="if(typeof changeScopeMobile === 'function') changeScopeMobile()">
+                        <option value="L01">Lesson 1</option>
+                        <option value="L02">Lesson 2</option>
+                        <option value="L03">Lesson 3</option>
+                        <option value="L04">Lesson 4</option>
+                        <option value="L05">Lesson 5</option>
+                        <option value="L06">Lesson 6</option>
+                        <option value="L07">Lesson 7</option>
+                        <option value="L08">Lesson 8</option>
+                        <option value="L09">Lesson 9</option>
+                        <option value="L10">Lesson 10</option>
+                    </select>
+                    <select id="mobilePartSelect" onchange="if(typeof changeScopeMobile === 'function') changeScopeMobile()">
+                        <option value="p1">Part 1</option>
+                        <option value="p2">Part 2</option>
+                        <option value="p3">Part 3</option>
+                        <option value="p4">Part 4</option>
+                        <option value="full">Full Text</option>
+                    </select>
+                </div>
                 <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 5px; margin-bottom: 5px; border-bottom: none;">
                     <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
-                    </div>
+                </div>
                 <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
                     <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
                         <button class="font-size-btn" onclick="changeFontSize('eng', -2)" style="padding:4px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; color:#333; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
@@ -50,8 +183,7 @@
                 <div class="target-text-display sns-box" id="targetTextDisplay" style="display: none;">※データがありません</div>
 
                 <div id="speechResultWindow" style="display:none; flex-grow: 1; flex-direction: column; width: 100%; height: 100%;">
-                    <!-- HUD（スコアボード） -->
-                   <div id="gameHud" class="game-hud">
+                    <div id="gameHud" class="game-hud">
                         <div class="hud-badge hud-acc">
                             <span class="hud-title">ACCURACY</span>
                             <span class="hud-value" id="hudAccValue">0<span style="font-size:1rem;">%</span></span>
@@ -63,7 +195,6 @@
                         <div style="margin-left:auto; color:#fff; font-size:0.8rem; opacity:0.8;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
-                    <!-- 文字起こしエリアとSTARTボタン -->
                     <div class="transcription-container">
                         <div class="recognized-text sns-box-large" id="recognizedTextDisplay"></div>
                         
@@ -78,7 +209,6 @@
                 </div>
             </div>
 
-            <!-- 単語ポップアップ -->
             <div id="vocabPopup" style="display:none;">
                 <div class="popup-word" id="popupWord">Word</div>
                 <div class="popup-pron" id="popupPron">/pron/</div>

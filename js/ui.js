@@ -344,3 +344,54 @@ function checkCelebration() {
         fireConfetti();
     }
 }
+// ==========================================
+// ★ スマホ専用：メニュー連動と自動起動
+// ==========================================
+
+// スマホ画面の上部メニュー（Lesson/Part）を変更したときに呼ばれる関数
+function changeScopeMobile() {
+    const lesson = document.getElementById('mobileLessonSelect').value; // 例: "L01"
+    const part = document.getElementById('mobilePartSelect').value; // 例: "p1"
+
+    // 読み込むデータのキーを生成（スマホでは「Part 1」を選んだら、そのPartの全文を出すのが使いやすいです）
+    let newKey = "";
+    if (part === "full") {
+        newKey = lesson + "_P1_full"; 
+    } else {
+        const partNum = part.replace('p', ''); // p1 を 1 に変換
+        newKey = lesson + "_P" + partNum + "_full"; // 例: L01_P1_full
+    }
+
+    currentKey = newKey;
+
+    // もし "_full" のデータが存在しない場合は、"_p1" などの分割データを探して自動補正する安全装置
+    let safeScripts = (typeof lessonScripts !== 'undefined') ? lessonScripts : {};
+    if (typeof currentLevel !== 'undefined') {
+        if (currentLevel === 'pre1' && typeof lessonScriptsPre1 !== 'undefined') safeScripts = lessonScriptsPre1;
+        if (currentLevel === 'grade1' && typeof lessonScriptsGrade1 !== 'undefined') safeScripts = lessonScriptsGrade1;
+    }
+
+    if (!safeScripts[currentKey]) {
+        const fallbackKey = lesson + "_P" + (part === 'full' ? '1' : part.replace('p', '')) + "_p1";
+        if (safeScripts[fallbackKey]) {
+            currentKey = fallbackKey;
+        }
+    }
+
+    // 画面を更新（すでにシャドーイング中ならシャドーイングのまま、それ以外はReadingモードで開く）
+    const modeToOpen = (typeof currentMode !== 'undefined' && currentMode === 'shadowing') ? 'shadowing' : 'reading';
+    if (typeof openSpeechOverlay === 'function') {
+        openSpeechOverlay(modeToOpen);
+    }
+}
+
+// スマホでページを開いた瞬間に、自動的に音読画面を起動する魔法
+window.addEventListener('DOMContentLoaded', () => {
+    // 画面の横幅が768px以下（スマホサイズ）かチェック
+    if (window.innerWidth <= 768) {
+        // 他のデータが読み込まれるのを0.5秒だけ待ってから、スマホ専用画面をドーンと表示する
+        setTimeout(() => {
+            changeScopeMobile();
+        }, 500);
+    }
+});
