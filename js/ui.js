@@ -395,3 +395,62 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 });
+// ==========================================
+// ★ スマホ専用：リサイズ機能 ＆ 音声ボタン連動
+// ==========================================
+
+// PC版の音声ボタン処理を上書きして、スマホのボタンの表示も連動させる
+const originalUpdateAudioButtonUI = window.updateAudioButtonUI;
+window.updateAudioButtonUI = function(isPlaying) {
+    if (originalUpdateAudioButtonUI) originalUpdateAudioButtonUI(isPlaying);
+    const mBtn = document.getElementById('btnMobileMainAudio');
+    if (mBtn) mBtn.innerHTML = isPlaying ? "⏸ 一時停止" : "▶ 再生";
+};
+
+// リサイズバーを指でスワイプして上下の高さを変える機能
+function initMobileResizer() {
+    const resizer = document.getElementById('mobileResizer');
+    const topPanel = document.getElementById('targetTextDisplay');
+    
+    if (!resizer || !topPanel) return;
+
+    let isDragging = false;
+    let startY = 0;
+    let startTopHeight = 0;
+
+    // タッチ開始
+    resizer.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startY = e.touches[0].clientY;
+        startTopHeight = topPanel.getBoundingClientRect().height;
+        document.body.style.overflow = 'hidden'; // 画面全体のスクロールを止める
+    }, { passive: false });
+
+    // タッチしながら移動
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault(); // 誤動作防止
+        
+        const deltaY = e.touches[0].clientY - startY;
+        let newHeight = startTopHeight + deltaY;
+        
+        // 広げすぎ・縮めすぎをブロック（最低100px、最大は画面端から250pxまで）
+        if (newHeight < 100) newHeight = 100;
+        if (newHeight > window.innerHeight - 250) newHeight = window.innerHeight - 250;
+        
+        topPanel.style.height = `${newHeight}px`;
+    }, { passive: false });
+
+    // タッチ終了
+    document.addEventListener('touchend', () => {
+        if (isDragging) {
+            isDragging = false;
+            document.body.style.overflow = ''; // スクロール制限を解除
+        }
+    });
+}
+
+// 画面が読み込まれた時にリサイズ機能を有効にする
+window.addEventListener('DOMContentLoaded', () => {
+    initMobileResizer();
+});
