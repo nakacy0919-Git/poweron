@@ -65,22 +65,32 @@
 
             /* --- スピーチ結果領域 --- */
             #speechResultWindow {
-                display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden;
+                display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden !important;
+                margin: 0 !important; padding: 0 !important;
             }
+            /* ★ 無駄な余白と角丸を消去し、画面の底まで白い背景を伸ばす */
             .transcription-container {
-                /* 下部の不要な余白を削り、縦幅を広げる */
-                flex-grow: 1; display: flex; flex-direction: column; padding-bottom: 80px; background: #fff;
+                flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
+                padding: 0 !important; margin: 0 !important; background: #fff !important;
+                border-radius: 0 !important; height: 100% !important;
             }
 
             /* --- 青・赤のバーを完全に消し去り、横幅をフルに使う --- */
             #recognizedTextDisplay {
-                padding: 0 5px !important; display: flex; flex-direction: column; height: 100%; width: 100% !important; box-sizing: border-box !important;
+                padding: 0 5px !important; margin: 0 !important; display: flex !important; flex-direction: column !important; 
+                height: 100% !important; width: 100% !important; box-sizing: border-box !important;
+                border-radius: 0 !important; flex-grow: 1 !important;
             }
             #recognizedTextDisplay > div,
             #recognizedTextDisplay > div > div {
                 border: none !important; border-left: none !important; border-right: none !important;
                 margin: 0 !important; padding-left: 2px !important; padding-right: 2px !important;
                 box-shadow: none !important; border-radius: 0 !important; background: transparent !important;
+            }
+
+            /* ★ テキストがSTARTボタンの裏に隠れないよう、一番下の「Your Voice」の内側にだけ余白を設ける */
+            #recognizedTextDisplay > div:last-child {
+                padding-bottom: 100px !important; 
             }
 
             /* --- テキストサイズを12pxに完全強制 (ヘッダー以外に適用) --- */
@@ -189,6 +199,7 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
+                        <!-- 白文字に修正 -->
                         <div style="color: #ffffff; font-size: 0.75rem; margin-left: auto; white-space: nowrap;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
@@ -378,7 +389,7 @@
             }
         }
 
-        // ★ Target Text と Your Voice を完全に独立してサイズ変更する処理
+        // Target Text と Your Voice を完全に独立してサイズ変更する処理
         let targetMobileSize = 12;
         let voiceMobileSize = 12;
         const originalChangeFontSize = window.changeFontSize;
@@ -416,7 +427,6 @@
 
                 const header = div.querySelector('div:first-child');
 
-                // 中身を見て判定し、変数の適用と【ボタン指令の書き換え】を同時に行う
                 if (div.innerText.includes('TARGET TEXT') || div.innerText.includes('Target Text') || div.innerText.includes('お手本')) {
                     div.style.setProperty('--mobile-font', 'var(--target-font)');
                     targetBox = div;
