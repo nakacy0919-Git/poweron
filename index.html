@@ -68,7 +68,6 @@
                 display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden !important;
                 margin: 0 !important; padding: 0 !important;
             }
-            /* ★ 無駄な余白と角丸を消去し、画面の底まで白い背景を伸ばす */
             .transcription-container {
                 flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
                 padding: 0 !important; margin: 0 !important; background: #fff !important;
@@ -88,19 +87,26 @@
                 box-shadow: none !important; border-radius: 0 !important; background: transparent !important;
             }
 
-            /* ★ テキストがSTARTボタンの裏に隠れないよう、一番下の「Your Voice」の内側にだけ余白を設ける */
             #recognizedTextDisplay > div:last-child {
                 padding-bottom: 100px !important; 
             }
 
-            /* --- テキストサイズを12pxに完全強制 (ヘッダー以外に適用) --- */
+            /* ★ ヘッダーの文字とボタンのサイズが連動して大きくならないように完全に固定 */
+            #recognizedTextDisplay > div > div:first-child,
+            #recognizedTextDisplay > div > div:first-child span {
+                font-size: 13px !important;
+            }
+            #recognizedTextDisplay .font-size-btn { 
+                font-size: 12px !important; 
+                padding: 4px 8px !important; 
+            }
+
+            /* --- テキスト本文にだけサイズ変更を適用 --- */
             #recognizedTextDisplay > div > div:nth-child(n+2),
             #recognizedTextDisplay > div > div:nth-child(n+2) * {
                 font-size: var(--mobile-font) !important;
                 line-height: 1.6 !important;
             }
-
-            #recognizedTextDisplay .font-size-btn { padding: 4px 8px !important; font-size: 12px !important; }
 
             /* --- STARTボタンの中央固定 --- */
             #readingMicContainer, #shadowingMicContainer {
@@ -143,7 +149,7 @@
         <div class="main-screen" id="mainScreen">
             
             <div id="mainOverlay">
-                <!-- スマホ上部メニュー（Paragraph追加） -->
+                <!-- スマホ上部メニュー -->
                 <div id="mobileTopMenu" class="mobile-only-menu">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
                         <option value="1">Lesson 1</option><option value="2">Lesson 2</option><option value="3">Lesson 3</option><option value="4">Lesson 4</option><option value="5">Lesson 5</option>
@@ -199,8 +205,8 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
-                        <!-- 白文字に修正 -->
-                        <div style="color: #ffffff; font-size: 0.75rem; margin-left: auto; white-space: nowrap;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
+                        <!-- ★ サイズを10pxにさらに小さく変更 -->
+                        <div style="color: #ffffff; font-size: 10px; margin-left: auto; white-space: nowrap;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
                     <div class="transcription-container">
