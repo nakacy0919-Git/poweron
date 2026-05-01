@@ -64,11 +64,11 @@
             .hud-value { font-size: 1rem !important; }
 
             /* --- スピーチ結果領域 --- */
-            /* ★画面全体がスクロールしてズレるのを「overflow: hidden」で完全封殺 */
             #speechResultWindow {
                 display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden !important;
                 margin: 0 !important; padding: 0 !important;
             }
+            /* ★ .transcription-container にoverflow: hidden をかけ、全体がスクロールするのを防ぐ */
             .transcription-container {
                 flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
                 padding: 0 !important; margin: 0 !important; background: #fff !important;
@@ -76,6 +76,7 @@
             }
 
             /* --- 青・赤のバーを消し、縦横をフルに使う --- */
+            /* ★ここにも overflow: hidden をかけ、絶対に枠からはみ出させない */
             #recognizedTextDisplay {
                 padding: 0 5px !important; margin: 0 !important; display: flex !important; flex-direction: column !important; 
                 height: 100% !important; width: 100% !important; box-sizing: border-box !important;
@@ -87,11 +88,6 @@
                 border: none !important; border-left: none !important; border-right: none !important;
                 margin: 0 !important; padding-left: 2px !important; padding-right: 2px !important;
                 box-shadow: none !important; border-radius: 0 !important; background: transparent !important;
-            }
-
-            /* ★超重要：文字が増えても枠が無限に膨張してTarget Textを押し出さないようにする魔法 */
-            #recognizedTextDisplay > div {
-                min-height: 0 !important;
             }
 
             /* テキストがSTARTボタンの裏に隠れないよう、一番下の「Your Voice」の内側にだけ余白を設ける */
@@ -156,7 +152,6 @@
     </style>
 </head>
 <body>
-    <!-- PC用の左ナビゲーション -->
     <div class="nav-container">
         <button class="nav-btn color-blue active" onclick="selectLesson(1, this)">Lesson <span class="num">1</span></button>
         <button class="nav-btn color-orange" onclick="selectLesson(2, this)">Lesson <span class="num">2</span></button>
@@ -174,7 +169,6 @@
         <div class="main-screen" id="mainScreen">
             
             <div id="mainOverlay">
-                <!-- スマホ上部メニュー -->
                 <div id="mobileTopMenu" class="mobile-only-menu">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
                         <option value="1">Lesson 1</option><option value="2">Lesson 2</option><option value="3">Lesson 3</option><option value="4">Lesson 4</option><option value="5">Lesson 5</option>
@@ -188,7 +182,6 @@
                     </select>
                 </div>
 
-                <!-- スマホ用音声プレイヤー -->
                 <div id="mobileAudioControls" class="mobile-audio-controls">
                     <button class="m-audio-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
                     <button class="m-audio-btn" onclick="seekAudio(-5)">⏪ 5秒</button>
@@ -200,7 +193,6 @@
                     <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
                 </div>
                 
-                <!-- PC用フォントコントロール -->
                 <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
                     <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
                         <button class="font-size-btn" onclick="changeFontSize('eng', -2)">A -</button>
@@ -219,7 +211,6 @@
 
                 <div class="target-text-display sns-box" id="targetTextDisplay" style="display: none;">※データがありません</div>
 
-                <!-- スピーチ結果 -->
                 <div id="speechResultWindow" style="display:none; flex-grow: 1; flex-direction: column; width: 100%; height: 100%;">
                     <div id="gameHud" class="game-hud">
                         <div class="hud-badge hud-acc">
@@ -230,7 +221,6 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
-                        <!-- ★ 読めた単語は青色 の表示をさらに小さく（10px）固定 -->
                         <div style="color: #ffffff; font-size: 10px !important; margin-left: auto; white-space: nowrap; font-weight: normal;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
@@ -248,7 +238,6 @@
                 </div>
             </div>
 
-            <!-- 単語ポップアップ -->
             <div id="vocabPopup" style="display:none;">
                 <div class="popup-word" id="popupWord">Word</div>
                 <div class="popup-pron" id="popupPron">/pron/</div>
@@ -263,7 +252,6 @@
 
         <div id="drag-handle"></div>
 
-        <!-- PC用右サイドバー -->
         <div class="sidebar compact-sidebar" id="sidebar">
             <div class="sidebar-group">
                 <div class="selector-container">
@@ -315,7 +303,6 @@
         </div>
     </div>
 
-    <!-- 成績提出モーダル -->
     <div id="submitModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:center;">
             <h3 style="margin-top:0; color:#333;">📤 成績の提出</h3>
@@ -346,7 +333,6 @@
         </div>
     </div>
 
-    <!-- 成績提出ボタン -->
     <button id="floatingSubmitBtn" onclick="openCustomSubmitModal()" style="display:none; position:fixed; bottom:95px; left:50%; transform:translateX(-50%); background:#ff4081; color:white; border:none; border-radius:50px; padding:12px 30px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:99999; white-space:nowrap; transition:transform 0.2s;">
         📤 成績提出
     </button>
@@ -420,7 +406,7 @@
             }
         }
 
-        // Target Text と Your Voice を完全に独立してサイズ変更する処理
+        // ★ Target Text と Your Voice を完全に独立してサイズ変更する処理
         let targetMobileSize = 12;
         let voiceMobileSize = 12;
         const originalChangeFontSize = window.changeFontSize;
@@ -438,7 +424,7 @@
             }
         };
 
-        // DOMの監視：ヘッダーの固定、不要な線の削除、ボタン指令の書き換え
+        // DOMの監視：ヘッダーのロック、不要な線の削除、ボタン指令の書き換え
         const observer = new MutationObserver(() => {
             if (window.innerWidth > 768) return; 
             
@@ -487,17 +473,20 @@
                 }
 
                 if(!document.getElementById('mobileResizerHandle')) {
-                    targetBox.style.height = '45vh'; 
-                    targetBox.style.overflowY = 'auto';
-                    targetBox.style.flexShrink = '0';
+                    // ★ 枠全体の rigidity（硬さ）を保証する
+                    recDisplay.style.cssText += 'display:flex !important; flex-direction:column !important; height:100% !important; overflow:hidden !important;';
+
+                    // ★ JS側でも Target Text の高さを完全固定
+                    targetBox.style.cssText += 'height: 45vh !important; overflow-y: auto !important; flex-shrink: 0 !important;';
                     
-                    voiceBox.style.flexGrow = '1';
-                    voiceBox.style.overflowY = 'auto';
+                    // ★ JS側でも Your Voice の高さを（画面全体 - 上の高さ - リサイズバー）で完全固定
+                    // 100%から45vhとリサイズバー(24px)を引く
+                    voiceBox.style.cssText += 'height: calc(100% - 45vh - 24px) !important; flex-grow: 0 !important; flex-shrink: 0 !important; overflow-y: auto !important;';
 
                     const resizer = document.createElement('div');
                     resizer.id = 'mobileResizerHandle';
                     resizer.innerHTML = '<div style="width:50px; height:5px; background:#aaa; border-radius:3px;"></div>';
-                    resizer.style.cssText = 'display:flex; justify-content:center; align-items:center; height:24px; margin: 0; background:#f0f4f8; cursor:ns-resize; touch-action:none; z-index:50; border-top:1px solid #ddd; border-bottom:1px solid #ddd;';
+                    resizer.style.cssText = 'display:flex; justify-content:center; align-items:center; height:24px; margin: 0; background:#f0f4f8; cursor:ns-resize; touch-action:none; z-index:50; border-top:1px solid #ddd; border-bottom:1px solid #ddd; flex-shrink: 0;';
                     
                     targetBox.parentNode.insertBefore(resizer, voiceBox);
 
@@ -510,8 +499,11 @@
                     document.addEventListener('touchmove', (e) => {
                         if(!isDragging) return; e.preventDefault();
                         let newHeight = startHeight + (e.touches[0].clientY - startY);
+                        // リサイズ時も、TargetBoxの高さを固定し、VoiceBoxの高さを再計算して固定する
                         if(newHeight > 60 && newHeight < window.innerHeight - 200) { 
                             targetBox.style.height = newHeight + 'px'; 
+                            // VoiceBoxの高さを（100% - TargetTextの高さ - リサイズバー(24px)）で再計算して完全固定
+                            voiceBox.style.height = `calc(100% - ${newHeight}px - 24px) !important`;
                         }
                     }, {passive: false});
                     
