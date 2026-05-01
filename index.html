@@ -64,6 +64,7 @@
             .hud-value { font-size: 1rem !important; }
 
             /* --- スピーチ結果領域 --- */
+            /* ★画面全体がスクロールしてズレるのを「overflow: hidden」で完全封殺 */
             #speechResultWindow {
                 display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden !important;
                 margin: 0 !important; padding: 0 !important;
@@ -71,15 +72,16 @@
             .transcription-container {
                 flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
                 padding: 0 !important; margin: 0 !important; background: #fff !important;
-                border-radius: 0 !important; height: 100% !important;
+                border-radius: 0 !important; height: 100% !important; overflow: hidden !important;
             }
 
-            /* --- 青・赤のバーを完全に消し去り、横幅をフルに使う --- */
+            /* --- 青・赤のバーを消し、縦横をフルに使う --- */
             #recognizedTextDisplay {
                 padding: 0 5px !important; margin: 0 !important; display: flex !important; flex-direction: column !important; 
                 height: 100% !important; width: 100% !important; box-sizing: border-box !important;
-                border-radius: 0 !important; flex-grow: 1 !important;
+                border-radius: 0 !important; flex-grow: 1 !important; overflow: hidden !important;
             }
+            
             #recognizedTextDisplay > div,
             #recognizedTextDisplay > div > div {
                 border: none !important; border-left: none !important; border-right: none !important;
@@ -87,25 +89,48 @@
                 box-shadow: none !important; border-radius: 0 !important; background: transparent !important;
             }
 
-            #recognizedTextDisplay > div:last-child {
-                padding-bottom: 100px !important; 
+            /* ★超重要：文字が増えても枠が無限に膨張してTarget Textを押し出さないようにする魔法 */
+            #recognizedTextDisplay > div {
+                min-height: 0 !important;
             }
 
-            /* ★ ヘッダーの文字とボタンのサイズが連動して大きくならないように完全に固定 */
-            #recognizedTextDisplay > div > div:first-child,
-            #recognizedTextDisplay > div > div:first-child span {
-                font-size: 13px !important;
+            /* テキストがSTARTボタンの裏に隠れないよう、一番下の「Your Voice」の内側にだけ余白を設ける */
+            #recognizedTextDisplay > div:last-child > div:nth-child(2) {
+                padding-bottom: 120px !important; 
             }
-            #recognizedTextDisplay .font-size-btn { 
-                font-size: 12px !important; 
-                padding: 4px 8px !important; 
+
+            /* =========================================================
+               ★ ヘッダーとボタンが絶対に大きくならない鉄壁のCSSロック
+               ========================================================= */
+            #recognizedTextDisplay > div > div:first-child,
+            #recognizedTextDisplay > div > div:first-child div,
+            #recognizedTextDisplay > div > div:first-child span {
+                font-size: 14px !important;
+                line-height: 1.2 !important;
+            }
+            #recognizedTextDisplay > div > div:first-child button {
+                font-size: 12px !important;
+                padding: 4px 8px !important;
+                margin: 0 !important;
+                transform: none !important; /* ボタンが拡大縮小されるのを防ぐ */
             }
 
             /* --- テキスト本文にだけサイズ変更を適用 --- */
-            #recognizedTextDisplay > div > div:nth-child(n+2),
-            #recognizedTextDisplay > div > div:nth-child(n+2) * {
+            #recognizedTextDisplay > div > div:nth-child(n+2) {
                 font-size: var(--mobile-font) !important;
                 line-height: 1.6 !important;
+            }
+            /* 本文の中のspan（色付き単語など）も親のサイズに追従させる */
+            #recognizedTextDisplay > div > div:nth-child(n+2) * {
+                font-size: inherit !important;
+                line-height: inherit !important;
+            }
+
+            /* --- 二重表示をCSSで完全封殺 --- */
+            #recognizedTextDisplay div:has(> img),
+            #recognizedTextDisplay div:has(> .overlay-title),
+            #recognizedTextDisplay .mobile-hidden-header {
+                display: none !important;
             }
 
             /* --- STARTボタンの中央固定 --- */
@@ -205,8 +230,8 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
-                        <!-- ★ サイズを10pxにさらに小さく変更 -->
-                        <div style="color: #ffffff; font-size: 10px; margin-left: auto; white-space: nowrap;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
+                        <!-- ★ 読めた単語は青色 の表示をさらに小さく（10px）固定 -->
+                        <div style="color: #ffffff; font-size: 10px !important; margin-left: auto; white-space: nowrap; font-weight: normal;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
                     <div class="transcription-container">
@@ -413,7 +438,7 @@
             }
         };
 
-        // DOMの監視：不要な線を消し、個別のテキストサイズを割り当て、ボタンの指令を書き換える
+        // DOMの監視：ヘッダーの固定、不要な線の削除、ボタン指令の書き換え
         const observer = new MutationObserver(() => {
             if (window.innerWidth > 768) return; 
             
