@@ -1,0 +1,161 @@
+/* ==========================================
+   スマホ専用の超硬化＆スクロールレイアウト
+   ========================================== */
+.mobile-only-menu, .mobile-audio-controls { display: none; }
+
+/* 独立したフォントサイズ用変数 */
+:root { 
+    --target-font: 12px; 
+    --voice-font: 12px; 
+} 
+
+@media (max-width: 768px) {
+    /* PC用の不要な部分を完全に消す */
+    .nav-container, .sidebar, #drag-handle, #windowHeader, #fontControls, #targetTextDisplay {
+        display: none !important;
+    }
+
+    .app-container { flex-direction: column; height: 100vh; padding: 0; }
+    .main-screen { width: 100% !important; height: 100vh !important; padding: 0 !important; border-radius: 0 !important; }
+    #mainOverlay { display: flex !important; flex-direction: column; height: 100%; width: 100%; background: #f4f7f6; overflow: hidden; }
+
+    /* --- スマホ専用上部メニュー --- */
+    .mobile-only-menu {
+        display: flex !important; justify-content: space-between; align-items: center;
+        padding: 10px; background: #4facfe; z-index: 100; gap: 5px;
+    }
+    .mobile-only-menu select {
+        padding: 6px; border-radius: 6px; border: none; font-weight: bold; color: #333; width: 32%; font-size: 14px;
+    }
+
+    /* --- スマホ専用音声コントロール --- */
+    .mobile-audio-controls {
+        display: flex !important; justify-content: center; gap: 10px;
+        padding: 12px 5px; background: #fdfbfb; border-bottom: 1px solid #e9ecef; z-index: 99;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .m-audio-btn {
+        padding: 8px 14px; font-size: 0.85rem; border: none;
+        background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0277bd;
+        border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .m-audio-btn.stop-btn { background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828; }
+
+    /* --- HUD（スコア表）をコンパクトな1段に --- */
+    #gameHud {
+        padding: 8px 10px !important; margin-bottom: 0 !important; min-height: 40px;
+        display: flex !important; align-items: center !important; justify-content: flex-start !important;
+        flex-wrap: nowrap !important; gap: 8px !important;
+    }
+    .hud-badge { margin: 0 !important; padding: 2px 6px !important; }
+    .hud-title { font-size: 0.6rem !important; }
+    .hud-value { font-size: 1rem !important; }
+
+    /* --- スピーチ結果領域 --- */
+    #speechResultWindow {
+        display: flex !important; flex-grow: 1 !important; flex-direction: column !important; height: 100% !important; overflow: hidden !important;
+        margin: 0 !important; padding: 0 !important;
+    }
+    .transcription-container {
+        flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
+        padding: 0 !important; margin: 0 !important; background: #fff !important;
+        border-radius: 0 !important; height: 100% !important; overflow: hidden !important;
+    }
+
+    /* --- テキスト表示エリア全体 --- */
+    #recognizedTextDisplay {
+        display: flex !important; flex-direction: column !important; height: 100% !important; width: 100% !important;
+        padding: 0 !important; margin: 0 !important; box-sizing: border-box !important;
+        border-radius: 0 !important; flex-grow: 1 !important; overflow: hidden !important;
+    }
+    
+    /* =========================================================
+       ★ TARGET/VOICE 枠の基本構造（ガタつき防止）
+       ========================================================= */
+    .target-box-area, .voice-box-area {
+        display: flex !important;
+        flex-direction: column !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 5px !important;
+        background: transparent !important;
+        overflow: hidden !important; /* 枠自体は絶対にスクロールさせない */
+    }
+
+    /* --- 内側のヘッダー（上に固定） --- */
+    .target-box-area > div:first-child,
+    .voice-box-area > div:first-child {
+        flex-shrink: 0 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 1px dashed #ccc !important;
+        padding: 5px 0 !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        background: #fff !important; /* スクロール時に透けないように */
+    }
+    #recognizedTextDisplay .font-size-btn { 
+        font-size: 12px !important; padding: 4px 8px !important; height: 26px !important; width: 36px !important;
+        margin: 0 !important; transition: none !important; transform: none !important;
+    }
+
+    /* =========================================================
+       ★ 内側の本文エリア（ここでスクロールさせる）
+       ========================================================= */
+    .target-box-area > div:nth-child(n+2),
+    .voice-box-area > div:nth-child(n+2) {
+        flex-grow: 1 !important;
+        overflow-y: auto !important; /* スクロールを許可！ */
+        -webkit-overflow-scrolling: touch !important;
+        padding-top: 5px !important;
+        transition: none !important;
+        animation: none !important;
+    }
+
+    /* --- フォントサイズ独立変更（アニメーションなし） --- */
+    .target-box-area > div:nth-child(n+2) {
+        font-size: var(--target-font) !important;
+        line-height: 1.6 !important;
+    }
+    .voice-box-area > div:nth-child(n+2) {
+        font-size: var(--voice-font) !important;
+        line-height: 1.6 !important;
+        padding-bottom: 120px !important; /* STARTボタン避けの余白 */
+    }
+
+    /* 内部のspan等（青色単語など）もサイズを強制追従 */
+    .target-box-area > div:nth-child(n+2) *,
+    .voice-box-area > div:nth-child(n+2) * {
+        font-size: inherit !important;
+        line-height: inherit !important;
+        transition: none !important; animation: none !important;
+    }
+
+    /* --- 二重表示をCSSで完全封殺 --- */
+    #recognizedTextDisplay div:has(> img),
+    #recognizedTextDisplay div:has(> .overlay-title),
+    #recognizedTextDisplay .mobile-hidden-header {
+        display: none !important;
+    }
+
+    /* --- STARTボタンの中央固定 --- */
+    #readingMicContainer, #shadowingMicContainer {
+        position: fixed !important; bottom: 25px !important; left: 0 !important; width: 100% !important;
+        display: flex !important; justify-content: center !important; align-items: center !important;
+        background: transparent !important; box-shadow: none !important; z-index: 1000 !important;
+        pointer-events: none;
+    }
+    #shadowingMicContainer { display: none !important; }
+    .start-record-btn {
+        pointer-events: auto;
+        font-size: 1.3rem; padding: 18px 45px; font-weight: 900; letter-spacing: 2px;
+        border-radius: 50px; box-shadow: 0 6px 15px rgba(255, 64, 129, 0.4);
+    }
+
+    /* --- 録音中はメニューを消す --- */
+    body.is-recording .mobile-only-menu, 
+    body.is-recording .mobile-audio-controls {
+        display: none !important;
+    }
+}

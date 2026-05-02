@@ -7,160 +7,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
     <title>PowerSlide Power On Ⅲ</title>
-    <link rel="stylesheet" href="css/style.css">
     
-    <style>
-        /* ==========================================
-           スマホ（768px以下）専用のレイアウト
-           ========================================== */
-        .mobile-only-menu, .mobile-audio-controls { display: none; }
-        
-        /* ★ Target Text と Your Voice の初期サイズをそれぞれ独立して12pxに固定 */
-        :root { 
-            --target-font: 12px; 
-            --voice-font: 12px; 
-        } 
-
-        @media (max-width: 768px) {
-            /* PC用の不要な部分を完全に消す */
-            .nav-container, .sidebar, #drag-handle, #windowHeader, #fontControls, #targetTextDisplay {
-                display: none !important;
-            }
-
-            .app-container { flex-direction: column; height: 100vh; padding: 0; }
-            .main-screen { width: 100% !important; height: 100vh !important; padding: 0 !important; border-radius: 0 !important; }
-            #mainOverlay { display: flex !important; flex-direction: column; height: 100%; width: 100%; background: #f4f7f6; }
-
-            /* --- スマホ専用上部メニュー（Paragraph追加） --- */
-            .mobile-only-menu {
-                display: flex !important; justify-content: space-between; align-items: center;
-                padding: 10px; background: #4facfe; z-index: 100; gap: 5px;
-            }
-            .mobile-only-menu select {
-                padding: 6px; border-radius: 6px; border: none; font-weight: bold; color: #333; width: 32%; font-size: 14px;
-            }
-
-            /* --- スマホ専用音声コントロール --- */
-            .mobile-audio-controls {
-                display: flex !important; justify-content: center; gap: 10px;
-                padding: 12px 5px; background: #fdfbfb; border-bottom: 1px solid #e9ecef; z-index: 99;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            }
-            .m-audio-btn {
-                padding: 8px 14px; font-size: 0.85rem; border: none;
-                background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0277bd;
-                border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .m-audio-btn.stop-btn { background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828; }
-
-            /* --- HUD（スコア表）をコンパクトな1段に --- */
-            #gameHud {
-                padding: 8px 10px !important; margin-bottom: 0 !important; min-height: 40px;
-                display: flex !important; align-items: center !important; justify-content: flex-start !important;
-                flex-wrap: nowrap !important; gap: 8px !important;
-            }
-            .hud-badge { margin: 0 !important; padding: 2px 6px !important; }
-            .hud-title { font-size: 0.6rem !important; }
-            .hud-value { font-size: 1rem !important; }
-
-            /* --- スピーチ結果領域 --- */
-            /* ★画面全体がスクロールしてズレるのを「overflow: hidden」で完全封殺 */
-            #speechResultWindow {
-                display: flex !important; flex-grow: 1 !important; height: 100% !important; overflow: hidden !important;
-                margin: 0 !important; padding: 0 !important;
-            }
-            .transcription-container {
-                flex-grow: 1 !important; display: flex !important; flex-direction: column !important; 
-                padding: 0 !important; margin: 0 !important; background: #fff !important;
-                border-radius: 0 !important; height: 100% !important; overflow: hidden !important;
-            }
-
-            /* --- 青・赤のバーを消し、縦横をフルに使う --- */
-            #recognizedTextDisplay {
-                padding: 0 5px !important; margin: 0 !important; display: flex !important; flex-direction: column !important; 
-                height: 100% !important; width: 100% !important; box-sizing: border-box !important;
-                border-radius: 0 !important; flex-grow: 1 !important; overflow: hidden !important;
-            }
-            
-            #recognizedTextDisplay > div,
-            #recognizedTextDisplay > div > div {
-                border: none !important; border-left: none !important; border-right: none !important;
-                margin: 0 !important; padding-left: 2px !important; padding-right: 2px !important;
-                box-shadow: none !important; border-radius: 0 !important; background: transparent !important;
-            }
-
-            /* ★超重要：文字が増えても枠が無限に膨張してTarget Textを押し出さないようにする魔法 */
-            #recognizedTextDisplay > div {
-                min-height: 0 !important;
-            }
-
-            /* テキストがSTARTボタンの裏に隠れないよう、一番下の「Your Voice」の内側にだけ余白を設ける */
-            #recognizedTextDisplay > div:last-child > div:nth-child(2) {
-                padding-bottom: 120px !important; 
-            }
-
-            /* =========================================================
-               ★ ヘッダーとボタンが絶対に大きくならない鉄壁のCSSロック
-               ========================================================= */
-            #recognizedTextDisplay > div > div:first-child,
-            #recognizedTextDisplay > div > div:first-child div,
-            #recognizedTextDisplay > div > div:first-child span {
-                font-size: 14px !important;
-                line-height: 1.2 !important;
-            }
-            #recognizedTextDisplay > div > div:first-child button {
-                font-size: 12px !important;
-                padding: 4px 8px !important;
-                margin: 0 !important;
-                transform: none !important; /* ボタンが拡大縮小されるのを防ぐ */
-                transition: none !important; /* アニメーションを無効化 */
-            }
-
-            /* --- テキスト本文にだけサイズ変更を適用 --- */
-            #recognizedTextDisplay > div > div:nth-child(n+2) {
-                font-size: var(--mobile-font) !important;
-                line-height: 1.6 !important;
-                transition: none !important; /* 本文が伸びるアニメーションを完全に消去 */
-                animation: none !important;
-            }
-            /* 本文の中のspan（色付き単語など）も親のサイズに追従させる */
-            #recognizedTextDisplay > div > div:nth-child(n+2) * {
-                font-size: inherit !important;
-                line-height: inherit !important;
-                transition: none !important;
-            }
-
-            /* --- 二重表示をCSSで完全封殺 --- */
-            #recognizedTextDisplay div:has(> img),
-            #recognizedTextDisplay div:has(> .overlay-title),
-            #recognizedTextDisplay .mobile-hidden-header {
-                display: none !important;
-            }
-
-            /* --- STARTボタンの中央固定 --- */
-            #readingMicContainer, #shadowingMicContainer {
-                position: fixed !important; bottom: 25px !important; left: 0 !important; width: 100% !important;
-                display: flex !important; justify-content: center !important; align-items: center !important;
-                background: transparent !important; box-shadow: none !important; z-index: 1000 !important;
-                pointer-events: none;
-            }
-            #shadowingMicContainer { display: none !important; }
-            .start-record-btn {
-                pointer-events: auto;
-                font-size: 1.3rem; padding: 18px 45px; font-weight: 900; letter-spacing: 2px;
-                border-radius: 50px; box-shadow: 0 6px 15px rgba(255, 64, 129, 0.4);
-            }
-
-            /* --- 録音中はメニューを消す --- */
-            body.is-recording .mobile-only-menu, 
-            body.is-recording .mobile-audio-controls {
-                display: none !important;
-            }
-        }
-    </style>
+    <!-- スタイルシートの読み込み -->
+    <link rel="stylesheet" href="css/style.css">     <!-- 元のPC用CSS -->
+    <link rel="stylesheet" href="css/mobile.css">  <!-- 追加：スマホ専用のCSS -->
 </head>
 <body>
-    <!-- PC用の左ナビゲーション（完全復元） -->
+    <!-- PC用の左ナビゲーション -->
     <div class="nav-container">
         <button class="nav-btn color-blue active" onclick="selectLesson(1, this)">Lesson <span class="num">1</span></button>
         <button class="nav-btn color-orange" onclick="selectLesson(2, this)">Lesson <span class="num">2</span></button>
@@ -181,14 +34,28 @@
                 <!-- スマホ上部メニュー -->
                 <div id="mobileTopMenu" class="mobile-only-menu">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
-                        <option value="1">Lesson 1</option><option value="2">Lesson 2</option><option value="3">Lesson 3</option><option value="4">Lesson 4</option><option value="5">Lesson 5</option>
-                        <option value="6">Lesson 6</option><option value="7">Lesson 7</option><option value="8">Lesson 8</option><option value="9">Lesson 9</option><option value="10">Lesson 10</option>
+                        <option value="1">Lesson 1</option>
+                        <option value="2">Lesson 2</option>
+                        <option value="3">Lesson 3</option>
+                        <option value="4">Lesson 4</option>
+                        <option value="5">Lesson 5</option>
+                        <option value="6">Lesson 6</option>
+                        <option value="7">Lesson 7</option>
+                        <option value="8">Lesson 8</option>
+                        <option value="9">Lesson 9</option>
+                        <option value="10">Lesson 10</option>
                     </select>
                     <select id="mobilePartSelect" onchange="syncMobileMenu()">
-                        <option value="1">Part 1</option><option value="2">Part 2</option><option value="3">Part 3</option><option value="4">Part 4</option>
+                        <option value="1">Part 1</option>
+                        <option value="2">Part 2</option>
+                        <option value="3">Part 3</option>
+                        <option value="4">Part 4</option>
                     </select>
                     <select id="mobileParaSelect" onchange="syncMobileMenu()">
-                        <option value="full">Full Text</option><option value="p1">Para 1</option><option value="p2">Para 2</option><option value="p3">Para 3</option>
+                        <option value="full">Full Text</option>
+                        <option value="p1">Para 1</option>
+                        <option value="p2">Para 2</option>
+                        <option value="p3">Para 3</option>
                     </select>
                 </div>
 
@@ -204,7 +71,7 @@
                     <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
                 </div>
                 
-                <!-- PC用フォントコントロール（完全復元） -->
+                <!-- PC用フォントコントロール -->
                 <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
                     <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
                         <button class="font-size-btn" onclick="changeFontSize('eng', -2)">A -</button>
@@ -267,7 +134,7 @@
 
         <div id="drag-handle"></div>
 
-        <!-- PC用右サイドバー（完全復元） -->
+        <!-- PC用右サイドバー -->
         <div class="sidebar compact-sidebar" id="sidebar">
             <div class="sidebar-group">
                 <div class="selector-container">
@@ -319,7 +186,7 @@
         </div>
     </div>
 
-    <!-- 成績提出モーダル（完全復元） -->
+    <!-- 成績提出モーダル -->
     <div id="submitModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:center;">
             <h3 style="margin-top:0; color:#333;">📤 成績の提出</h3>
@@ -366,184 +233,7 @@
     <script src="js/main.js"></script>
     <script src="js/speech.js"></script>
 
-    <script>
-        // スマホメニューの連動
-        function syncMobileMenu() {
-            const lessonVal = document.getElementById('mobileLessonSelect').value;
-            const partVal = document.getElementById('mobilePartSelect').value;
-            const paraVal = document.getElementById('mobileParaSelect').value;
-
-            const navBtns = document.querySelectorAll('.nav-btn');
-            if(navBtns[lessonVal - 1]) {
-                selectLesson(parseInt(lessonVal), navBtns[lessonVal - 1]);
-            }
-
-            document.getElementById('partSelect').value = partVal;
-            document.getElementById('paraSelect').value = paraVal;
-            onScopeChange();
-
-            setTimeout(() => {
-                const mode = (typeof currentMode !== 'undefined' && currentMode === 'shadowing') ? 'shadowing' : 'reading';
-                if(typeof openSpeechOverlay === 'function') openSpeechOverlay(mode);
-            }, 100);
-        }
-
-        // 成績提出モーダルを開く専用関数
-        function openCustomSubmitModal() {
-            const modal = document.getElementById('submitModal');
-            if(modal) {
-                modal.style.display = 'flex';
-                
-                let lVal = document.getElementById('mobileLessonSelect') ? document.getElementById('mobileLessonSelect').value : '';
-                let pVal = document.getElementById('mobilePartSelect') ? document.getElementById('mobilePartSelect').value : '';
-                let prVal = document.getElementById('mobileParaSelect') ? document.getElementById('mobileParaSelect').value : '';
-                
-                if(window.innerWidth > 768) {
-                    const activeNav = document.querySelector('.nav-btn.active');
-                    if(activeNav) lVal = activeNav.innerText.replace(/\D/g, '');
-                    if(document.getElementById('partSelect')) pVal = document.getElementById('partSelect').value;
-                    if(document.getElementById('paraSelect')) prVal = document.getElementById('paraSelect').value;
-                }
-
-                let scopeStr = `Lesson ${lVal} - Part ${pVal}`;
-                if(prVal && prVal !== 'full') {
-                    scopeStr += ` (${prVal.toUpperCase()})`;
-                }
-                
-                const display = document.getElementById('submitScopeDisplay');
-                if(display) display.innerText = scopeStr;
-
-                const accElement = document.getElementById('hudAccValue');
-                const wpmElement = document.getElementById('hudWpmValue');
-                if(accElement && document.getElementById('submitAcc')) {
-                    document.getElementById('submitAcc').innerText = accElement.innerText.replace('%', '');
-                }
-                if(wpmElement && document.getElementById('submitWpm')) {
-                    document.getElementById('submitWpm').innerText = wpmElement.innerText;
-                }
-            }
-        }
-
-        // ★ Target Text と Your Voice を完全に独立してサイズ変更する処理
-        let targetMobileSize = 12;
-        let voiceMobileSize = 12;
-        const originalChangeFontSize = window.changeFontSize;
-        window.changeFontSize = function(type, step) {
-            if (window.innerWidth > 768) {
-                if(originalChangeFontSize) try { originalChangeFontSize(type, step); } catch(e){}
-                return;
-            }
-            if (type === 'eng' || type === 'target') {
-                targetMobileSize = Math.max(10, Math.min(30, targetMobileSize + step));
-                document.documentElement.style.setProperty('--target-font', targetMobileSize + 'px');
-            } else if (type === 'rec' || type === 'voice') {
-                voiceMobileSize = Math.max(10, Math.min(30, voiceMobileSize + step));
-                document.documentElement.style.setProperty('--voice-font', voiceMobileSize + 'px');
-            }
-        };
-
-        // DOMの監視：ヘッダーのロック、アニメーションの排除、高さの数式固定
-        const observer = new MutationObserver(() => {
-            if (window.innerWidth > 768) return; 
-            
-            const recDisplay = document.getElementById('recognizedTextDisplay');
-            if(!recDisplay) return;
-
-            const allDivs = Array.from(recDisplay.querySelectorAll(':scope > div'));
-
-            let targetBox = null;
-            let voiceBox = null;
-
-            allDivs.forEach((div) => {
-                if (div.id === 'mobileResizerHandle') return;
-
-                div.style.setProperty('border', 'none', 'important');
-                div.style.setProperty('box-shadow', 'none', 'important');
-
-                const header = div.querySelector('div:first-child');
-
-                if (div.innerText.includes('TARGET TEXT') || div.innerText.includes('Target Text') || div.innerText.includes('お手本')) {
-                    div.style.setProperty('--mobile-font', 'var(--target-font)');
-                    targetBox = div;
-                    if (header) {
-                        const btns = header.querySelectorAll('.font-size-btn');
-                        if (btns.length >= 2) {
-                            btns[0].setAttribute('onclick', "changeFontSize('target', -2)");
-                            btns[1].setAttribute('onclick', "changeFontSize('target', 2)");
-                        }
-                    }
-                } else if (div.innerText.includes('YOUR VOICE') || div.innerText.includes('Your Voice') || div.innerText.includes('あなたの発音')) {
-                    div.style.setProperty('--mobile-font', 'var(--voice-font)');
-                    voiceBox = div;
-                    if (header) {
-                        const btns = header.querySelectorAll('.font-size-btn');
-                        if (btns.length >= 2) {
-                            btns[0].setAttribute('onclick', "changeFontSize('voice', -2)");
-                            btns[1].setAttribute('onclick', "changeFontSize('voice', 2)");
-                        }
-                    }
-                }
-            });
-
-            if(targetBox && voiceBox) {
-                if(voiceBox.innerHTML.includes('STARTボタンを押して')) {
-                    voiceBox.innerHTML = voiceBox.innerHTML.replace(/※.*?STARTボタンを押して.*?<\/span>/g, '<span style="font-size:12px;color:#666;">※Startボタンを押して開始</span>');
-                }
-
-                if(!document.getElementById('mobileResizerHandle')) {
-                    // 全体の枠を固める
-                    recDisplay.style.cssText += 'display:flex !important; flex-direction:column !important; height:100% !important; overflow:hidden !important;';
-
-                    // ★ ブラウザの勝手な計算（レイアウトシフト）を止める「contain: size layout」を追加
-                    targetBox.style.cssText += 'height: 45vh !important; overflow-y: auto !important; flex-shrink: 0 !important; contain: size layout !important;';
-                    
-                    // Voice枠の高さを「100% - Target(45vh) - バー(24px)」で完全固定
-                    voiceBox.style.cssText += 'height: calc(100% - 45vh - 24px) !important; flex-grow: 0 !important; flex-shrink: 0 !important; overflow-y: auto !important; contain: size layout !important;';
-
-                    const resizer = document.createElement('div');
-                    resizer.id = 'mobileResizerHandle';
-                    resizer.innerHTML = '<div style="width:50px; height:5px; background:#aaa; border-radius:3px;"></div>';
-                    resizer.style.cssText = 'display:flex; justify-content:center; align-items:center; height:24px; margin: 0; background:#f0f4f8; cursor:ns-resize; touch-action:none; z-index:50; border-top:1px solid #ddd; border-bottom:1px solid #ddd; flex-shrink: 0;';
-                    
-                    targetBox.parentNode.insertBefore(resizer, voiceBox);
-
-                    let isDragging = false, startY, startHeight;
-                    resizer.addEventListener('touchstart', (e) => {
-                        isDragging = true; startY = e.touches[0].clientY; startHeight = targetBox.offsetHeight;
-                        document.body.style.overflow = 'hidden';
-                    }, {passive: false});
-                    
-                    document.addEventListener('touchmove', (e) => {
-                        if(!isDragging) return; e.preventDefault();
-                        let newHeight = startHeight + (e.touches[0].clientY - startY);
-                        if(newHeight > 60 && newHeight < window.innerHeight - 200) { 
-                            targetBox.style.height = newHeight + 'px'; 
-                            voiceBox.style.height = `calc(100% - ${newHeight}px - 24px) !important`;
-                        }
-                    }, {passive: false});
-                    
-                    document.addEventListener('touchend', () => { 
-                        isDragging = false; document.body.style.overflow = ''; 
-                    });
-                }
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // START時にメニューを消して画面を広くする処理
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.start-record-btn');
-            if(btn) {
-                setTimeout(() => {
-                    const isRecording = btn.innerText.includes('STOP') || btn.innerText.includes('FINISH');
-                    if(isRecording) {
-                        document.body.classList.add('is-recording');
-                    } else {
-                        document.body.classList.remove('is-recording');
-                    }
-                }, 50);
-            }
-        });
-    </script>
+    <!-- 追加：スマホ専用のJavaScriptファイルを読み込む -->
+    <script src="js/mobile.js"></script>
 </body>
 </html>
