@@ -8,11 +8,20 @@
     <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
     <title>PowerSlide Power On Ⅲ</title>
     
-    <!-- スタイルシートの読み込み -->
-    <link rel="stylesheet" href="css/style.css">     <!-- 元のPC用CSS -->
-    <link rel="stylesheet" href="css/mobile.css">  <!-- 追加：スマホ専用のCSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
+    <!-- 初期ウェルカムスクリーン（インラインスタイルを撤去しました） -->
+    <div id="mobileWelcomeScreen">
+        <div style="text-align: center;">
+            <div style="font-size: 5rem; margin-bottom: 10px;">📖</div>
+            <h1>PowerSlide</h1>
+            <p>English Reading Practice</p>
+            <button onclick="startMobileApp()">音読練習を開始</button>
+        </div>
+    </div>
+
     <!-- PC用の左ナビゲーション -->
     <div class="nav-container">
         <button class="nav-btn color-blue active" onclick="selectLesson(1, this)">Lesson <span class="num">1</span></button>
@@ -29,11 +38,11 @@
 
     <div class="app-container" id="appContainer">
         <div class="main-screen" id="mainScreen">
-            
             <div id="mainOverlay">
-                <!-- スマホ上部メニュー -->
+                <!-- スマホ上部メニュー（SNS風デザイン） -->
                 <div id="mobileTopMenu" class="mobile-only-menu">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
+                        <option value="" selected disabled>Lessonを選択</option>
                         <option value="1">Lesson 1</option>
                         <option value="2">Lesson 2</option>
                         <option value="3">Lesson 3</option>
@@ -46,12 +55,14 @@
                         <option value="10">Lesson 10</option>
                     </select>
                     <select id="mobilePartSelect" onchange="syncMobileMenu()">
+                        <option value="" selected disabled>Partを選択</option>
                         <option value="1">Part 1</option>
                         <option value="2">Part 2</option>
                         <option value="3">Part 3</option>
                         <option value="4">Part 4</option>
                     </select>
                     <select id="mobileParaSelect" onchange="syncMobileMenu()">
+                        <option value="" selected disabled>段落を選択</option>
                         <option value="full">Full Text</option>
                         <option value="p1">Para 1</option>
                         <option value="p2">Para 2</option>
@@ -59,11 +70,11 @@
                     </select>
                 </div>
 
-                <!-- スマホ用音声プレイヤー -->
+                <!-- スマホ用音声プレイヤー（SNS風デザイン） -->
                 <div id="mobileAudioControls" class="mobile-audio-controls">
-                    <button class="m-audio-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
-                    <button class="m-audio-btn" onclick="seekAudio(-5)">⏪ 5秒</button>
-                    <button class="m-audio-btn" onclick="seekAudio(5)">5秒 ⏩</button>
+                    <button class="m-audio-btn play-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
+                    <button class="m-audio-btn" onclick="seekAudio(-5)">⏪</button>
+                    <button class="m-audio-btn" onclick="seekAudio(5)">⏩</button>
                     <button class="m-audio-btn stop-btn" onclick="stopAudio()">⏹ 停止</button>
                 </div>
 
@@ -71,7 +82,6 @@
                     <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
                 </div>
                 
-                <!-- PC用フォントコントロール -->
                 <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
                     <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
                         <button class="font-size-btn" onclick="changeFontSize('eng', -2)">A -</button>
@@ -90,7 +100,6 @@
 
                 <div class="target-text-display sns-box" id="targetTextDisplay" style="display: none;">※データがありません</div>
 
-                <!-- スピーチ結果 -->
                 <div id="speechResultWindow" style="display:none; flex-grow: 1; flex-direction: column; width: 100%; height: 100%;">
                     <div id="gameHud" class="game-hud">
                         <div class="hud-badge hud-acc">
@@ -101,7 +110,6 @@
                             <span class="hud-title">WPM</span>
                             <span class="hud-value" id="hudWpmValue">0</span>
                         </div>
-                        <!-- ★ 読めた単語は青色 の表示をさらに小さく（10px）固定 -->
                         <div style="color: #ffffff; font-size: 10px !important; margin-left: auto; white-space: nowrap; font-weight: normal;">※読めた単語は<span style="color:#4facfe; font-weight:bold;">青色</span></div>
                     </div>
                     
@@ -119,7 +127,6 @@
                 </div>
             </div>
 
-            <!-- 単語ポップアップ -->
             <div id="vocabPopup" style="display:none;">
                 <div class="popup-word" id="popupWord">Word</div>
                 <div class="popup-pron" id="popupPron">/pron/</div>
@@ -217,7 +224,6 @@
         </div>
     </div>
 
-    <!-- 成績提出ボタン -->
     <button id="floatingSubmitBtn" onclick="openCustomSubmitModal()" style="display:none; position:fixed; bottom:95px; left:50%; transform:translateX(-50%); background:#ff4081; color:white; border:none; border-radius:50px; padding:12px 30px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:99999; white-space:nowrap; transition:transform 0.2s;">
         📤 成績提出
     </button>
@@ -232,8 +238,6 @@
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
     <script src="js/speech.js"></script>
-
-    <!-- 追加：スマホ専用のJavaScriptファイルを読み込む -->
     <script src="js/mobile.js"></script>
 </body>
 </html>
