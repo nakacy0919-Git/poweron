@@ -400,3 +400,17 @@ hr { margin: 3px 0 !important; }
 #recognizedTextDisplay > div > div[style*="border-bottom: 2px solid #f0f0f0"] {
     display: none !important;
 }
+/* ==========================================
+   Target TextとYour Voiceの青・赤線を全端末で強制削除
+========================================== */
+#recognizedTextDisplay > div,
+#recognizedTextDisplay > div > div,
+.target-box-area,
+.voice-box-area {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}

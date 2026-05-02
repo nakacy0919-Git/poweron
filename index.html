@@ -8,12 +8,12 @@
     <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
     <title>PowerSlide Power On Ⅲ</title>
     
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/mobile.css?v=7">
 </head>
 <body>
-    <!-- 初期ウェルカムスクリーン（インラインスタイルを撤去しました） -->
-    <div id="mobileWelcomeScreen">
+    <!-- ★ 初期ウェルカムスクリーン（PCでは絶対に表示させないよう display:none を追加） -->
+    <div id="mobileWelcomeScreen" style="display: none;">
         <div style="text-align: center;">
             <div style="font-size: 5rem; margin-bottom: 10px;">📖</div>
             <h1>PowerSlide</h1>
@@ -39,39 +39,25 @@
     <div class="app-container" id="appContainer">
         <div class="main-screen" id="mainScreen">
             <div id="mainOverlay">
-                <!-- スマホ上部メニュー（SNS風デザイン） -->
-                <div id="mobileTopMenu" class="mobile-only-menu">
+                <!-- ★ スマホ上部メニュー（PCでは絶対に表示させないよう display:none を追加） -->
+                <div id="mobileTopMenu" class="mobile-only-menu" style="display: none;">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
                         <option value="" selected disabled>Lessonを選択</option>
-                        <option value="1">Lesson 1</option>
-                        <option value="2">Lesson 2</option>
-                        <option value="3">Lesson 3</option>
-                        <option value="4">Lesson 4</option>
-                        <option value="5">Lesson 5</option>
-                        <option value="6">Lesson 6</option>
-                        <option value="7">Lesson 7</option>
-                        <option value="8">Lesson 8</option>
-                        <option value="9">Lesson 9</option>
-                        <option value="10">Lesson 10</option>
+                        <option value="1">Lesson 1</option><option value="2">Lesson 2</option><option value="3">Lesson 3</option><option value="4">Lesson 4</option><option value="5">Lesson 5</option>
+                        <option value="6">Lesson 6</option><option value="7">Lesson 7</option><option value="8">Lesson 8</option><option value="9">Lesson 9</option><option value="10">Lesson 10</option>
                     </select>
                     <select id="mobilePartSelect" onchange="syncMobileMenu()">
                         <option value="" selected disabled>Partを選択</option>
-                        <option value="1">Part 1</option>
-                        <option value="2">Part 2</option>
-                        <option value="3">Part 3</option>
-                        <option value="4">Part 4</option>
+                        <option value="1">Part 1</option><option value="2">Part 2</option><option value="3">Part 3</option><option value="4">Part 4</option>
                     </select>
                     <select id="mobileParaSelect" onchange="syncMobileMenu()">
                         <option value="" selected disabled>段落を選択</option>
-                        <option value="full">Full Text</option>
-                        <option value="p1">Para 1</option>
-                        <option value="p2">Para 2</option>
-                        <option value="p3">Para 3</option>
+                        <option value="full">Full Text</option><option value="p1">Para 1</option><option value="p2">Para 2</option><option value="p3">Para 3</option>
                     </select>
                 </div>
 
-                <!-- スマホ用音声プレイヤー（SNS風デザイン） -->
-                <div id="mobileAudioControls" class="mobile-audio-controls">
+                <!-- ★ スマホ用音声プレイヤー（PCでは絶対に表示させないよう display:none を追加） -->
+                <div id="mobileAudioControls" class="mobile-audio-controls" style="display: none;">
                     <button class="m-audio-btn play-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
                     <button class="m-audio-btn" onclick="seekAudio(-5)">⏪</button>
                     <button class="m-audio-btn" onclick="seekAudio(5)">⏩</button>
@@ -224,7 +210,8 @@
         </div>
     </div>
 
-    <button id="floatingSubmitBtn" onclick="openCustomSubmitModal()" style="display:none; position:fixed; bottom:95px; left:50%; transform:translateX(-50%); background:#ff4081; color:white; border:none; border-radius:50px; padding:12px 30px; font-size:1.1rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:99999; white-space:nowrap; transition:transform 0.2s;">
+    <!-- ★スマホ用成績提出ボタン（初期は非表示） -->
+    <button id="floatingSubmitBtn" onclick="openCustomSubmitModal()" style="display:none; position:fixed; bottom:25px; right:15px; background:#ff4081; color:white; border:none; border-radius:50px; padding:10px 15px; font-size:0.9rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:99999; white-space:nowrap;">
         📤 成績提出
     </button>
 
@@ -238,6 +225,6 @@
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
     <script src="js/speech.js"></script>
-    <script src="js/mobile.js"></script>
+    <script src="js/mobile.js?v=7"></script>
 </body>
 </html>

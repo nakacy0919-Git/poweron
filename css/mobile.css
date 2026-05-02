@@ -1,151 +1,49 @@
 /* ==========================================
-   スマホ専用：被り解消・線削除・SNS風レイアウト
-   ========================================== */
+   スマホ専用：SNS風デザイン・ガタつき封印・10px強制
+========================================== */
 .mobile-only-menu, .mobile-audio-controls { display: none; }
-
-:root { 
-    --target-font: 12px; 
-    --voice-font: 12px; 
-} 
-
-/* ★PC版では初期ウェルカム画面を絶対に表示させない */
-@media (min-width: 769px) {
-    #mobileWelcomeScreen { display: none !important; }
-}
 
 @media (max-width: 768px) {
     /* PC要素の排除 */
-    .nav-container, .sidebar, #drag-handle, #windowHeader, #fontControls, #targetTextDisplay {
-        display: none !important;
-    }
+    .nav-container, .sidebar, #drag-handle, #windowHeader, #fontControls, #targetTextDisplay { display: none !important; }
+    .app-container { flex-direction: column !important; height: 100dvh !important; padding: 0 !important; overflow: hidden !important; }
+    #mainOverlay { display: flex !important; flex-direction: column !important; height: 100% !important; width: 100% !important; background: #ffffff !important; padding: 0 !important; overflow: hidden !important; }
 
-    .app-container { flex-direction: column; height: 100vh; padding: 0; }
-    #mainOverlay { display: flex !important; flex-direction: column; height: 100%; width: 100%; background: #f8f9fa; overflow: hidden; }
-
-    /* ★ ウェルカム画面 */
-    #mobileWelcomeScreen {
-        display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); z-index: 999999;
-        flex-direction: column; justify-content: center; align-items: center; color: white;
-        transition: opacity 0.5s ease;
-    }
-    #mobileWelcomeScreen.hidden-welcome {
-        display: none !important; /* JSでこのクラスが付与されたら完全に消える */
-    }
-    #mobileWelcomeScreen button {
-        background: #fff; color: #4facfe; border: none; padding: 16px 45px; font-size: 1.3rem; font-weight: 900; border-radius: 50px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer;
-    }
+    /* Welcome Screen */
+    #mobileWelcomeScreen.active { display: flex !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); z-index: 999999; flex-direction: column; justify-content: center; align-items: center; color: white; }
+    #mobileWelcomeScreen button { background: #fff; color: #4facfe; border: none; padding: 16px 45px; font-size: 1.3rem; font-weight: 900; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
     /* =========================================================
-       ★ スマホ上部メニュー（SNS風のクリーンデザイン）
-       ========================================================= */
-    .mobile-only-menu {
-        display: flex !important; justify-content: space-between; align-items: center;
-        padding: max(10px, env(safe-area-inset-top)) 15px 10px 15px !important;
-        background: #ffffff !important;
-        border-bottom: 1px solid #efefef !important;
-        z-index: 9999 !important; gap: 8px !important;
-        position: relative !important; pointer-events: auto !important; flex-shrink: 0 !important;
-    }
-    .mobile-only-menu select {
-        padding: 6px 4px !important; border-radius: 8px !important;
-        border: 1px solid #dbdbdb !important; background: #fafafa !important; color: #262626 !important;
-        font-weight: 600 !important; width: 32% !important; font-size: 13px !important;
-        pointer-events: auto !important;
-    }
+       ★ スマホ上部メニュー＆音声コントロール（美しいSNS風デザイン復活）
+    ========================================================= */
+    #mobileTopMenu { display: flex !important; justify-content: space-between; padding: max(10px, env(safe-area-inset-top)) 10px 10px 10px !important; background: #fff; border-bottom: 1px solid #efefef !important; box-shadow: 0 2px 10px rgba(0,0,0,0.03); z-index: 9999; flex-shrink: 0; }
+    #mobileTopMenu select { padding: 8px 6px; border-radius: 8px; border: 1px solid #dbdbdb; background: #f8f9fa; color: #262626; font-weight: bold; width: 32%; font-size: 13px; outline: none; }
+    
+    #mobileAudioControls { display: flex !important; justify-content: center; gap: 12px; padding: 12px 10px; background: #fff; border-bottom: 1px solid #efefef !important; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0;}
+    .m-audio-btn { background: #fff !important; border: 1px solid #dbdbdb !important; color: #262626 !important; border-radius: 8px !important; padding: 8px 16px !important; font-weight: bold !important; font-size: 0.9rem !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s ease !important; cursor: pointer; }
+    .m-audio-btn:active { background: #f0f0f0 !important; transform: scale(0.96); }
+    .play-btn { color: #0095f6 !important; border-color: #0095f6 !important; }
+    .stop-btn { color: #ed4956 !important; border-color: #ed4956 !important; }
+
+    #gameHud { padding: 8px 10px !important; margin: 0 !important; display: flex !important; align-items: center !important; gap: 8px !important; flex-shrink: 0;}
 
     /* =========================================================
-       ★ スマホ音声コントロール（SNS風のクリーンデザイン）
-       ========================================================= */
-    .mobile-audio-controls {
-        display: flex !important; justify-content: center; align-items: center;
-        gap: 12px !important; padding: 10px 15px !important;
-        background: #ffffff !important; border-bottom: 1px solid #efefef !important;
-        z-index: 9998 !important; position: relative !important; pointer-events: auto !important; flex-shrink: 0 !important;
-    }
-    .m-audio-btn {
-        background: transparent !important; border: 1px solid #dbdbdb !important; color: #262626 !important;
-        border-radius: 8px !important; font-size: 0.85rem !important; padding: 8px 16px !important;
-        font-weight: 600 !important; display: flex !important; align-items: center !important; justify-content: center !important;
-        pointer-events: auto !important; cursor: pointer !important; transition: all 0.2s ease !important;
-    }
-    .m-audio-btn:active { background: #fafafa !important; transform: scale(0.96); }
+       ★ 画面のガタつきを完全に封印する高さ固定設定
+    ========================================================= */
+    #speechResultWindow { display: flex !important; height: 100% !important; flex-direction: column !important; overflow: hidden !important; }
+    .target-box-area { height: 40vh !important; flex: 0 0 40vh !important; border-bottom: 2px dashed #ddd !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+    .voice-box-area { flex: 1 1 auto !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+
+    /* 本文スクロールエリア */
+    .mobile-text-body { flex-grow: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; padding: 12px !important; }
+    .voice-box-area .mobile-text-body { padding-bottom: 120px !important; }
+
+    /* =========================================================
+       ★ ボタンの配置（提出ボタンの display: block !important; を削除し正常化）
+    ========================================================= */
+    #readingMicContainer, #shadowingMicContainer { position: fixed !important; bottom: 25px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 10000 !important; display: flex !important; }
+    .start-record-btn { padding: 15px 45px !important; font-size: 1.3rem !important; border-radius: 50px !important; box-shadow: 0 6px 15px rgba(255,64,129,0.4) !important; }
     
-    /* 再生と停止にだけSNS特有のアクセントカラーを配置 */
-    .m-audio-btn.play-btn { color: #0095f6 !important; border-color: #0095f6 !important; }
-    .m-audio-btn.stop-btn { color: #ed4956 !important; border-color: #ed4956 !important; }
-
-    /* ★ 黒いバー（HUD） */
-    #gameHud {
-        padding: 8px 10px !important; margin-bottom: 0 !important; min-height: 40px;
-        display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important;
-    }
-    .hud-badge { margin: 0 !important; padding: 2px 6px !important; }
-    .hud-title { font-size: 0.6rem !important; }
-    .hud-value { font-size: 1rem !important; }
-
-    /* スピーチ結果領域全体 */
-    #speechResultWindow { display: flex !important; flex-grow: 1 !important; flex-direction: column !important; height: 100% !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
-    .transcription-container { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; padding: 0 !important; margin: 0 !important; background: #fff !important; height: 100% !important; overflow: hidden !important; }
-
-    /* ★ 黒いバーとの被りを解消（上部に15pxの余白） */
-    #recognizedTextDisplay {
-        display: flex !important; flex-direction: column !important; height: 100% !important; width: 100% !important;
-        padding-top: 15px !important; 
-        margin: 0 !important; box-sizing: border-box !important; overflow: hidden !important;
-    }
-    
-    /* ★ 青と赤の線を「物理的に完全に抹殺」 */
-    .target-box-area, .voice-box-area {
-        display: flex !important; flex-direction: column !important;
-        border: none !important;           
-        border-left: none !important;      
-        border-right: none !important;
-        border-top: none !important;
-        border-bottom: none !important;
-        padding: 0 15px !important;        
-        box-shadow: none !important;       
-        background: transparent !important;
-    }
-    .target-box-area::before, .voice-box-area::before,
-    .target-box-area::after, .voice-box-area::after {
-        display: none !important;
-    }
-
-    /* 内側ヘッダー（Target Text / Your Voice） */
-    .target-box-area > div:first-child,
-    .voice-box-area > div:first-child {
-        position: sticky !important; top: 0; background: #fff !important; z-index: 10;
-        display: flex !important; justify-content: space-between !important; align-items: center !important;
-        border-bottom: 1px dashed #e5e7eb !important; font-size: 14px !important; font-weight: 700 !important; padding: 5px 0 !important;
-        color: #374151 !important; 
-    }
-    /* フォントサイズ変更ボタンもモダンに */
-    #recognizedTextDisplay .font-size-btn { 
-        font-size: 12px !important; padding: 4px 10px !important; height: 26px !important; width: auto !important; margin: 0 !important; 
-        background: transparent !important; border: 1px solid #dbdbdb !important; color: #262626 !important; border-radius: 6px !important; font-weight: bold !important;
-    }
-
-    /* 本文エリア（スクロール） */
-    .target-box-area > div:nth-child(n+2),
-    .voice-box-area > div:nth-child(n+2) {
-        flex-grow: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
-        padding-top: 8px !important; color: #1f2937 !important;
-    }
-    .target-box-area > div:nth-child(n+2) { font-size: var(--target-font) !important; line-height: 1.6 !important; }
-    .voice-box-area > div:nth-child(n+2) { font-size: var(--voice-font) !important; line-height: 1.6 !important; padding-bottom: 120px !important; }
-    .target-box-area > div:nth-child(n+2) *, .voice-box-area > div:nth-child(n+2) * { font-size: inherit !important; line-height: inherit !important; transition: none !important; animation: none !important; }
-
-    /* ★ スタートボタン */
-    #readingMicContainer, #shadowingMicContainer { 
-        position: fixed !important; bottom: 25px !important; 
-        left: 50% !important; transform: translateX(-50%) !important; 
-        display: flex !important; justify-content: center !important; z-index: 1000 !important; 
-        width: auto !important; 
-    }
-    #shadowingMicContainer { display: none !important; }
-    .start-record-btn { pointer-events: auto !important; font-size: 1.3rem; padding: 18px 45px; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 15px rgba(255, 64, 129, 0.4); }
-
-    body.is-recording .mobile-only-menu, body.is-recording .mobile-audio-controls { display: none !important; }
+    /* 提出ボタン：位置だけを右下に指定。表示・非表示はPC側の指示に従う */
+    #floatingSubmitBtn { position: fixed !important; bottom: 25px !important; right: 15px !important; left: auto !important; transform: none !important; padding: 10px 15px !important; font-size: 0.9rem !important; z-index: 10001 !important; }
 }
