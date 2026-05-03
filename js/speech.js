@@ -1,5 +1,5 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（録音中スコア非表示・完全安定版）
+// speech.js: 音声認識とスコア計算（練習範囲・WPM・時間 送信対応版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -333,12 +333,10 @@ function processSpeechMatch(spokenText) {
         if (targetBox.style.fontSize !== `${engFontToUse}px`) targetBox.style.fontSize = `${engFontToUse}px`;
     }
     
-    // ★★★ 修正：録音中は数字を隠し、終わった瞬間に結果を表示する ★★★
     const accEl = document.getElementById('hudAccValue');
     const wpmEl = document.getElementById('hudWpmValue');
 
     if (isMainRecording) {
-        // 録音中は「---」を表示（ガタつき防止＆集中力アップ）
         if (accEl && accEl.innerText !== "---") {
             accEl.innerHTML = "---";
             accEl.style.color = '#aaaaaa';
@@ -347,7 +345,6 @@ function processSpeechMatch(spokenText) {
             wpmEl.innerText = "---";
         }
     } else {
-        // FINISH/STOPが押された瞬間に結果をバーンと表示
         if (accEl) {
             let newAccHtml = `${currentScore}<span style="font-size:1rem;">%</span>`;
             if (accEl.innerHTML !== newAccHtml) accEl.innerHTML = newAccHtml;
@@ -364,14 +361,13 @@ function processSpeechMatch(spokenText) {
                 if (wpmEl.innerText !== newWpm) wpmEl.innerText = newWpm;
             }
         } else if (recordStartTime === 0) {
-            // 初期状態は0を表示
             if (wpmEl && wpmEl.innerText !== "0") wpmEl.innerText = "0";
         }
     }
 }
 
 // ==========================================
-// ★ 成績提出システム
+// ★ 成績提出システム（送信データに範囲・WPM・時間を追加）
 // ==========================================
 function openSubmitModal() {
     const hudScore = parseInt(document.getElementById('hudAccValue').innerText) || 0;
@@ -388,6 +384,7 @@ function openSubmitModal() {
     const paraSelect = document.getElementById('paraSelect');
     const paraNum = paraSelect && paraSelect.options.length > 0 ? paraSelect.options[paraSelect.selectedIndex].text : "?";
     
+    // モーダルに練習範囲を表示
     document.getElementById('submitScopeDisplay').innerText = `Lesson ${lNum} / ${pNum} / ${paraNum}`;
     
     document.getElementById('studentClass').value = localStorage.getItem('savedClass') || "";
@@ -405,6 +402,9 @@ function sendScoreToGAS() {
     const finalScore = parseInt(document.getElementById('submitAcc').innerText) || 0;
     const finalWpm = parseInt(document.getElementById('submitWpm').innerText) || 0;
     
+    // ★追加：画面の表示から「練習範囲」の文字列を取得
+    const sScope = document.getElementById('submitScopeDisplay').innerText;
+    
     if (!sClass || !sNum || !sName) return alert("クラス、出席番号、氏名をすべて入力してください。");
     if (!GAS_URL || !GAS_URL.startsWith("https://script.google.com/")) return alert("先生の設定エラー：GASのURLが正しく設定されていません。");
 
@@ -417,17 +417,20 @@ function sendScoreToGAS() {
     btn.disabled = true;
     btn.style.background = "#999";
 
+    // 音読にかかった時間（秒）
     let elapsedSeconds = recordStartTime > 0 ? Math.round((Date.now() - recordStartTime) / 1000) : 0;
     let cheatCode = (finalScore * 123) + sName.length;
 
+    // ★追加：送るデータ（payload）に scope を追加
     const payload = {
         className: sClass,
         studentNumber: sNum,
         name: sName,
+        scope: sScope,         // ★追加：Lesson / Part / Para
         mode: currentMode === 'reading' ? 'Reading Check' : 'Shadowing',
         score: finalScore, 
-        wpm: finalWpm,     
-        timeTaken: elapsedSeconds,
+        wpm: finalWpm,         // (送信済)
+        timeTaken: elapsedSeconds, // (送信済：音読時間[秒])
         checksum: cheatCode
     };
 
