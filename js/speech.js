@@ -1,10 +1,8 @@
 // ==========================================
-// speech.js: 音声認識とスコア計算（変数重複エラー完全解消版）
+// speech.js: 音声認識とスコア計算（誤作動防止・超軽量・DOM更新最適化版）
 // ==========================================
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// ★ state.js等とダブってエラーになる変数の宣言を完全に削除しました！
-// speech.js専用の変数だけを宣言します。
 let mainRecognition;
 let isMainRecording = false;
 let finalTranscript = ''; 
@@ -112,8 +110,14 @@ function openSpeechOverlay(mode) {
     targetText = safeScripts[activeKey] || "※データ未登録";
     // ---------------------------------------------
     
-    if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
-    if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
+    // スマホの時は初期値を強制的に10にする
+    if (window.innerWidth <= 768) {
+        if (typeof engFontSize !== 'undefined') engFontSize = 10;
+        if (typeof recFontSize !== 'undefined') recFontSize = 10;
+    } else {
+        if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
+        if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
+    }
     
     const accEl = document.getElementById('hudAccValue');
     if(accEl) {
@@ -125,6 +129,44 @@ function openSpeechOverlay(mode) {
     if(wpmEl) wpmEl.innerText = "0";
     
     currentScore = 0; lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; recordStartTime = 0;
+
+    // ★★★ 根本修正：マイク開始前に「枠組み」を1回だけ作っておく ★★★
+    const recDisplay = document.getElementById('recognizedTextDisplay');
+    if (recDisplay) {
+        let innerHtml = ``;
+
+        if (mode === 'reading') {
+            innerHtml += `
+                <div style="flex: 1 1 50%; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; padding: 15px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-shrink: 0;">
+                        <div style="font-size: 0.9rem; color: #4facfe; font-weight: bold;">TARGET TEXT（お手本）</div>
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                        </div>
+                    </div>
+                    <!-- ★修正：重いアニメーション(transition)を完全に削除しました -->
+                    <div id="staticTargetText" style="flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; line-height: 1.8; color: #333; font-size: ${engFontSize}px;">${targetText}</div>
+                </div>`;
+        }
+
+        innerHtml += `
+                <div style="flex: 1 1 50%; display: flex; flex-direction: column; overflow: hidden; padding: 15px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #ff4b4b; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-shrink: 0;">
+                        <div style="font-size: 0.9rem; color: #ff4b4b; font-weight: bold;">YOUR VOICE（あなたの発音）</div>
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
+                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
+                        </div>
+                    </div>
+                    <!-- ★修正：重いアニメーション(transition)を完全に削除しました -->
+                    <div id="dynamicVoiceText" style="flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; line-height: 1.6; color: #aaa; font-weight: 500; font-size: ${recFontSize}px;">
+                        ※右下のSTARTボタンを押して開始してください
+                    </div>
+                </div>`;
+                
+        recDisplay.innerHTML = innerHtml;
+    }
 
     const rMic = document.getElementById('readingMicContainer');
     const sMic = document.getElementById('shadowingMicContainer');
@@ -148,6 +190,9 @@ function openSpeechOverlay(mode) {
 }
 
 function toggleReadingRecording() {
+    // ★安全ロック：Reading Checkモードでない時は絶対に起動させない（誤作動防止）
+    if (currentMode !== 'reading') return;
+
     if (!mainRecognition) return alert("ブラウザが音声認識に未対応です(Chrome推奨)。");
     const micBtn = document.getElementById('micBtn');
     const submitBtn = document.getElementById('floatingSubmitBtn');
@@ -172,6 +217,9 @@ function toggleReadingRecording() {
 }
 
 function startShadowing() {
+    // ★安全ロック：Shadowingモードでない時は絶対に起動させない（誤再生防止）
+    if (currentMode !== 'shadowing') return;
+
     if (!mainRecognition) return alert("ブラウザが未対応です");
     if (isMainRecording) return;
     
@@ -223,9 +271,7 @@ function recalculateMatch() {
 function processSpeechMatch(spokenText) {
     if (!targetText) return;
     
-    // ★ 判定モードを固定（false: 順不同の甘め / true: 順通りの厳しめ）
     const isStrict = false;
-    
     const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
     
     const targetWordsArray = targetText.split(/\s+/).filter(w => w).map(cleanString);
@@ -268,68 +314,46 @@ function processSpeechMatch(spokenText) {
     const percentage = validTargetWordCount === 0 ? 0 : Math.round((matchCount / validTargetWordCount) * 100);
     currentScore = percentage > 100 ? 100 : percentage; 
     
-    const recDisplay = document.getElementById('recognizedTextDisplay');
-    if (recDisplay) {
-        let modeTitle = currentMode === 'reading' ? '📖 Reading Check' : '🎙️ Shadowing Training';
-        recDisplay.style.fontSize = ''; 
-        
-        let innerHtml = `
-            <div style="padding-bottom: 120px; margin-top: -15px;">
-                <div style="display:flex; align-items:center; margin-bottom: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
-                    <div style="font-size:1.8rem; margin-right:15px; background:#e0f2fe; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${currentMode === 'reading' ? '📖' : '🎧'}</div>
-                    <div>
-                        <div style="font-weight:900; font-size:1.1rem; color:#333;">${modeTitle}</div>
-                        <div style="font-size:0.75rem; color:#888; font-weight:bold;">@Lesson_Text</div>
-                    </div>
-                </div>`;
-
-        if (currentMode === 'reading') {
-            let engFontToUse = typeof engFontSize !== 'undefined' ? engFontSize : 32;
-            innerHtml += `
-                <div style="margin-bottom: 15px; padding: 15px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                        <div style="font-size: 0.9rem; color: #4facfe; font-weight: bold;">TARGET TEXT（お手本）</div>
-                        
-                        <div style="display:flex; gap:8px;">
-                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
-                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
-                        </div>
-                    </div>
-                    <div id="engContainer" style="line-height: 1.8; color: #333; font-size: ${engFontToUse}px; transition: font-size 0.2s ease;">${targetText}</div>
-                </div>`;
-        }
-
+    // ★★★ 根本修正：本当に変わった部分「だけ」を更新し、フリーズを防止 ★★★
+    const voiceBox = document.getElementById('dynamicVoiceText');
+    if (voiceBox) {
         let fontSizeToUse = typeof recFontSize !== 'undefined' ? recFontSize : 32;
-        innerHtml += `
-                <div style="padding: 15px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #ff4b4b; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                        <div style="font-size: 0.9rem; color: #ff4b4b; font-weight: bold;">YOUR VOICE（あなたの発音）</div>
-                        
-                        <div style="display:flex; gap:8px;">
-                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', -2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A -</button>
-                            <button onclick="if(typeof changeFontSize==='function') changeFontSize('rec', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #ffcdd2; border-radius:6px; background:#ffebee; color:#c62828; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
-                        </div>
-                    </div>
-                    <div style="line-height: 1.6; color: ${spokenText ? '#333' : '#aaa'}; font-weight: 500; font-size: ${fontSizeToUse}px; transition: font-size 0.2s ease;">
-                        ${spokenText ? htmlOutput.join(' ') : (isMainRecording ? 'Listening... (マイクに向かってお話しください)' : '※右下のSTARTボタンを押して開始してください')}
-                    </div>
-                </div>
-            </div>`;
-            
-        recDisplay.innerHTML = innerHtml;
+        if (voiceBox.style.fontSize !== `${fontSizeToUse}px`) voiceBox.style.fontSize = `${fontSizeToUse}px`;
+        
+        let newColor = spokenText ? '#333' : '#aaa';
+        if (voiceBox.style.color !== newColor) voiceBox.style.color = newColor;
+
+        let newHtml = spokenText ? htmlOutput.join(' ') : (isMainRecording ? 'Listening... (マイクに向かってお話しください)' : '※右下のSTARTボタンを押して開始してください');
+        
+        // 文字が増えたり変わったりした瞬間だけ画面を描き直す（超軽量化）
+        if (voiceBox.innerHTML !== newHtml) {
+            voiceBox.innerHTML = newHtml;
+        }
+    }
+
+    const targetBox = document.getElementById('staticTargetText');
+    if (targetBox) {
+        let engFontToUse = typeof engFontSize !== 'undefined' ? engFontSize : 32;
+        if (targetBox.style.fontSize !== `${engFontToUse}px`) targetBox.style.fontSize = `${engFontToUse}px`;
     }
     
     const accEl = document.getElementById('hudAccValue');
     if (accEl) {
-        accEl.innerHTML = `${currentScore}<span style="font-size:1rem;">%</span>`;
-        accEl.style.color = currentScore >= 70 ? '#ffd700' : '#ffffff'; 
+        let newAccHtml = `${currentScore}<span style="font-size:1rem;">%</span>`;
+        if (accEl.innerHTML !== newAccHtml) accEl.innerHTML = newAccHtml;
+        
+        let newAccColor = currentScore >= 70 ? '#ffd700' : '#ffffff';
+        if (accEl.style.color !== newAccColor) accEl.style.color = newAccColor;
     }
 
     if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
         let elapsedMinutes = (Date.now() - recordStartTime) / 60000;
         if (elapsedMinutes < 0.01) elapsedMinutes = 0.01;
         const wpmEl = document.getElementById('hudWpmValue');
-        if (wpmEl) wpmEl.innerText = Math.round(spokenOriginalWords.length / elapsedMinutes);
+        if (wpmEl) {
+            let newWpm = Math.round(spokenOriginalWords.length / elapsedMinutes).toString();
+            if (wpmEl.innerText !== newWpm) wpmEl.innerText = newWpm;
+        }
     }
 }
 
@@ -337,13 +361,11 @@ function processSpeechMatch(spokenText) {
 // ★ 成績提出システム（画面の数字と100%完全一致保証版）
 // ==========================================
 function openSubmitModal() {
-    // 1. 裏の変数は無視！「いま画面(HUD)に表示されている数字」をそのまま取得する
     const hudScore = parseInt(document.getElementById('hudAccValue').innerText) || 0;
     const hudWpm = parseInt(document.getElementById('hudWpmValue').innerText) || 0;
 
     if (hudScore === 0) return alert("まだスコアがありません。一度練習を行ってから提出してください。");
     
-    // 2. 取得した画面の数字をポップアップ画面にコピー
     document.getElementById('submitAcc').innerText = hudScore;
     document.getElementById('submitWpm').innerText = hudWpm;
     
@@ -367,7 +389,6 @@ function sendScoreToGAS() {
     const sNum = document.getElementById('studentNumber').value.trim();
     const sName = document.getElementById('studentName').value.trim();
     
-    // 3. 送信する瞬間も、「ポップアップ画面の数字」を直接読み取る（絶対にズレない）
     const finalScore = parseInt(document.getElementById('submitAcc').innerText) || 0;
     const finalWpm = parseInt(document.getElementById('submitWpm').innerText) || 0;
     
@@ -384,18 +405,15 @@ function sendScoreToGAS() {
     btn.style.background = "#999";
 
     let elapsedSeconds = recordStartTime > 0 ? Math.round((Date.now() - recordStartTime) / 1000) : 0;
-    
-    // 4. 不正チェック用の暗号も、画面の数字(finalScore)を使って計算
     let cheatCode = (finalScore * 123) + sName.length;
 
-    // 5. 送信するデータパック
     const payload = {
         className: sClass,
         studentNumber: sNum,
         name: sName,
         mode: currentMode === 'reading' ? 'Reading Check' : 'Shadowing',
-        score: finalScore, // ★画面の数字をそのまま送る
-        wpm: finalWpm,     // ★画面の数字をそのまま送る
+        score: finalScore, 
+        wpm: finalWpm,     
         timeTaken: elapsedSeconds,
         checksum: cheatCode
     };

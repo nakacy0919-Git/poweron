@@ -8,21 +8,11 @@
     <meta name="apple-mobile-web-app-title" content="Power On Ⅲ">
     <title>PowerSlide Power On Ⅲ</title>
     
-    <link rel="stylesheet" href="css/style.css?v=7">
-    <link rel="stylesheet" href="css/mobile.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=20">
+    <link rel="stylesheet" href="css/mobile.css?v=20">
 </head>
 <body>
-    <!-- ★ 初期ウェルカムスクリーン（PCでは絶対に表示させないよう display:none を追加） -->
-    <div id="mobileWelcomeScreen" style="display: none;">
-        <div style="text-align: center;">
-            <div style="font-size: 5rem; margin-bottom: 10px;">📖</div>
-            <h1>PowerSlide</h1>
-            <p>English Reading Practice</p>
-            <button onclick="startMobileApp()">音読練習を開始</button>
-        </div>
-    </div>
 
-    <!-- PC用の左ナビゲーション -->
     <div class="nav-container">
         <button class="nav-btn color-blue active" onclick="selectLesson(1, this)">Lesson <span class="num">1</span></button>
         <button class="nav-btn color-orange" onclick="selectLesson(2, this)">Lesson <span class="num">2</span></button>
@@ -39,7 +29,6 @@
     <div class="app-container" id="appContainer">
         <div class="main-screen" id="mainScreen">
             <div id="mainOverlay">
-                <!-- ★ スマホ上部メニュー（PCでは絶対に表示させないよう display:none を追加） -->
                 <div id="mobileTopMenu" class="mobile-only-menu" style="display: none;">
                     <select id="mobileLessonSelect" onchange="syncMobileMenu()">
                         <option value="" selected disabled>Lessonを選択</option>
@@ -56,7 +45,6 @@
                     </select>
                 </div>
 
-                <!-- ★ スマホ用音声プレイヤー（PCでは絶対に表示させないよう display:none を追加） -->
                 <div id="mobileAudioControls" class="mobile-audio-controls" style="display: none;">
                     <button class="m-audio-btn play-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
                     <button class="m-audio-btn" onclick="seekAudio(-5)">⏪</button>
@@ -64,23 +52,14 @@
                     <button class="m-audio-btn stop-btn" onclick="stopAudio()">⏹ 停止</button>
                 </div>
 
-                <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom: 5px; margin-bottom: 5px; border-bottom: none;">
-                    <span class="overlay-title" id="overlayTitle" style="margin:0; font-weight:900; color:#333; font-size:1.2rem;"></span>
+                <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom: none;">
+                    <span class="overlay-title" id="overlayTitle" style="margin:0;"></span>
                 </div>
                 
                 <div id="fontControls" style="display:none; justify-content:flex-end; width:100%; margin-bottom:10px; gap: 15px;">
                     <div style="display:none; align-items:center; gap: 8px;" id="engFontControl">
                         <button class="font-size-btn" onclick="changeFontSize('eng', -2)">A -</button>
                         <button class="font-size-btn" onclick="changeFontSize('eng', 2)">A +</button>
-                    </div>
-                    <div style="display:none; align-items:center; gap: 8px;" id="jpnFontControl">
-                        <button class="font-size-btn" onclick="changeFontSize('jpn', -2)">A -</button>
-                        <button class="font-size-btn" onclick="changeFontSize('jpn', 2)">A +</button>
-                    </div>
-                    <div style="display:none; align-items:center; gap: 8px;" id="recFontControl">
-                        <span style="font-size:0.9rem; font-weight:bold; color:#ff007f;">文字サイズ:</span>
-                        <button class="font-size-btn" onclick="changeFontSize('rec', -2)">A -</button>
-                        <button class="font-size-btn" onclick="changeFontSize('rec', 2)">A +</button>
                     </div>
                 </div>
 
@@ -100,6 +79,13 @@
                     </div>
                     
                     <div class="transcription-container">
+                        <div id="mobileGuideMessage" class="mobile-guide-msg" style="display: none;">
+                            <div style="font-size:3.5rem; margin-bottom:15px; animation: bounce 1s infinite;">👆</div>
+                            <div style="color:#0095f6; font-weight:900; font-size:1.1rem; text-align:center; line-height:1.6; background:#f0f8ff; padding:20px; border-radius:12px; border:2px dashed #a1c4fd; width:90%; box-shadow: 0 4px 15px rgba(0,149,246,0.15);">
+                                Lesson<br>Part<br>段落<br><span style="color:#ff4081; font-size:0.9rem;">すべてを選択してください</span>
+                            </div>
+                        </div>
+
                         <div class="recognized-text sns-box-large" id="recognizedTextDisplay"></div>
                         
                         <div id="readingMicContainer" style="display:none;">
@@ -127,7 +113,6 @@
 
         <div id="drag-handle"></div>
 
-        <!-- PC用右サイドバー -->
         <div class="sidebar compact-sidebar" id="sidebar">
             <div class="sidebar-group">
                 <div class="selector-container">
@@ -140,61 +125,39 @@
                     <button class="ctrl-btn" onclick="stopAudio()">⏹ Stop</button>
                     <button class="ctrl-btn" onclick="seekAudio(5)">5s ⏩</button>
                 </div>
-                <div class="loop-controls compact-ctrls">
-                    <button id="btn-loop-start" class="loop-btn" onclick="setLoopStart()">Start</button>
-                    <button id="btn-loop-end" class="loop-btn" onclick="setLoopEnd()">End</button>
-                    <button class="loop-btn" onclick="clearLoop()">Clear</button>
-                </div>
             </div>
             <hr style="margin: 5px 0;">
             <div class="sidebar-group right-controls">
                 <div style="margin-bottom: 10px;">
-                    <select id="levelSelect" onchange="changeLevel(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #4facfe; font-weight: bold; color: #0288d1; background: #e1f5fe; cursor: pointer; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-size: 0.95rem;">
+                    <select id="levelSelect" onchange="changeLevel(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #4facfe; font-weight: bold; color: #0288d1; background: #e1f5fe; cursor: pointer; font-size: 0.95rem;">
                         <option value="standard">🔰 Standard (標準)</option>
                         <option value="pre1">🎯 英検準1級レベル</option>
                         <option value="grade1">👑 英検1級レベル</option>
                     </select>
                 </div>
-
-                <button class="btn btn-script stylish-btn" onclick="toggleTextMode('script')" id="btnScript">
-                    <span class="main-txt">Script</span><span class="sub-txt">本文を表示</span>
-                </button>
-                <button class="btn btn-japanese stylish-btn" onclick="toggleTextMode('japanese')" id="btnJapanese">
-                    <span class="main-txt">Japanese</span><span class="sub-txt">日本語訳を表示</span>
-                </button>
-                <button class="btn btn-vocab stylish-btn" onclick="startVocabQuiz()">
-                    <span class="main-txt" style="margin-top:6px;">Vocabulary</span>
-                </button>
+                <button class="btn btn-script stylish-btn" onclick="toggleTextMode('script')" id="btnScript"><span class="main-txt">Script</span><span class="sub-txt">本文を表示</span></button>
+                <button class="btn btn-japanese stylish-btn" onclick="toggleTextMode('japanese')" id="btnJapanese"><span class="main-txt">Japanese</span><span class="sub-txt">日本語訳を表示</span></button>
+                <button class="btn btn-vocab stylish-btn" onclick="startVocabQuiz()"><span class="main-txt" style="margin-top:6px;">Vocabulary</span></button>
                 <hr style="margin: 5px 0;">
-                <button class="btn btn-compre stylish-btn" onclick="openSpeechOverlay('reading')">
-                    <span class="main-txt">Reading Check</span><span class="sub-txt">音読練習</span>
-                </button>
-                <button class="btn btn-shadowing stylish-btn" onclick="openSpeechOverlay('shadowing')">
-                    <span class="main-txt">Shadowing</span><span class="sub-txt">シャドーイング</span>
-                </button>
-                <button class="btn btn-clear stylish-btn" onclick="resetAppMode()">
-                    <span class="main-txt" style="margin-top:6px;">ALL CLEAR</span>
-                </button>
+                <button class="btn btn-compre stylish-btn" onclick="openSpeechOverlay('reading')"><span class="main-txt">Reading Check</span><span class="sub-txt">音読練習</span></button>
+                <button class="btn btn-shadowing stylish-btn" onclick="openSpeechOverlay('shadowing')"><span class="main-txt">Shadowing</span><span class="sub-txt">シャドーイング</span></button>
+                <button class="btn btn-clear stylish-btn" onclick="resetAppMode()"><span class="main-txt" style="margin-top:6px;">ALL CLEAR</span></button>
             </div>
         </div>
     </div>
 
-    <!-- 成績提出モーダル -->
     <div id="submitModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:center;">
             <h3 style="margin-top:0; color:#333;">📤 成績の提出</h3>
             <p style="font-size:0.9rem; color:#666; margin-bottom:10px;">ベストスコアを先生に送信します。</p>
-            
             <div style="background:#fff9c4; padding:8px; border-radius:6px; margin-bottom:15px; font-size:0.9rem; font-weight:bold; color:#f57f17;">
                 📍 練習範囲: <span id="submitScopeDisplay">未取得</span>
             </div>
-            
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" id="studentClass" placeholder="クラス (例: 1A)" style="width:50%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:16px;">
                 <input type="number" id="studentNumber" placeholder="出席番号" style="width:50%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:16px;">
             </div>
             <input type="text" id="studentName" placeholder="氏名 (フルネーム)" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:16px; margin-bottom:20px; box-sizing:border-box;">
-            
             <div style="background:#f0f8ff; padding:15px; border-radius:8px; margin-bottom:20px;">
                 <div style="font-weight:bold; color:#0288d1; margin-bottom:5px;">送信するデータ</div>
                 <div style="display:flex; justify-content:space-around; font-size:1.2rem; font-weight:900; color:#333;">
@@ -202,7 +165,6 @@
                     <div>WPM: <span id="submitWpm">0</span></div>
                 </div>
             </div>
-
             <div style="display:flex; gap:10px;">
                 <button onclick="document.getElementById('submitModal').style.display='none'" style="flex:1; padding:12px; border:none; border-radius:6px; background:#e0e0e0; color:#333; font-weight:bold; cursor:pointer;">キャンセル</button>
                 <button onclick="if(typeof sendScoreToGAS === 'function'){ sendScoreToGAS(); } else { alert('送信機能が未定義です'); }" id="finalSubmitBtn" style="flex:2; padding:12px; border:none; border-radius:6px; background:#4caf50; color:#fff; font-weight:bold; cursor:pointer;">このスコアで送信する</button>
@@ -210,7 +172,6 @@
         </div>
     </div>
 
-    <!-- ★スマホ用成績提出ボタン（初期は非表示） -->
     <button id="floatingSubmitBtn" onclick="openCustomSubmitModal()" style="display:none; position:fixed; bottom:25px; right:15px; background:#ff4081; color:white; border:none; border-radius:50px; padding:10px 15px; font-size:0.9rem; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); cursor:pointer; z-index:99999; white-space:nowrap;">
         📤 成績提出
     </button>
@@ -224,7 +185,7 @@
     <script src="js/quiz.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/speech.js"></script>
-    <script src="js/mobile.js?v=7"></script>
+    <script src="js/speech.js?v=20"></script>
+    <script src="js/mobile.js?v=20"></script>
 </body>
 </html>

@@ -414,3 +414,7 @@ hr { margin: 3px 0 !important; }
     border: none !important;
     box-shadow: none !important;
 }
+/* PC・スマホ共通：不要なトップヘッダー（本アイコン・Reading Check・@lesson_text等）を完全に非表示 */
+#windowHeader {
+    display: none !important;
+}
