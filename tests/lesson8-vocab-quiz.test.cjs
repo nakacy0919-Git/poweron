@@ -264,3 +264,54 @@ test('Legacy lessons keep the existing five-second quiz, without the points chal
     assert.ok(!html.includes('Pポイントチャレンジ'));
     assert.ok(!html.includes('日→英4択'));
 });
+
+
+test('Full Part 1 clears Stage 1 with 110P, then Stage 2 unlocks and clears', () => {
+    const {run,context,clock,callbacks} = launch();
+    run('setupQuizData(1)');
+    for (let i=0;i<18;i++) {
+        const question=run('quizQuestions[currentQuizIndex]');
+        const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+        context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+        context.answer=question.correct;
+        clock.now += i<11 ? 1000 : 2001;
+        run('checkAnswer1(answerButton,answer,answer)');
+        callbacks.splice(0).forEach(cb=>cb());
+    }
+    assert.equal(run('quizPoints'),110);
+    assert.equal(run('quizScore'),18);
+    assert.equal(run('lesson8QuizProgress.get("L08_P1",1).bestPoints'),110);
+    assert.equal(run('lesson8QuizProgress.unlockedReverse("L08_P1",18)'),true);
+    run('setupQuizData(3)');
+    assert.equal(run('quizMode'),3);
+    for(let i=0;i<18;i++) {
+        const question=run('quizQuestions[currentQuizIndex]');
+        const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+        context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+        context.answer=question.correct;
+        clock.now += 1000;
+        run('checkAnswer1(answerButton,answer,answer)');
+        callbacks.splice(0).forEach(cb=>cb());
+    }
+    assert.equal(run('quizPoints'),180);
+    assert.equal(run('lesson8QuizProgress.get("L08_P1",3).bestPoints'),180);
+    assert.match(run("document.getElementById('targetTextDisplay').innerHTML"),/次のPartのクイズへ/);
+});
+
+test('Accuracy alone must not trigger the points clear celebration', () => {
+    const {run,context,clock,callbacks} = launch();
+    let confetti=0;
+    context.fireConfetti=()=>{confetti++;};
+    run('setupQuizData(1)');
+    run('quizQuestions = quizQuestions.slice(0,1)');
+    const q=run('quizQuestions[0]');
+    const buttons=q.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=q.correct;
+    clock.now=2001;
+    run('checkAnswer1(answerButton,answer,answer)');
+    callbacks.splice(0).forEach(cb=>cb());
+    assert.equal(run('quizScore'),1);
+    assert.equal(run('quizPoints'),0);
+    assert.equal(confetti,0);
+});
