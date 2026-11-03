@@ -10,6 +10,7 @@
     
     <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/mobile.css?v=20">
+    <link rel="stylesheet" href="css/lesson8Practice.css?v=1">
 </head>
 <body>
 
@@ -51,6 +52,7 @@
                     <button class="m-audio-btn" onclick="seekAudio(5)">⏩</button>
                     <button class="m-audio-btn stop-btn" onclick="stopAudio()">⏹ 停止</button>
                     <button class="m-audio-btn" id="btnMobileVocabQuiz" onclick="startVocabQuiz()">📝 単語テスト</button>
+                    <button class="m-audio-btn lesson8-only" style="display:none;" onclick="startChunkPractice()">🧩 Chunk</button>
                 </div>
 
                 <div class="overlay-header" id="windowHeader" style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom: none;">
@@ -139,6 +141,7 @@
                 <button class="btn btn-script stylish-btn" onclick="toggleTextMode('script')" id="btnScript"><span class="main-txt">Script</span><span class="sub-txt">本文を表示</span></button>
                 <button class="btn btn-japanese stylish-btn" onclick="toggleTextMode('japanese')" id="btnJapanese"><span class="main-txt">Japanese</span><span class="sub-txt">日本語訳を表示</span></button>
                 <button class="btn btn-vocab stylish-btn" onclick="startVocabQuiz()"><span class="main-txt" style="margin-top:6px;">Vocabulary</span></button>
+                <button class="btn btn-vocab stylish-btn lesson8-only" style="display:none;" onclick="startChunkPractice()"><span class="main-txt">Chunk Practice</span><span class="sub-txt">本文チャンクの意味を4択で確認</span></button>
                 <hr style="margin: 5px 0;">
                 <button class="btn btn-compre stylish-btn" onclick="openSpeechOverlay('reading')"><span class="main-txt">Reading Check</span><span class="sub-txt">音読練習</span></button>
                 <button class="btn btn-shadowing stylish-btn" onclick="openSpeechOverlay('shadowing')"><span class="main-txt">Shadowing</span><span class="sub-txt">シャドーイング</span></button>
@@ -181,9 +184,11 @@
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
    
     <script src="lessons/lessonData.js"></script>
+    <script src="lessons/lesson8/chunks.js?v=1"></script>
     <script src="js/state.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/quiz.js"></script>
+    <script src="js/lesson8Practice.js?v=1"></script>
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
     <script src="js/speech.js?v=20"></script>
