@@ -7,14 +7,23 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.join(__dirname, '..');
 
-function launch() {
+function launch(existingStore) {
     const callbacks = [];
     const nodes = {};
     const classes = new Set();
+    const store = existingStore || new Map();
+    const clock = {now:0};
     const context = {
         currentKey: 'L08_P1_full',
         currentMode: 'quiz',
-        window: {innerWidth: 1280},
+        window: {
+            innerWidth: 1280,
+            localStorage: {
+                getItem: key => store.has(key) ? store.get(key) : null,
+                setItem: (key,value) => store.set(key,String(value))
+            }
+        },
+        performance: {now: () => clock.now},
         document: {
             body: {classList: {add: s => classes.add(s), remove: s => classes.delete(s)}},
             getElementById(id) {
@@ -30,10 +39,11 @@ function launch() {
     };
     vm.createContext(context);
     vm.runInContext(fs.readFileSync(path.join(root,'lessons/lessonData.js'),'utf8'),context);
+    vm.runInContext(fs.readFileSync(path.join(root,'js/lesson8QuizProgress.js'),'utf8'),context);
     vm.runInContext(fs.readFileSync(path.join(root,'js/quiz.js'),'utf8'),context);
     const run = source => vm.runInContext(source, context);
     run('isTimerEnabled = false');
-    return {context,run,callbacks,nodes,classes};
+    return {context,run,callbacks,nodes,classes,store,clock};
 }
 
 test('Lesson 8 has exactly 18 / 11 / 9 / 10 vocabulary items and valid four choices', () => {
@@ -107,6 +117,7 @@ test('reverse Japanese-to-English four-choice works for all Lesson 8 parts', () 
     const {run,context} = launch();
     for (const [part,count] of [[1,18],[2,11],[3,9],[4,10]]) {
         context.currentKey = 'L08_P'+part+'_full';
+        run('lesson8QuizProgress.save("L08_P'+part+'", 1, {points: '+(count*10)+', correct: '+count+', questionCount: '+count+'})');
         run('setupQuizData(3)');
         const questions = run('quizQuestions');
         const words = run('lessonVocab.L08_P'+part+'.map(v=>v.word)');
@@ -125,6 +136,7 @@ test('reverse Japanese-to-English four-choice works for all Lesson 8 parts', () 
 
 test('reverse choices score exactly once and cannot double-advance on timeout', () => {
     const {run,context,callbacks} = launch();
+    run('lesson8QuizProgress.save("L08_P1", 1, {points:180, correct:18, questionCount:18})');
     run('setupQuizData(3)');
     const question=run('quizQuestions[0]');
     const buttons=question.choices.map(innerText=>({innerText,style:{}}));
@@ -144,6 +156,111 @@ test('reverse quiz does not auto-play the correct word pronunciation', () => {
     const {run,context} = launch();
     let audioCalls=0;
     context.playWordAudio=()=>{audioCalls++;};
+    run('lesson8QuizProgress.save("L08_P1", 1, {points:180, correct:18, questionCount:18})');
     run('setupQuizData(3)');
     assert.equal(audioCalls,0);
+});
+
+
+test('Lesson 8 targets are 60 percent, with 10P for a correct answer within 2 seconds', () => {
+    const {run,context,clock} = launch();
+    const expected = [[1,18,110],[2,11,70],[3,9,60],[4,10,60]];
+    for (const [part,count,target] of expected) {
+        context.currentKey = 'L08_P'+part+'_full';
+        assert.equal(run('lesson8QuizProgress.targetForCount('+count+')'),target);
+    }
+    context.currentKey = 'L08_P1_full';
+    run('setupQuizData(1)');
+    const question=run('quizQuestions[0]');
+    const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=question.correct;
+    clock.now=2000;
+    run('checkAnswer1(answerButton,answer,answer)');
+    assert.equal(run('quizScore'),1);
+    assert.equal(run('quizPoints'),10);
+});
+
+test('Correct answer after 2000ms awards 0P, but still counts as correct', () => {
+    const {run,context,clock} = launch();
+    run('setupQuizData(1)');
+    const question=run('quizQuestions[0]');
+    const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=question.correct;
+    clock.now=2001;
+    run('handleTimeOut()');
+    assert.equal(run('currentQuizIndex'),0); // 2 seconds is a P window, not answer timeout
+    run('checkAnswer1(answerButton,answer,answer)');
+    assert.equal(run('quizScore'),1);
+    assert.equal(run('quizPoints'),0);
+    assert.match(run("document.getElementById('quizPointsFeedback').innerText"),/0P/);
+});
+
+test('Wrong answers award no P points even when fast', () => {
+    const {run,context,clock} = launch();
+    run('setupQuizData(1)');
+    const question=run('quizQuestions[0]');
+    const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=question.choices.find(x=>x!==question.correct);
+    clock.now=200;
+    run('checkAnswer1(answerButton,answer,"'+question.correct+'")');
+    assert.equal(run('quizScore'),0);
+    assert.equal(run('quizPoints'),0);
+});
+
+test('Reverse stage is locked until sufficient stage-one points are saved', () => {
+    const {run,context} = launch();
+    run('startVocabQuiz()');
+    assert.match(run("document.getElementById('targetTextDisplay').innerHTML"),/disabled aria-disabled/);
+    run('lesson8QuizProgress.save("L08_P1",1,{points:100,correct:17,questionCount:18})');
+    assert.equal(run('lesson8QuizProgress.unlockedReverse("L08_P1",18)'),false);
+    run('lesson8QuizProgress.save("L08_P1",1,{points:110,correct:18,questionCount:18})');
+    assert.equal(run('lesson8QuizProgress.unlockedReverse("L08_P1",18)'),true);
+    run('startVocabQuiz()');
+    assert.match(run("document.getElementById('targetTextDisplay').innerHTML"),/ステージ2：日本語から英単語/);
+});
+
+test('Lesson 8 result screen saves completed attempts and does not double-save', () => {
+    const {run,context,callbacks} = launch();
+    run('setupQuizData(1)');
+    run('quizQuestions = quizQuestions.slice(0,1)');
+    const q=run('quizQuestions[0]');
+    const buttons=q.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=q.correct;
+    run('checkAnswer1(answerButton,answer,answer)');
+    callbacks.splice(0).forEach(cb=>cb());
+    assert.equal(run('lesson8QuizProgress.get("L08_P1",1).attempts'),1);
+    assert.equal(run('lesson8QuizProgress.get("L08_P1",1).bestPoints'),10);
+    run('renderQuizResult()');
+    assert.equal(run('lesson8QuizProgress.get("L08_P1",1).attempts'),1);
+});
+
+test('Local score and unlocking survive a new page session on the same browser', () => {
+    const first=launch();
+    first.run('lesson8QuizProgress.save("L08_P2",1,{points:70,correct:11,questionCount:11})');
+    const another=launch(first.store);
+    assert.equal(another.run('lesson8QuizProgress.get("L08_P2",1).bestPoints'),70);
+    assert.equal(another.run('lesson8QuizProgress.get("L08_P2",1).attempts'),1);
+    assert.equal(another.run('lesson8QuizProgress.unlockedReverse("L08_P2",11)'),true);
+    assert.equal(another.run('lesson8QuizProgress.get("L08_P1",1).bestPoints'),0);
+});
+
+test('Progress remains usable when browser storage is denied', () => {
+    const {run,context} = launch();
+    context.window.localStorage = {getItem(){throw Error('denied')},setItem(){throw Error('denied')}};
+    assert.equal(run('lesson8QuizProgress.save("L08_P3",1,{points:60,correct:9,questionCount:9}).persisted'),false);
+    assert.equal(run('lesson8QuizProgress.unlockedReverse("L08_P3",9)'),true);
+});
+
+test('Legacy lessons keep the existing five-second quiz, without the points challenge', () => {
+    const {run,context} = launch();
+    context.currentKey='L07_P1_full';
+    run('startVocabQuiz()');
+    const html=run("document.getElementById('targetTextDisplay').innerHTML");
+    assert.match(html,/5秒制限/);
+    assert.ok(!html.includes('Pポイントチャレンジ'));
+    assert.ok(!html.includes('日→英4択'));
 });
