@@ -418,3 +418,20 @@ hr { margin: 3px 0 !important; }
 #windowHeader {
     display: none !important;
 }
+
+/* Lesson 8: locally-saved P-point challenge */
+.quiz-mode-btn:disabled, .quiz-mode-btn:disabled:hover {
+    opacity: .48; cursor: not-allowed; transform: none; box-shadow: none;
+}
+.quiz-progress-panel {
+    background: #f5f7ff; color: #303a50; border: 1px solid #cfd7ec;
+    border-radius: 14px; width: min(100%, 630px); box-sizing: border-box;
+    padding: 14px 18px; display: flex; flex-direction: column; gap: 5px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 1rem; text-align: center;
+}
+.quiz-progress-panel strong { font-size: 1.2rem; }
+.quiz-points-hud { margin-bottom: 12px; font-size: 1.1rem; color: #333; }
+.quiz-points-hud strong { color: #2950b0; font-size: 1.5rem; }
+.quiz-result-progress { padding: 14px; border: 1px solid #cfd7ec; border-radius: 12px; background: #f8faff; margin: 15px auto; max-width: 680px; }
+.quiz-next-stage-btn { padding: 16px 30px; margin: 10px; background: #215d9c; color: #fff; border: none; border-radius: 30px; cursor: pointer; font-weight: 800; font-size: 1.15rem; }
+.quiz-next-stage-btn:hover { background: #174b80; }
