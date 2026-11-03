@@ -545,12 +545,12 @@ function renderQuizResult() {
     display.innerHTML = `
         <div style="text-align:center; padding: 50px; font-family:'Nunito', sans-serif;">
             <div style="font-size: 2.5rem; font-weight:900; color:#333;">Quiz Result</div>
-            <div style="font-size: 6rem; font-weight: 900; color: ${percent >= 80 ? '#4caf50' : '#764ba2'}; margin: 20px 0;">${percent}%</div>
+            <div style="font-size: 6rem; font-weight: 900; color: ${isLesson8PointRound ? (cleared ? '#4caf50' : '#764ba2') : (percent >= 80 ? '#4caf50' : '#764ba2')}; margin: 20px 0;">${percent}%</div>
             <p style="font-size: 1.8rem; font-weight:bold; color:#555;">${quizScore} / ${quizQuestions.length} Correct</p>
             ${progressionHtml}
             <button onclick="startVocabQuiz()" style="margin-top:40px; padding: 20px 50px; font-size:1.5rem; font-weight:900; border-radius:40px; border:none; background:#333; color:white; cursor:pointer; font-family:'Noto Sans JP', sans-serif; box-shadow:0 5px 15px rgba(0,0,0,0.2);">メニューに戻る</button>
             <button onclick="closeVocabQuiz()" style="margin:15px; padding:15px 25px; border:1px solid #aaa; border-radius:30px; background:white;">終了</button>
         </div>
     `;
-    if (percent >= 80 && typeof fireConfetti === 'function') fireConfetti();
+    if ((isLesson8PointRound ? cleared : percent >= 80) && typeof fireConfetti === 'function') fireConfetti();
 }
