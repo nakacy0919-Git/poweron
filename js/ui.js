@@ -78,6 +78,77 @@ function toggleTextMode(mode) {
 
 // ★ 本文の中に登録された単語（New Words）を赤くハイライトさせる処理（美UI組み込み済）
 // ★ 本文の中に登録された単語（New Words）を赤くハイライトさせる処理（美UI組み込み済）
+
+// Highlight only the original plain text, never previously generated HTML.
+function escapeTextHtml(text) {
+    return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeVocabRegExp(value) {
+    return String(value).replace(/[.*+?^$()|[\]{}\\]/g, '\\function renderDualText() {');
+}
+function getVocabMatches(collection) {
+    if (!collection) return [];
+    const entries = Array.isArray(collection) ? collection :
+        Object.entries(collection).map(([word, data]) => ({
+            ...(data && typeof data === 'object' ? data : {}), word
+        }));
+    const seen = new Set(), matches = [];
+    entries.forEach(entry => {
+        if (!entry || typeof entry.word !== 'string') return;
+        const variants = [...(Array.isArray(entry.targetStrings) ? entry.targetStrings : []), entry.word];
+        variants.forEach(phrase => {
+            if (typeof phrase !== 'string' || !phrase.trim()) return;
+            const normalized = phrase.trim().toLowerCase().replace(/\s+/g, ' ');
+            if (seen.has(normalized)) return;
+            seen.add(normalized);
+            matches.push({phrase:phrase.trim(), word:entry.word});
+        });
+    });
+    return matches.sort((a,b)=>b.phrase.length-a.phrase.length);
+}
+function highlightVocabText(rawText, collection) {
+    const text = String(rawText);
+    const candidates = getVocabMatches(collection);
+    const safe = part => escapeTextHtml(part).replace(/\n/g,'<br>');
+    if (!candidates.length) return safe(text);
+    const alternatives = candidates.map(v => escapeVocabRegExp(v.phrase).replace(/\s+/g, '\\s+')).join('|');
+    const regex = new RegExp('(^|[^A-Za-z0-9])(' + alternatives + ')(?=$|[^A-Za-z0-9])','gi');
+    const dictionary = new Map(candidates.map(v => [v.phrase.toLowerCase().replace(/\s+/g,' '),v.word]));
+    let output = '', cursor = 0;
+    for (const match of text.matchAll(regex)) {
+        const word = match[2], begin = match.index + match[1].length;
+        output += safe(text.slice(cursor, begin));
+        const sourceWord = dictionary.get(word.toLowerCase().replace(/\s+/g, ' '));
+        output += '<span class="vocab-highlight" data-word="' +
+            encodeURIComponent(sourceWord) +
+            '" onclick="showVocab(event, this.textContent, decodeURIComponent(this.dataset.word))">' +
+            escapeTextHtml(word) + '</span>';
+        cursor = begin + word.length;
+    }
+    return output + safe(text.slice(cursor));
+}
+function splitEnglishSentences(rawText) {
+    const source = String(rawText).replace(/<br\s*\/?>/gi,'\n\n').replace(/<[^>]*>/g,'');
+    const sentences = [];
+    let start = 0;
+    for (let i=0; i<source.length; i++) {
+        if (!/[.!?]/.test(source[i])) continue;
+        const before = source.slice(start,i+1).trim();
+        if (/\b(?:St|Mr|Mrs|Ms|Dr|Prof|Jr|Sr|vs|U\.S|U\.K)\.$/i.test(before)) continue;
+        if (source[i]==='.' && /\d/.test(source[i-1]||'') && /\d/.test(source[i+1]||'')) continue;
+        let close = i+1;
+        while (close<source.length && /["'”’)\]]/.test(source[close])) close++;
+        if (close<source.length && !/\s/.test(source[close])) continue;
+        let next = close;
+        while (next<source.length && /\s/.test(source[next])) next++;
+        const sentence = source.slice(start,next);
+        if (sentence.trim()) sentences.push(sentence);
+        start=next; i=next-1;
+    }
+    if (start<source.length && source.slice(start).trim()) sentences.push(source.slice(start));
+    return sentences.length ? sentences : [source];
+}
+
 function renderDualText() {
     const display = document.getElementById('targetTextDisplay');
     if (!display) return;
@@ -98,37 +169,20 @@ function renderDualText() {
     }
     // ---------------------------------------------
 
-    let rawEng = safeScripts[currentKey] || "※英語データ未登録";
-    let rawJpn = safeTranslations[currentKey] || "※和訳データ未登録";
+    let rawEng = safeScripts[currentKey] || (typeof lessonScripts !== 'undefined' && lessonScripts[currentKey]) || "※英語データ未登録";
+    let rawJpn = safeTranslations[currentKey] || (typeof lessonTranslations !== 'undefined' && lessonTranslations[currentKey]) || "※和訳データ未登録";
     
     const baseKey = currentKey.split('_').slice(0, 2).join('_'); 
-    const currentVocab = safeVocab[currentKey] || safeVocab[baseKey]; 
+    const currentVocab = safeVocab[currentKey] || safeVocab[baseKey] ||
+        (typeof lessonVocab !== 'undefined' && (lessonVocab[currentKey] || lessonVocab[baseKey])); 
 
     let html = `<div id="textContainer" style="display:flex; flex-direction:column; gap:20px; padding-top:5px;">`;
     // ...（この下の if (isScriptOpen) { ... 等はそのまま残します）
 
     if (isScriptOpen) {
-        let engHtml = rawEng;
-        
-        if (currentVocab) {
-            let vocabList = [];
-            if (Array.isArray(currentVocab)) {
-                vocabList = currentVocab;
-            } else {
-                vocabList = Object.keys(currentVocab).map(k => ({ word: k, ...currentVocab[k] }));
-            }
+        // Separate sentences before generating spans; never split HTML attributes.
+        const engSentences = splitEnglishSentences(rawEng);
 
-            vocabList.sort((a, b) => b.word.length - a.word.length);
-
-            vocabList.forEach(v => {
-                if(!v.word) return;
-                const regex = new RegExp(`\\b${v.word}\\b`, 'gi');
-                engHtml = engHtml.replace(regex, `<span class="vocab-highlight" onclick="showVocab(event, '$&', '${v.word}')">$&</span>`);
-            });
-        }
-
-        const engSentences = engHtml.match(/.*?([.?!]\s*|$)/g)?.filter(s => s.trim().length > 0) || [engHtml];
-        
         // ★ 美しいUI枠（A- A+ ボタン埋め込み）
         html += `
         <div style="padding: 20px; background: #fdfbfb; border-radius: 12px; border-left: 5px solid #4facfe; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
@@ -142,7 +196,7 @@ function renderDualText() {
             <div id="engContainer" style="font-size:${engFontSize}px; line-height:1.8; color:#333; transition: font-size 0.2s ease;">`;
         
         engSentences.forEach((s, i) => { 
-            html += `<span class="eng-sentence" id="eng-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${s}</span>`; 
+            html += `<span class="eng-sentence" id="eng-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${highlightVocabText(s, currentVocab)}</span>`; 
         });
         html += `</div></div>`;
     }
@@ -201,15 +255,16 @@ function showVocab(event, displayWord, dictWord) {
     // ---------------------------------------------
 
     const baseKey = currentKey.split('_').slice(0, 2).join('_');
-    const currentVocab = safeVocab[currentKey] || safeVocab[baseKey];
+    const currentVocab = safeVocab[currentKey] || safeVocab[baseKey] ||
+        (typeof lessonVocab !== 'undefined' && (lessonVocab[currentKey] || lessonVocab[baseKey]));
     if (!currentVocab) return;
     // ...（この下はそのまま残します）
     
     let vocabData = null;
     if (Array.isArray(currentVocab)) {
-        vocabData = currentVocab.find(v => v.word.toLowerCase() === dictWord.toLowerCase());
+        vocabData = currentVocab.find(v => v.word && v.word.toLowerCase() === dictWord.toLowerCase());
     } else {
-        vocabData = currentVocab[dictWord];
+        vocabData = currentVocab[dictWord] || currentVocab[dictWord.toLowerCase()];
     }
 
     if (!vocabData) return;
