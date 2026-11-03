@@ -102,3 +102,48 @@ test('mobile entry and responsive quiz visibility rules exist', () => {
     assert.match(css,/body\.quiz-active #speechResultWindow/);
     assert.match(css,/body\.quiz-active \.quiz-choices/);
 });
+
+test('reverse Japanese-to-English four-choice works for all Lesson 8 parts', () => {
+    const {run,context} = launch();
+    for (const [part,count] of [[1,18],[2,11],[3,9],[4,10]]) {
+        context.currentKey = 'L08_P'+part+'_full';
+        run('setupQuizData(3)');
+        const questions = run('quizQuestions');
+        const words = run('lessonVocab.L08_P'+part+'.map(v=>v.word)');
+        const original = run('lessonVocab.L08_P'+part);
+        assert.equal(questions.length,count);
+        for (const question of questions) {
+            assert.ok(original.some(v=>v.word===question.correct && v.meaning===question.meaning));
+            assert.equal(question.choices.length,4);
+            assert.equal(new Set(question.choices).size,4);
+            assert.equal(question.choices.filter(x=>x===question.correct).length,1);
+            assert.ok(question.choices.every(x=>words.includes(x)));
+        }
+        assert.match(run("document.getElementById('targetTextDisplay').innerHTML"), /日本語の意味に合う英語/);
+    }
+});
+
+test('reverse choices score exactly once and cannot double-advance on timeout', () => {
+    const {run,context,callbacks} = launch();
+    run('setupQuizData(3)');
+    const question=run('quizQuestions[0]');
+    const buttons=question.choices.map(innerText=>({innerText,style:{}}));
+    context.answerButton={style:{},parentElement:{querySelectorAll(){return buttons;}}};
+    context.answer=question.correct;
+    run('checkAnswer1(answerButton, answer, answer)');
+    run('checkAnswer1(answerButton, answer, answer)');
+    run('handleTimeOut()');
+    assert.equal(run('quizScore'),1);
+    assert.equal(run('currentQuizIndex'),0);
+    callbacks.splice(0).forEach(fn=>fn());
+    assert.equal(run('quizScore'),1);
+    assert.equal(run('currentQuizIndex'),1);
+});
+
+test('reverse quiz does not auto-play the correct word pronunciation', () => {
+    const {run,context} = launch();
+    let audioCalls=0;
+    context.playWordAudio=()=>{audioCalls++;};
+    run('setupQuizData(3)');
+    assert.equal(audioCalls,0);
+});
