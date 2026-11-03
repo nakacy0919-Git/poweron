@@ -40,21 +40,31 @@ if (window.innerWidth <= 768) {
 
 // グローバル関数
 window.syncMobileMenu = function() {
-    if (window.innerWidth <= 768) window.checkSelectionGuide(); 
-    
-    let l = document.getElementById('mobileLessonSelect').value;
-    let p = document.getElementById('mobilePartSelect').value;
-    let pr = document.getElementById('mobileParaSelect').value;
-    
-    if (l) {
-        const navBtns = document.querySelectorAll('.nav-btn');
-        if(navBtns[l-1]) window.selectLesson(parseInt(l), navBtns[l-1]);
+    const lesson = document.getElementById('mobileLessonSelect')?.value || '';
+    const part = document.getElementById('mobilePartSelect')?.value || '';
+    const para = document.getElementById('mobileParaSelect')?.value || '';
+    if (window.innerWidth <= 768 && typeof window.checkSelectionGuide === 'function')
+        window.checkSelectionGuide();
+
+    // Do not start recognition before every selection has been made.
+    if (!lesson || !part || !para) {
+        if (lesson && Number(currentLesson) !== Number(lesson))
+            selectLesson(Number(lesson),document.querySelectorAll('.nav-btn')[Number(lesson)-1]);
+        return;
     }
-    if (p) document.getElementById('partSelect').value = p;
-    if (pr) document.getElementById('paraSelect').value = pr;
-    
-    if (typeof window.onScopeChange === 'function') window.onScopeChange();
-    setTimeout(() => { if(typeof window.openSpeechOverlay === 'function') window.openSpeechOverlay('reading'); }, 100);
+    if (Number(currentLesson) !== Number(lesson))
+        selectLesson(Number(lesson),document.querySelectorAll('.nav-btn')[Number(lesson)-1]);
+
+    const desktopPart = document.getElementById('partSelect');
+    const desktopPara = document.getElementById('paraSelect');
+    if (desktopPart) desktopPart.value = part;
+    if (typeof updateParaSelect === 'function') updateParaSelect();
+    if (desktopPara) desktopPara.value = para;
+    if (typeof onScopeChange === 'function') onScopeChange();
+
+    // Preserve Shadowing when the learner intentionally changed the scope.
+    const nextMode = currentMode === 'shadowing' ? 'shadowing' : 'reading';
+    if (typeof openSpeechOverlay === 'function') openSpeechOverlay(nextMode);
 };
 
 window.openCustomSubmitModal = function() {
