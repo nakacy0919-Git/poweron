@@ -125,8 +125,9 @@ test('combined gate needs both module results and opens Copeak only when passing
     assert.equal(opens.length,1);
     assert.equal(opens[0].url,'https://copeak.pic-speak-story.com/');
     saved.set('poweron_lesson8_progress_v1',JSON.stringify({L08_P1:{
-        vocab:{points:150,max:180},chunk:{points:190,max:250}
+        vocab:{points:100,max:180},chunk:{points:210,max:250}
     }}));
+    // 310P alone is insufficient when Vocabulary has not reached 60%.
     assert.equal(run("getLesson8PracticeStatus('L08_P1').ready"),false);
 });
 test('desktop, mobile, and score CSS are wired',()=>{
@@ -137,4 +138,66 @@ test('desktop, mobile, and score CSS are wired',()=>{
     assert.match(html,/lesson8-only/);
     assert.match(css,/l8-chunk-choices/);
     assert.match(css,/@media\(max-width:768px\)/);
+});
+
+test('quiz menu shows saved points first, then mode buttons, and all four parts',()=>{
+    const {run,ctx,nodes,saved}=createApp();
+    saved.set('poweron_lesson8_progress_v1',JSON.stringify({L08_P2:{
+        vocab:{points:70,max:110},chunk:{points:200,max:310}
+    }}));
+    ctx.currentKey='L08_P2_full';
+    run('startVocabQuiz()');
+    const view=nodes.targetTextDisplay.innerHTML;
+    assert.ok(view.includes('Part 2 · 現在の獲得ポイント'));
+    assert.ok(view.includes('270'));
+    assert.ok(view.includes('70 / 110 P'));
+    assert.ok(view.includes('200 / 310 P'));
+    assert.ok(view.includes('あと30P'));
+    for(const p of [1,2,3,4])assert.ok(view.includes('Part '+p));
+    assert.ok(view.indexOf('現在の獲得ポイント')<view.indexOf('setupQuizData(1)'));
+    assert.ok(view.includes('class="quiz-menu-container l8-scored-menu"'));
+    assert.equal(run("getLesson8PracticeStatus('L08_P2').ready"),false);
+});
+test('part-specific pass thresholds and module 60% floor apply',()=>{
+    const app=createApp(),{run,saved}=app;
+    const cases=[
+        {part:'L08_P1',vMax:180,cMax:250,v:110,c:200,pass:310},
+        {part:'L08_P2',vMax:110,cMax:310,v:70,c:230,pass:300},
+        {part:'L08_P3',vMax:90,cMax:190,v:60,c:140,pass:200},
+        {part:'L08_P4',vMax:100,cMax:120,v:60,c:100,pass:160}
+    ];
+    for(const c of cases){
+        const obj={};
+        obj[c.part]={vocab:{points:c.v,max:c.vMax},chunk:{points:c.c,max:c.cMax}};
+        saved.set('poweron_lesson8_progress_v1',JSON.stringify(obj));
+        const result=run("getLesson8PracticeStatus('"+c.part+"')");
+        assert.equal(result.pass,c.pass);
+        assert.equal(result.ready,true,c.part);
+        assert.equal(result.remaining,0);
+        obj[c.part].chunk.points=c.c-10;
+        saved.set('poweron_lesson8_progress_v1',JSON.stringify(obj));
+        const below=run("getLesson8PracticeStatus('"+c.part+"')");
+        assert.equal(below.ready,false,c.part);
+        assert.equal(below.remaining,10);
+    }
+});
+test('overall 1,000P threshold is separate from individual part passes',()=>{
+    const {run,saved}=createApp();
+    const scores={
+       L08_P1:{vocab:{points:110,max:180},chunk:{points:200,max:250}},
+       L08_P2:{vocab:{points:70,max:110},chunk:{points:230,max:310}},
+       L08_P3:{vocab:{points:60,max:90},chunk:{points:140,max:190}},
+       L08_P4:{vocab:{points:60,max:100},chunk:{points:100,max:120}}
+    };
+    saved.set('poweron_lesson8_progress_v1',JSON.stringify(scores));
+    let summary=run('getLesson8Overview()');
+    assert.equal(summary.total,970);
+    assert.equal(summary.remaining,30);
+    assert.equal(summary.ready,false);
+    scores.L08_P1.chunk.points+=30;
+    saved.set('poweron_lesson8_progress_v1',JSON.stringify(scores));
+    summary=run('getLesson8Overview()');
+    assert.equal(summary.total,1000);
+    assert.equal(summary.remaining,0);
+    assert.equal(summary.ready,true);
 });
