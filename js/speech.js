@@ -1,82 +1,207 @@
-// ==========================================
-// speech.js: 音声認識とスコア計算（練習範囲・WPM・時間 送信対応版）
-// ==========================================
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-let mainRecognition;
+// PowerOn speech recognition: resilient Reading Check and Shadowing.
+// SpeechRecognition needs HTTPS, microphone permission and a supported browser.
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+let mainRecognition = null;
 let isMainRecording = false;
-let finalTranscript = ''; 
-let currentInterim = ''; 
+let speechStopping = false;
+let speechSessionId = 0;
+let recognitionSegmentFinal = '';
+let finalTranscript = '';
+let currentInterim = '';
+let recognitionRestartTimer = null;
+let recognitionStopFallback = null;
+let recordEndTime = 0;
 
-// ★先生のGAS URL
-const GAS_URL = "https://script.google.com/macros/s/AKfycby6AC39tWELS-GeGn0cuWfMNKunMb-Rp4RBZ-_L2VGjbCm9f-9PK54iG1q5K3lSlhI2BQ/exec"; 
+// Submission endpoint remains unchanged.
+const GAS_URL = "https://script.google.com/macros/s/AKfycby6AC39tWELS-GeGn0cuWfMNKunMb-Rp4RBZ-_L2VGjbCm9f-9PK54iG1q5K3lSlhI2BQ/exec";
 
-if (window.SpeechRecognition) {
-    mainRecognition = new SpeechRecognition();
-    mainRecognition.lang = 'en-US';
-    mainRecognition.interimResults = true;
-    mainRecognition.continuous = true;
-    
-    mainRecognition.onerror = (e) => {
-        if (e.error === 'not-allowed' || e.error === 'denied') {
-            isMainRecording = false;
-            document.body.classList.remove('is-recording');
-            
-            const micBtn = document.getElementById('micBtn');
-            if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
-            const bShadow = document.getElementById('bigShadowBtn');
-            const sShadow = document.getElementById('stopShadowBtn');
-            if(bShadow) bShadow.style.display = 'flex';
-            if(sShadow) sShadow.style.display = 'none';
-            
-            const submitBtn = document.getElementById('floatingSubmitBtn');
-            if (submitBtn) submitBtn.style.display = 'none';
+function speechMessage(message) {
+    const box = document.getElementById('dynamicVoiceText');
+    if (box) box.textContent = message;
+}
 
-            const recDisplay = document.getElementById('recognizedTextDisplay');
-            if (recDisplay) {
-                recDisplay.innerHTML = `
-                <div style="padding: 20px; background: #fff5f8; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
-                    <div style="font-size: 1.2rem; color: #d32f2f; font-weight: bold; margin-bottom: 10px;">⚠️ マイクへのアクセスがブロックされています</div>
-                    <div style="line-height: 1.6; color: #333; font-size: 1rem; font-weight: 500;">
-                        お使いのブラウザでマイクが許可されていません。<br><br>
-                        【解決方法】<br>
-                        URLバーの「ぁあ（aA）」マークを押してマイクを許可するか、設定アプリからSafariのマイクアクセスを許可してください。
-                    </div>
-                </div>`;
+function setRecordingButtons(running, finished) {
+    const mic = document.getElementById('micBtn');
+    const begin = document.getElementById('bigShadowBtn');
+    const end = document.getElementById('stopShadowBtn');
+    if (mic) {
+        mic.classList.toggle('recording', running && currentMode === 'reading');
+        mic.textContent = running ? 'STOP' : (finished ? 'RETRY' : 'START');
+    }
+    if (begin) {
+        begin.style.display = running && currentMode === 'shadowing' ? 'none' : 'flex';
+        begin.textContent = finished ? 'RETRY' : 'START';
+    }
+    if (end) {
+        end.style.display = running && currentMode === 'shadowing' ? 'flex' : 'none';
+        end.textContent = 'FINISH';
+    }
+    document.body.classList.toggle('is-recording', !!running);
+}
+
+function stopRecognitionTimers() {
+    if (recognitionRestartTimer !== null) clearTimeout(recognitionRestartTimer);
+    if (recognitionStopFallback !== null) clearTimeout(recognitionStopFallback);
+    recognitionRestartTimer = null;
+    recognitionStopFallback = null;
+}
+
+function appendRecognitionSegment() {
+    // Preserve the newest final and interim words without replaying prior resultIndex.
+    const segment = [recognitionSegmentFinal, currentInterim].filter(Boolean).join(' ').trim();
+    if (segment) finalTranscript = [finalTranscript, segment].filter(Boolean).join(' ').trim();
+    recognitionSegmentFinal = '';
+    currentInterim = '';
+    lastSpokenText = finalTranscript;
+}
+
+function finishRecognition() {
+    if (!speechStopping) return;
+    speechStopping = false;
+    stopRecognitionTimers();
+    mainRecognition = null;
+    processSpeechMatch(lastSpokenText);
+    setRecordingButtons(false, true);
+    const submit = document.getElementById('floatingSubmitBtn');
+    if (submit) submit.style.display = currentScore > 0 ? 'block' : 'none';
+    if (typeof checkCelebration === 'function') checkCelebration();
+}
+
+function stopSpeechRecording() {
+    if (!isMainRecording) return;
+    isMainRecording = false;
+    speechStopping = true;
+    recordEndTime = Date.now();
+    stopRecognitionTimers();
+    setRecordingButtons(false, true);
+    if (currentMode === 'shadowing' && typeof stopAudio === 'function') stopAudio();
+    // The final result may arrive after stop(); wait for onend before final scoring.
+    processSpeechMatch(lastSpokenText);
+    const active = mainRecognition;
+    if (!active) { finishRecognition(); return; }
+    try { active.stop(); } catch (_) { appendRecognitionSegment(); finishRecognition(); return; }
+    const token = speechSessionId;
+    recognitionStopFallback = setTimeout(() => {
+        if (token !== speechSessionId || !speechStopping) return;
+        appendRecognitionSegment();
+        finishRecognition();
+    }, 1500);
+}
+
+function abortSpeechSession() {
+    speechSessionId++;
+    isMainRecording = false;
+    speechStopping = false;
+    stopRecognitionTimers();
+    const rec = mainRecognition;
+    mainRecognition = null;
+    if (rec) {
+        rec.onresult = null;
+        rec.onend = null;
+        rec.onerror = null;
+        try { rec.abort(); } catch (_) {}
+    }
+    setRecordingButtons(false, false);
+    const submit = document.getElementById('floatingSubmitBtn');
+    if (submit) submit.style.display = 'none';
+}
+
+function failSpeechRecognition(error) {
+    // The recognizer is unavailable. Restore buttons so students can retry.
+    const reason = error && (error.error || error.message || String(error));
+    let guide = '音声認識を開始できません。HTTPSのSafariまたはChromeで開き、マイクの設定とネット接続を確認してください。';
+    if (/not-allowed|service-not-allowed|permission|denied/i.test(reason)) {
+        guide = 'マイクへのアクセスが許可されていません。ブラウザのサイト設定でマイクを許可してから、RETRYを押してください。';
+    } else if (/audio-capture|device/i.test(reason)) {
+        guide = 'マイクを利用できません。端末のマイク接続と他のアプリの使用状況を確認してください。';
+    } else if (/network|service/i.test(reason)) {
+        guide = '音声認識サービスに接続できません。インターネット接続を確認してRETRYしてください。';
+    }
+    if (currentMode === 'shadowing' && typeof stopAudio === 'function') stopAudio();
+    abortSpeechSession();
+    recordEndTime = Date.now();
+    processSpeechMatch(lastSpokenText);
+    setRecordingButtons(false, true);
+    speechMessage(guide);
+}
+
+function startRecognitionEngine(token) {
+    if (token !== speechSessionId || !isMainRecording || !SpeechRecognitionCtor) return;
+    let recognizer;
+    try {
+        recognizer = new SpeechRecognitionCtor();
+        recognizer.lang = 'en-US';
+        recognizer.continuous = true;
+        recognizer.interimResults = true;
+        recognitionSegmentFinal = '';
+        currentInterim = '';
+        mainRecognition = recognizer;
+        recognizer.onresult = (event) => {
+            if (token !== speechSessionId || mainRecognition !== recognizer ||
+                (!isMainRecording && !speechStopping)) return;
+            const committed = [], pending = [];
+            for (let i = 0; i < event.results.length; i++) {
+                const item = event.results[i];
+                const text = item && item[0] && item[0].transcript ? item[0].transcript.trim() : '';
+                if (!text) continue;
+                (item.isFinal ? committed : pending).push(text);
             }
-        }
-    };
-
-    mainRecognition.onresult = (e) => { 
-        let interimTranscript = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) {
-                finalTranscript += e.results[i][0].transcript + ' ';
-            } else {
-                interimTranscript += e.results[i][0].transcript;
+            recognitionSegmentFinal = committed.join(' ');
+            currentInterim = pending.join(' ');
+            lastSpokenText = [finalTranscript, recognitionSegmentFinal, currentInterim].filter(Boolean).join(' ').trim();
+            processSpeechMatch(lastSpokenText);
+        };
+        recognizer.onerror = event => {
+            if (token !== speechSessionId || mainRecognition !== recognizer) return;
+            if (['no-speech','aborted'].includes(event.error)) return;
+            failSpeechRecognition(event);
+        };
+        recognizer.onend = () => {
+            if (token !== speechSessionId || mainRecognition !== recognizer) return;
+            appendRecognitionSegment();
+            if (speechStopping) {
+                finishRecognition();
+                return;
             }
-        }
-        currentInterim = interimTranscript; 
-        lastSpokenText = finalTranscript + interimTranscript;
-        processSpeechMatch(lastSpokenText); 
-    };
+            mainRecognition = null;
+            if (!isMainRecording) return;
+            processSpeechMatch(lastSpokenText);
+            recognitionRestartTimer = setTimeout(() => {
+                recognitionRestartTimer = null;
+                if (token === speechSessionId && isMainRecording && !speechStopping)
+                    startRecognitionEngine(token);
+            }, 350);
+        };
+        recognizer.start();
+    } catch (error) {
+        failSpeechRecognition(error);
+    }
+}
 
-    mainRecognition.onend = () => {
-        if (isMainRecording) {
-            if (currentInterim.trim() !== '') {
-                finalTranscript += currentInterim + ' ';
-                currentInterim = ''; 
-                lastSpokenText = finalTranscript;
-                processSpeechMatch(lastSpokenText);
-            }
-            setTimeout(() => { try { if (isMainRecording) mainRecognition.start(); } catch(err){} }, 250);
-        }
-    };
+function beginSpeechRecording() {
+    if (!SpeechRecognitionCtor) {
+        speechMessage('このブラウザは音声認識に対応していません。SafariまたはChromeの最新版で開いてください。');
+        return;
+    }
+    abortSpeechSession();
+    finalTranscript = '';
+    recognitionSegmentFinal = '';
+    currentInterim = '';
+    lastSpokenText = '';
+    recordStartTime = Date.now();
+    recordEndTime = 0;
+    currentScore = 0;
+    isMainRecording = true;
+    const token = speechSessionId;
+    setRecordingButtons(true, false);
+    processSpeechMatch('');
+    startRecognitionEngine(token);
 }
 
 function openSpeechOverlay(mode) {
     if (typeof resetAppMode === 'function') resetAppMode();
     currentMode = mode;
+    document.body.classList.add('speech-active');
     
     document.body.classList.remove('is-recording'); 
     
@@ -126,7 +251,7 @@ function openSpeechOverlay(mode) {
     const wpmEl = document.getElementById('hudWpmValue');
     if(wpmEl) wpmEl.innerText = "0";
     
-    currentScore = 0; lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; recordStartTime = 0;
+    currentScore = 0; lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; recordStartTime = 0; recordEndTime = 0;
 
     const recDisplay = document.getElementById('recognizedTextDisplay');
     if (recDisplay) {
@@ -168,10 +293,7 @@ function openSpeechOverlay(mode) {
     const bShadow = document.getElementById('bigShadowBtn');
     const sShadow = document.getElementById('stopShadowBtn');
 
-    const micBtn = document.getElementById('micBtn');
-    if(micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "START"; }
-    if(bShadow) { bShadow.style.display = 'flex'; bShadow.innerHTML = "START"; }
-    if(sShadow) sShadow.style.display = 'none';
+    setRecordingButtons(false, false);
 
     processSpeechMatch(""); 
 
@@ -184,187 +306,90 @@ function openSpeechOverlay(mode) {
     }
 }
 
+
+
 function toggleReadingRecording() {
     if (currentMode !== 'reading') return;
-    if (!mainRecognition) return alert("ブラウザが音声認識に未対応です(Chrome推奨)。");
-    const micBtn = document.getElementById('micBtn');
-    const submitBtn = document.getElementById('floatingSubmitBtn');
-    
-    if (isMainRecording) { 
-        isMainRecording = false; mainRecognition.stop();
-        document.body.classList.remove('is-recording'); 
-        
-        if (micBtn) { micBtn.classList.remove('recording'); micBtn.innerHTML = "RETRY"; }
-        if (submitBtn && currentScore > 0) submitBtn.style.display = 'block';
-        
-        if (typeof checkCelebration === 'function') checkCelebration(); 
-        processSpeechMatch(lastSpokenText); 
-    } else {
-        recordStartTime = Date.now(); 
-        isMainRecording = true; 
-        document.body.classList.add('is-recording'); 
-        
-        lastSpokenText = ""; finalTranscript = ""; currentInterim = ""; 
-        mainRecognition.start(); 
-        if (micBtn) { micBtn.classList.add('recording'); micBtn.innerHTML = "STOP"; }
-        if (submitBtn) submitBtn.style.display = 'none';
-        
-        processSpeechMatch(""); 
-    }
+    if (isMainRecording) stopSpeechRecording();
+    else if (!speechStopping) beginSpeechRecording();
 }
-
 function startShadowing() {
-    if (currentMode !== 'shadowing') return;
-    if (!mainRecognition) return alert("ブラウザが未対応です");
-    if (isMainRecording) return;
-    
-    const bShadow = document.getElementById('bigShadowBtn');
-    const sShadow = document.getElementById('stopShadowBtn');
-    if(bShadow) bShadow.style.display = 'none';
-    if(sShadow) { sShadow.style.display = 'flex'; sShadow.innerHTML = "FINISH"; }
-    
-    const submitBtn = document.getElementById('floatingSubmitBtn');
-    if (submitBtn) submitBtn.style.display = 'none';
-    
-    recordStartTime = Date.now(); 
-    isMainRecording = true; 
-    document.body.classList.add('is-recording'); 
-    
-    mainRecognition.start();
-    
-    if (typeof loopState !== 'undefined' && !loopState.active && typeof audioPlayer !== 'undefined' && audioPlayer) {
+    if (currentMode !== 'shadowing' || isMainRecording || speechStopping) return;
+    beginSpeechRecording();
+    if (!isMainRecording) return;
+    if (typeof loopState !== 'undefined' && !loopState.active && typeof audioPlayer !== 'undefined' && audioPlayer)
         audioPlayer.currentTime = 0;
-    }
     if (typeof audioPlayer !== 'undefined' && audioPlayer) {
-        audioPlayer.play().then(() => {
-            if (typeof updateAudioButtonUI === 'function') updateAudioButtonUI(true);
-        }).catch(e => console.error(e));
+        Promise.resolve(audioPlayer.play()).then(() => {
+            if (isMainRecording && typeof updateAudioButtonUI === 'function') updateAudioButtonUI(true);
+        }).catch(() => {
+            speechMessage('音声教材が再生できません。音声ファイルを確認するか、Reading Checkで練習してください。');
+        });
     }
-
-    processSpeechMatch(""); 
 }
-
 function stopShadowing() {
-    isMainRecording = false; mainRecognition.stop(); 
-    document.body.classList.remove('is-recording'); 
-    
-    if (typeof stopAudio === 'function') stopAudio();
-    
-    const bShadow = document.getElementById('bigShadowBtn');
-    const sShadow = document.getElementById('stopShadowBtn');
-    if(bShadow) { bShadow.style.display = 'flex'; bShadow.innerHTML = "RETRY"; }
-    if(sShadow) sShadow.style.display = 'none';
-    
-    const submitBtn = document.getElementById('floatingSubmitBtn');
-    if (submitBtn && currentScore > 0) submitBtn.style.display = 'block';
-    
-    if (typeof checkCelebration === 'function') checkCelebration(); 
-    processSpeechMatch(lastSpokenText);
+    if (currentMode !== 'shadowing') return;
+    stopSpeechRecording();
 }
-
-function recalculateMatch() {
-    processSpeechMatch(lastSpokenText || "");
-}
+function recalculateMatch() { processSpeechMatch(lastSpokenText || ''); }
 
 function processSpeechMatch(spokenText) {
     if (!targetText) return;
-    
-    const isStrict = false;
-    const cleanString = (str) => str.toLowerCase().replace(/[^a-z0-9]/gi, '');
-    
-    const targetWordsArray = targetText.split(/\s+/).filter(w => w).map(cleanString);
-    const spokenOriginalWords = spokenText.split(/\s+/).filter(w => w); 
-    
-    let matchCount = 0; 
-    let htmlOutput = []; 
-    let searchIndex = 0; 
-    let targetPool = [...targetWordsArray]; 
-    
-    spokenOriginalWords.forEach((originalWord) => {
-        let cleanSpoken = cleanString(originalWord); 
-        if (!cleanSpoken) {
-            htmlOutput.push(originalWord);
-            return;
-        }
-        
-        let isMatched = false;
-        if (isStrict) {
-            let foundIndex = targetWordsArray.indexOf(cleanSpoken, searchIndex);
-            if (foundIndex !== -1) { 
-                isMatched = true; searchIndex = foundIndex + 1; 
-            }
-        } else {
-            let foundIndex = targetPool.indexOf(cleanSpoken);
-            if (foundIndex !== -1) { 
-                isMatched = true; targetPool.splice(foundIndex, 1); 
-            }
-        }
-
-        if (isMatched) {
-            htmlOutput.push(`<span class="matched-word">${originalWord}</span>`);
-            matchCount++;
-        } else {
-            htmlOutput.push(`<span class="unmatched-word" style="color:#555;">${originalWord}</span>`);
-        }
-    });
-
-    const validTargetWordCount = targetWordsArray.length;
-    const percentage = validTargetWordCount === 0 ? 0 : Math.round((matchCount / validTargetWordCount) * 100);
-    currentScore = percentage > 100 ? 100 : percentage; 
-    
-    const voiceBox = document.getElementById('dynamicVoiceText');
-    if (voiceBox) {
-        let fontSizeToUse = typeof recFontSize !== 'undefined' ? recFontSize : 32;
-        if (voiceBox.style.fontSize !== `${fontSizeToUse}px`) voiceBox.style.fontSize = `${fontSizeToUse}px`;
-        
-        let newColor = spokenText ? '#333' : '#aaa';
-        if (voiceBox.style.color !== newColor) voiceBox.style.color = newColor;
-
-        let newHtml = spokenText ? htmlOutput.join(' ') : (isMainRecording ? 'Listening... (マイクに向かってお話しください)' : '※右下のSTARTボタンを押して開始してください');
-        
-        if (voiceBox.innerHTML !== newHtml) {
-            voiceBox.innerHTML = newHtml;
+    const plainText = String(targetText).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');
+    const tokens = s => (s.match(/[a-z0-9]+(?:['’][a-z0-9]+)*/gi) || []);
+    const canonical = word => word.toLowerCase().replace(/[’]/g, "'");
+    const targetWords = tokens(plainText).map(canonical);
+    const spokenOriginalWords = tokens(String(spokenText||''));
+    const spokenWords = spokenOriginalWords.map(canonical);
+    // An ordered LCS avoids counting an arbitrary jumble of target words as a fluent reading.
+    // 1000 tokens per side is ample for a reading task and bounds work on low-end iPads.
+    const target = targetWords.slice(0, 1000);
+    const spoken = spokenWords.slice(0, 1000);
+    const rows = spoken.length + 1, cols = target.length + 1;
+    const table = Array.from({length:rows}, () => new Uint16Array(cols));
+    for (let i=spoken.length-1; i>=0; i--) {
+        for (let j=target.length-1; j>=0; j--) {
+            table[i][j] = spoken[i] === target[j]
+                ? 1+table[i+1][j+1]
+                : Math.max(table[i+1][j],table[i][j+1]);
         }
     }
-
-    const targetBox = document.getElementById('staticTargetText');
-    if (targetBox) {
-        let engFontToUse = typeof engFontSize !== 'undefined' ? engFontSize : 32;
-        if (targetBox.style.fontSize !== `${engFontToUse}px`) targetBox.style.fontSize = `${engFontToUse}px`;
+    const matched = new Set();
+    let i=0, j=0;
+    while (i<spoken.length && j<target.length) {
+        if (spoken[i] === target[j]) { matched.add(i); i++; j++; }
+        else if (table[i+1][j] >= table[i][j+1]) i++;
+        else j++;
     }
-    
-    const accEl = document.getElementById('hudAccValue');
-    const wpmEl = document.getElementById('hudWpmValue');
-
-    if (isMainRecording) {
-        if (accEl && accEl.innerText !== "---") {
-            accEl.innerHTML = "---";
-            accEl.style.color = '#aaaaaa';
-        }
-        if (wpmEl && wpmEl.innerText !== "---") {
-            wpmEl.innerText = "---";
-        }
-    } else {
-        if (accEl) {
-            let newAccHtml = `${currentScore}<span style="font-size:1rem;">%</span>`;
-            if (accEl.innerHTML !== newAccHtml) accEl.innerHTML = newAccHtml;
-            
-            let newAccColor = currentScore >= 70 ? '#ffd700' : '#ffffff';
-            if (accEl.style.color !== newAccColor) accEl.style.color = newAccColor;
-        }
-
-        if (recordStartTime > 0 && spokenOriginalWords.length > 0) {
-            let elapsedMinutes = (Date.now() - recordStartTime) / 60000;
-            if (elapsedMinutes < 0.01) elapsedMinutes = 0.01;
-            if (wpmEl) {
-                let newWpm = Math.round(spokenOriginalWords.length / elapsedMinutes).toString();
-                if (wpmEl.innerText !== newWpm) wpmEl.innerText = newWpm;
-            }
-        } else if (recordStartTime === 0) {
-            if (wpmEl && wpmEl.innerText !== "0") wpmEl.innerText = "0";
-        }
+    const count = matched.size;
+    const total = target.length;
+    currentScore = total ? Math.min(100,Math.round(count/total*100)) : 0;
+    const safe = str => String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const box = document.getElementById('dynamicVoiceText');
+    if (box) {
+        const size = typeof recFontSize === 'number' ? recFontSize : 32;
+        box.style.fontSize = size+'px';
+        box.style.color = spokenOriginalWords.length ? '#333' : '#777';
+        box.innerHTML = spokenOriginalWords.length
+            ? spokenOriginalWords.map((word,index) => '<span class="'+(matched.has(index)?'matched-word':'unmatched-word')+'">'+safe(word)+'</span>').join(' ')
+            : (isMainRecording ? 'Listening...（声を出して読んでください）' : 'STARTボタンを押して音読してください');
     }
+    const model = document.getElementById('staticTargetText');
+    if (model) model.style.fontSize = (typeof engFontSize === 'number' ? engFontSize : 32)+'px';
+    const acc = document.getElementById('hudAccValue');
+    const wpm = document.getElementById('hudWpmValue');
+    if (isMainRecording || speechStopping) {
+        if (acc) {acc.textContent = '---';acc.style.color='#aaa';}
+        if (wpm) wpm.textContent='---';
+        return;
+    }
+    if (acc) { acc.textContent = currentScore+'%';acc.style.color=currentScore>=80?'#ffd700':'#fff'; }
+    const end = recordEndTime || Date.now();
+    const minutes = recordStartTime ? Math.max((end-recordStartTime)/60000,1/60) : 0;
+    const speed = minutes ? Math.round(spokenOriginalWords.length/minutes) : 0;
+    if (wpm) wpm.textContent = String(speed);
 }
+
 
 // ==========================================
 // ★ 成績提出システム（送信データに範囲・WPM・時間を追加）
@@ -418,7 +443,7 @@ function sendScoreToGAS() {
     btn.style.background = "#999";
 
     // 音読にかかった時間（秒）
-    let elapsedSeconds = recordStartTime > 0 ? Math.round((Date.now() - recordStartTime) / 1000) : 0;
+    let elapsedSeconds = recordStartTime > 0 ? Math.round(((recordEndTime || Date.now()) - recordStartTime) / 1000) : 0;
     let cheatCode = (finalScore * 123) + sName.length;
 
     // ★追加：送るデータ（payload）に scope を追加
