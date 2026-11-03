@@ -5,7 +5,7 @@
 let quizQuestions = [];
 let currentQuizIndex = 0;
 let quizScore = 0;
-let quizMode = 1; // 1: 4択, 2: Voice Speaking
+let quizMode = 1; // 1: 英→日4択, 2: Voice Speaking, 3: 日→英4択
 let isTimerEnabled = true;
 let quizTimer = null;
 let timeLeft = 50; // 5.0秒 (0.1秒単位)
@@ -56,6 +56,11 @@ function startVocabQuiz() {
                 <span class="quiz-mode-subtxt">意味をリストから選択します</span>
             </button>
 
+            <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(3)">
+                🇯🇵 4択クイズ (日→英)
+                <span class="quiz-mode-subtxt">日本語の意味から英単語を選択します</span>
+            </button>
+
             <button class="quiz-mode-btn btn-mode-2" onclick="setupQuizData(2)">
                 🎙️ Voice Speaking (日→英)
                 <span class="quiz-mode-subtxt">正しい英単語を発音して回答します</span>
@@ -87,12 +92,15 @@ function setupQuizData(mode) {
         return;
     }
 
-    // 同じPartの語彙から誤答を生成する。
-    const allMeaningsPool = [...new Set(currentVocabArray.map(v => v.meaning).filter(Boolean))];
+    // 日→英の場合だけ正答・誤答とも英単語とし、それ以外は日本語の意味とする。
+    const isReverseChoice = mode === 3;
+    const allChoicesPool = [...new Set(currentVocabArray
+        .map(v => isReverseChoice ? v.word : v.meaning).filter(Boolean))];
 
     quizQuestions = currentVocabArray.map(v => {
-        let choices = [v.meaning]; 
-        let fakes = allMeaningsPool.filter(m => m !== v.meaning);
+        const correct = isReverseChoice ? v.word : v.meaning;
+        let choices = [correct];
+        let fakes = allChoicesPool.filter(answer => answer !== correct);
         fakes.sort(() => 0.5 - Math.random());
         choices = choices.concat(fakes.slice(0, 3));
         
@@ -101,7 +109,7 @@ function setupQuizData(mode) {
         choices.sort(() => 0.5 - Math.random()); 
         
         let hintStr = v.word ? v.word.charAt(0) : "?";
-        return { word: v.word, correct: v.meaning, choices: choices, hint: hintStr };
+        return { word: v.word, meaning: v.meaning, correct, choices, hint: hintStr };
     });
 
     quizQuestions.sort(() => 0.5 - Math.random());
@@ -133,17 +141,20 @@ function renderQuizQuestion() {
             <div style="font-size: 1.4rem; font-family:'Nunito', sans-serif; color: #888; font-weight:900; margin-bottom: 15px;">Question ${currentQuizIndex + 1} / ${quizQuestions.length}</div>
     `;
 
-    if (isTimerEnabled && quizMode === 1) {
+    if (isTimerEnabled && (quizMode === 1 || quizMode === 3)) {
         html += `<div class="timer-container"><div id="tBar" class="timer-bar"></div></div>`;
     }
 
     const safeCorrect = q.correct ? q.correct.replace(/'/g, "\\'") : "";
     const safeWord = q.word ? q.word.replace(/'/g, "\\'") : "";
 
-    if (quizMode === 1) {
-        // モード1: 4択クイズ
+    if (quizMode === 1 || quizMode === 3) {
+        // モード1: 英→日4択 / モード3: 日→英4択
+        const questionLabel = quizMode === 3 ? "日本語の意味に合う英語を選んでください" : "英語の意味を選んでください";
+        const questionText = quizMode === 3 ? q.meaning : q.word;
         html += `
-            <div class="quiz-word" style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', sans-serif;">${q.word}</div>
+            <div style="font-size:1.05rem;color:#666;margin-bottom:12px;">${questionLabel}</div>
+            <div class="quiz-word" style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', 'Noto Sans JP', sans-serif;">${questionText}</div>
             <div class="quiz-choices" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto;">
                 ${q.choices.map(c => {
                     const safeChoice = c ? c.replace(/'/g, "\\'") : "";
@@ -152,7 +163,8 @@ function renderQuizQuestion() {
             </div>
         `;
         display.innerHTML = html;
-        if(typeof playWordAudio === 'function') playWordAudio(q.word);
+        // 日→英の出題時に正答の発音を流すと答えを教えてしまうため再生しない。
+        if (quizMode === 1 && typeof playWordAudio === 'function') playWordAudio(q.word);
         startTimer();
     } else {
         // モード2: Voice Speaking (PicFlash)
@@ -214,7 +226,7 @@ function handleTimeOut() {
 
 // --- モード1(4択)の判定 ---
 function checkAnswer1(btn, selected, correct) {
-    if (currentMode !== 'quiz' || quizMode !== 1 || isQuizTransitioning) return;
+    if (currentMode !== 'quiz' || (quizMode !== 1 && quizMode !== 3) || isQuizTransitioning) return;
     isQuizTransitioning = true;
     const sessionId = quizSessionId;
     clearInterval(quizTimer);
