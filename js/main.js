@@ -66,7 +66,11 @@ function onScopeChange() {
     });
     
     if (typeof audioPlayer !== 'undefined' && audioPlayer) {
-        audioPlayer.src = `lessons/lesson${currentLesson}/part${part}/audio/${currentKey}.mp3`;
+        // Lesson 8 Part 4 has audio files at the part root; others use /audio/.
+        const audioDir = currentLesson === 8 && String(part) === '4'
+            ? `lessons/lesson8/part4`
+            : `lessons/lesson${currentLesson}/part${part}/audio`;
+        audioPlayer.src = `${audioDir}/${currentKey}.mp3`;
     }
     
     if (typeof clearLoop === 'function') clearLoop();
