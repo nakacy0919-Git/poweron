@@ -235,8 +235,9 @@ function openSpeechOverlay(mode) {
     targetText = safeScripts[activeKey] || "※データ未登録";
     
     if (window.innerWidth <= 768) {
-        if (typeof engFontSize !== 'undefined') engFontSize = 10;
-        if (typeof recFontSize !== 'undefined') recFontSize = 10;
+        // 10px was unreadable on portrait iPad / mobile. Maintain at least 18px.
+        if (typeof engFontSize !== 'undefined') engFontSize = Math.max(18, Math.min(engFontSize, 24));
+        if (typeof recFontSize !== 'undefined') recFontSize = Math.max(18, Math.min(recFontSize, 24));
     } else {
         if (typeof engFontSize !== 'undefined' && engFontSize < 28) engFontSize = 28;
         if (typeof recFontSize !== 'undefined' && recFontSize < 32) recFontSize = 32;
