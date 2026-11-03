@@ -99,14 +99,10 @@ function resetAppMode() {
     if (typeof stopAudio === 'function') stopAudio();
     if (typeof clearLoop === 'function') clearLoop();
 
-    // ★修正：isMainRecording のエラー回避と、正しい関数名への噛み合わせ
-    if (typeof isMainRecording !== 'undefined' && isMainRecording) {
-        if (currentMode === 'shadowing') {
-            if (typeof stopShadowing === 'function') stopShadowing();
-        } else {
-            if (typeof toggleReadingRecording === 'function') toggleReadingRecording(); // 修正！
-        }
-    }
+    // Scope/mode changes must cancel the previous microphone session immediately.
+    // No previous onend/result callback may update a newly selected text.
+    if (typeof abortSpeechSession === 'function') abortSpeechSession();
+    document.body.classList.remove('speech-active');
 
     currentMode = ''; isScriptOpen = false; isJapaneseOpen = false;
 }
@@ -180,59 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseup', stopResize);
     document.addEventListener('touchend', stopResize);
 
-    // 【2. WPM & Accuracy 確定計測システム】
-    let sessionStartTime = 0;
-    let wpmInterval = null;
-
-    const updateStats = (isFinal = false) => {
-        const textDisplay = document.getElementById('recognizedTextDisplay');
-        if (!textDisplay || !sessionStartTime) return;
-
-        const matchedWordsCount = textDisplay.querySelectorAll('.matched-word').length;
-        
-        const allWordsCount = textDisplay.querySelectorAll('span').length;
-        if (allWordsCount > 0) {
-            const acc = Math.round((matchedWordsCount / allWordsCount) * 100);
-            document.getElementById('hudAccValue').innerText = acc + "%";
-        }
-
-        const currentTime = Date.now();
-        const elapsedMs = currentTime - sessionStartTime;
-        const elapsedMin = elapsedMs / 60000;
-
-        if (elapsedMin > 0.05) { 
-            const wpm = Math.round(matchedWordsCount / elapsedMin);
-            document.getElementById('hudWpmValue').innerText = wpm;
-        }
-    };
-
-    const startSession = () => {
-        sessionStartTime = Date.now();
-        document.getElementById('hudAccValue').innerText = "0%";
-        document.getElementById('hudWpmValue').innerText = "0";
-        clearInterval(wpmInterval);
-        wpmInterval = setInterval(() => updateStats(false), 1000); 
-    };
-
-    const stopSession = () => {
-        clearInterval(wpmInterval); 
-        updateStats(true); 
-        sessionStartTime = 0; 
-    };
-
-    const micBtn = document.getElementById('micBtn');
-    if (micBtn) {
-        const obs = new MutationObserver(() => {
-            if (micBtn.classList.contains('recording')) startSession();
-            else stopSession();
-        });
-        obs.observe(micBtn, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    const bigShadowBtn = document.getElementById('bigShadowBtn');
-    const stopShadowBtn = document.getElementById('stopShadowBtn');
-    if (bigShadowBtn && stopShadowBtn) {
-        bigShadowBtn.addEventListener('click', startSession);
-        stopShadowBtn.addEventListener('click', stopSession);
-    }
+    // Accuracy and WPM are calculated exactly once in speech.js.
+    // The old MutationObserver re-scored only visible spans and overwrote final results.
 });
