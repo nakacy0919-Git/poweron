@@ -33,3 +33,44 @@
  .l8-result-points { font-size:2.6rem; }
  .l8-next-btn { display:block; width:100%; margin:12px 0; }
 }
+
+/* Place the saved score above the mode buttons, including on iPad. */
+.l8-scored-menu { justify-content:flex-start; align-items:stretch; gap:11px; padding:14px 18px; }
+.l8-scored-menu .quiz-menu-title { margin:2px 0 0; font-size:clamp(1.25rem,2.8vw,1.8rem); text-align:center; }
+.l8-scored-menu .quiz-mode-btn { align-self:center; padding:14px 18px; width:min(100%,640px); font-size:clamp(1.1rem,2.4vw,1.35rem); border-radius:13px; }
+.l8-scored-menu .quiz-mode-subtxt { font-size:clamp(0.82rem,1.6vw,0.95rem); margin-top:3px; }
+.l8-dashboard { width:100%; max-width:850px; box-sizing:border-box; margin:0 auto 3px; }
+.l8-dashboard .l8-score-summary { margin:4px auto 9px; padding:13px 16px; }
+.l8-score-heading { align-items:center; }
+.l8-score-label { font-weight:900; color:#214e67; }
+.l8-score-amount { white-space:nowrap; font-size:clamp(1.8rem,3vw,2.3rem); font-variant-numeric:tabular-nums; line-height:1.15; }
+.l8-score-amount small { font-size:0.48em; font-weight:800; color:#587181; }
+.l8-score-track { width:100%; height:9px; border-radius:12px; overflow:hidden; background:#d9e9f0; margin:10px 0 8px; }
+.l8-score-track > div { height:100%; background:linear-gradient(90deg,#167a97,#3bacb5); border-radius:12px; }
+.l8-dashboard .l8-score-grid { margin-top:6px; gap:4px 14px; font-size:0.93rem; }
+.l8-dashboard .l8-score-status { margin:7px 0 0; font-size:0.93rem; }
+.l8-dashboard .l8-score-note { margin:5px 0 0; font-size:0.78rem; }
+.l8-lesson-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 14px; padding:4px 8px 9px; border-bottom:1px solid #d7e3e9; color:#244d61; }
+.l8-lesson-bar strong { font-size:0.97rem; }
+.l8-lesson-bar strong span { font-variant-numeric:tabular-nums; color:#087b89; }
+.l8-lesson-bar small { font-size:0.76rem; font-weight:700; color:#5f7381; }
+.l8-part-overview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; padding:9px 0 3px; }
+.l8-part-chip { border:1px solid #dae3e9; border-radius:9px; padding:7px 8px; min-width:0; background:#fff; display:flex; flex-direction:column; gap:2px; color:#4b6473; }
+.l8-part-chip.is-current { border:2px solid #1a8fa4; padding:6px 7px; background:#f5fbfc; }
+.l8-part-chip > span { font-size:0.8rem; font-weight:800; }
+.l8-part-chip > strong { font-size:0.94rem; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.l8-part-chip > small { font-size:0.74rem; }
+.l8-result-overview { margin:10px auto 3px; }
+@media(max-width:768px) {
+ .l8-scored-menu { padding:4px 2px 12px; gap:8px; }
+ .l8-scored-menu .quiz-menu-title { margin:0; }
+ .l8-scored-menu .quiz-mode-btn { padding:11px 10px; font-size:1.03rem; }
+ .l8-dashboard .l8-score-summary { padding:10px 11px; margin-top:0; }
+ .l8-score-amount { font-size:1.75rem; }
+ .l8-dashboard .l8-score-grid { grid-template-columns:1fr; gap:4px; font-size:0.84rem; }
+ .l8-part-overview { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+ .l8-part-chip { padding:6px; }
+ .l8-part-chip.is-current { padding:5px; }
+ .l8-lesson-bar { padding:4px 0 8px; }
+ .l8-score-grid span { white-space:normal; }
+}
