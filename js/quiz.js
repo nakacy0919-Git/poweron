@@ -533,7 +533,7 @@ function renderQuizResult() {
             <div class="quiz-result-progress">
                 <div style="font-size:2rem;font-weight:900;">${quizPoints}P / ${lesson8QuizProgress.maxForCount(quizQuestions.length)}P</div>
                 <div>クリア目標：${clearTarget}P　・　自己ベスト：${saved.bestPoints}P</div>
-                <div style="font-weight:bold;color:${cleared ? '#25834d' : '#9b5120'};">${cleared ? 'CLEAR! 次のステージに進めます。' : 'もう一度挑戦してポイントをためよう！'}</div>
+                <div style="font-weight:bold;color:${cleared ? '#25834d' : '#9b5120'};">${cleared ? (quizMode === 3 && quizPointsScope === 'L08_P4' ? 'LESSON 8 ALL CLEAR!' : 'CLEAR! 次のステージに進めます。') : 'もう一度挑戦してポイントをためよう！'}</div>
                 <div style="font-size:.82rem;color:#666;">${saved.persisted === false ? '保存できないブラウザ環境のため、今回は一時記録のみです。' : 'この端末に成績を保存しました。'}</div>
             </div>
             ${quizMode === 1 && cleared ? '<button onclick="setupQuizData(3)" class="quiz-next-stage-btn">次へ：日→英4択に挑戦</button>' : ''}
