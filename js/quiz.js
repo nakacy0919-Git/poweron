@@ -261,10 +261,10 @@ function startLesson8PointsClock() {
     quizPointsStartedAt = quizClockNow();
     const sessionId = quizSessionId;
     const index = currentQuizIndex;
-    quizTimer = setInterval(() => {
+    const thisTimer = setInterval(() => {
         if (currentMode !== 'quiz' || quizSessionId !== sessionId ||
             currentQuizIndex !== index || isQuizTransitioning) {
-            clearInterval(quizTimer);
+            clearInterval(thisTimer);
             return;
         }
         const remaining = Math.max(0,
@@ -277,8 +277,9 @@ function startLesson8PointsClock() {
                 ? (remaining / 1000).toFixed(1) + '秒　+10P'
                 : '2秒経過：正解しても0P（回答はできます）';
         }
-        if (remaining === 0) clearInterval(quizTimer);
+        if (remaining === 0) clearInterval(thisTimer);
     }, 50);
+    quizTimer = thisTimer;
 }
 
 // --- タイマー処理（暴走対策済み） ---
