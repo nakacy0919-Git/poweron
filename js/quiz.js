@@ -13,6 +13,16 @@ let timeLeft = 50; // 5.0秒 (0.1秒単位)
 let quizRecognition = null;
 let isQuizTransitioning = false;
 let quizSessionId = 0;
+let quizPoints = 0;
+let quizPointsScope = null;
+let quizPointsStartedAt = 0;
+let quizResultSavedSession = -1;
+
+function quizClockNow() {
+    return (typeof performance !== 'undefined' && performance && typeof performance.now === 'function')
+        ? performance.now() : Date.now();
+}
+
 function stopQuizRecognition() {
     if (!quizRecognition) return;
     const old = quizRecognition;
@@ -47,8 +57,25 @@ function startVocabQuiz() {
     document.getElementById('speechResultWindow').style.display = 'none';
     targetDisplay.style.display = 'block';
 
+    const lesson8Part = lesson8QuizProgress.partFromKey(currentKey);
+    const partVocab = lesson8Part && typeof lessonVocab !== 'undefined' ? lessonVocab[lesson8Part] : null;
+    const partWordCount = partVocab ? partVocab.length : 0;
+    const clearTarget = lesson8QuizProgress.targetForCount(partWordCount);
+    const stage1 = lesson8Part ? lesson8QuizProgress.get(lesson8Part, 1) : null;
+    const stage2 = lesson8Part ? lesson8QuizProgress.get(lesson8Part, 3) : null;
+    const stage2Unlocked = lesson8Part ? lesson8QuizProgress.unlockedReverse(lesson8Part, partWordCount) : false;
+
     targetDisplay.innerHTML = `
         <div class="quiz-menu-container">
+            ${lesson8Part ? `
+                <div class="quiz-progress-panel">
+                    <strong>Lesson 8 / Part ${lesson8Part.slice(-1)}　Pポイントチャレンジ</strong>
+                    <div>2秒以内の正解：+10P / それ以外：0P</div>
+                    <div>クリア目標：${clearTarget}P（満点 ${lesson8QuizProgress.maxForCount(partWordCount)}P）</div>
+                    <div>英→日：自己ベスト ${stage1.bestPoints}P　|　日→英：自己ベスト ${stage2.bestPoints}P</div>
+                    <div style="font-size:.8rem;color:#666;">成績はこの端末のブラウザに保存されます。</div>
+                </div>
+            ` : ''}
             <h2 class="quiz-menu-title">モードを選択してください</h2>
             
             <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(1)">
@@ -57,24 +84,26 @@ function startVocabQuiz() {
             </button>
 
             ${currentKey.startsWith("L08_") ? `
-            <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(3)">
+            <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(3)" ${stage2Unlocked ? '' : 'disabled aria-disabled="true"'}>
                 🇯🇵 4択クイズ (日→英)
-                <span class="quiz-mode-subtxt">日本語の意味から英単語を選択します</span>
+                <span class="quiz-mode-subtxt">${stage2Unlocked ? 'ステージ2：日本語から英単語を選択' : '🔒 ステージ1で' + clearTarget + 'Pを取ると解放'}</span>
             </button>
             ` : ""}
 
             <button class="quiz-mode-btn btn-mode-2" onclick="setupQuizData(2)">
                 🎙️ Voice Speaking (日→英)
-                <span class="quiz-mode-subtxt">正しい英単語を発音して回答します</span>
+                <span class="quiz-mode-subtxt">${lesson8Part ? '発音練習（Pポイント対象外）' : '正しい英単語を発音して回答します'}</span>
             </button>
 
             <button class="quiz-mode-btn" style="background:#eee;color:#333;" onclick="closeVocabQuiz()">✕ 終了する</button>
-            <div style="margin-top:30px; font-size:1.6rem; font-weight:900; color:#444; font-family:'Noto Sans JP', sans-serif;">
-                <label style="cursor:pointer; display:flex; align-items:center; gap:12px;">
-                    <input type="checkbox" id="timerToggle" ${isTimerEnabled ? 'checked' : ''} onchange="isTimerEnabled=this.checked" style="width:28px; height:28px; cursor:pointer;"> 
-                    ⏱️ 5秒制限を有効にする
-                </label>
-            </div>
+            ${lesson8Part ? '<p style="font-size:1rem;color:#444;">Pポイント獲得は2秒以内。2秒後も回答できます。</p>' : `
+                <div style="margin-top:30px; font-size:1.6rem; font-weight:900; color:#444; font-family:'Noto Sans JP', sans-serif;">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:12px;">
+                        <input type="checkbox" id="timerToggle" ${isTimerEnabled ? 'checked' : ''} onchange="isTimerEnabled=this.checked" style="width:28px; height:28px; cursor:pointer;">
+                        ⏱️ 5秒制限を有効にする
+                    </label>
+                </div>
+            `}
         </div>
     `;
 }
@@ -98,6 +127,17 @@ function setupQuizData(mode) {
         alert("このパートに登録された単語データが見つかりません。");
         return;
     }
+
+    // Lesson 8: Partごとに英→日をクリアしてから日→英へ進む。
+    if (mode === 3 && lesson8QuizProgress.partFromKey(currentKey) &&
+        !lesson8QuizProgress.unlockedReverse(currentKey, currentVocabArray.length)) {
+        alert('英→日4択で目標Pをクリアすると、日→英4択が解放されます。');
+        return;
+    }
+    quizPointsScope = lesson8QuizProgress.partFromKey(currentKey);
+    quizPoints = 0;
+    quizPointsStartedAt = 0;
+    quizResultSavedSession = -1;
 
     // 日→英の場合だけ正答・誤答とも英単語とし、それ以外は日本語の意味とする。
     const isReverseChoice = mode === 3;
@@ -143,12 +183,22 @@ function renderQuizQuestion() {
     }
 
     const q = quizQuestions[currentQuizIndex];
+    const isLesson8PointRound = lesson8QuizProgress.isPointsMode(quizPointsScope, quizMode);
     let html = `
         <div style="text-align:center; padding: 20px;">
             <div style="font-size: 1.4rem; font-family:'Nunito', sans-serif; color: #888; font-weight:900; margin-bottom: 15px;">Question ${currentQuizIndex + 1} / ${quizQuestions.length}</div>
     `;
 
-    if (isTimerEnabled && (quizMode === 1 || quizMode === 3)) {
+    if (isLesson8PointRound) {
+        const target = lesson8QuizProgress.targetForCount(quizQuestions.length);
+        html += `
+            <div class="quiz-points-hud">Pポイント：<strong id="quizPointsValue">${quizPoints}P</strong>　
+                クリア目標：${target}P
+            </div>
+            <div class="timer-container"><div id="tBar" class="timer-bar"></div></div>
+            <div id="quizPointsTimerLabel" style="font-size:1rem;color:#555;">2.0秒以内に正解すると +10P</div>
+        `;
+    } else if (isTimerEnabled && (quizMode === 1 || quizMode === 3)) {
         html += `<div class="timer-container"><div id="tBar" class="timer-bar"></div></div>`;
     }
 
@@ -168,11 +218,16 @@ function renderQuizQuestion() {
                     return `<button class="quiz-choice-btn" onclick="checkAnswer1(this, '${safeChoice}', '${safeCorrect}')" style="padding:25px 20px; border-radius:15px; border:2px solid #ddd; font-weight:900; font-size:1.5rem; font-family:'Noto Sans JP', sans-serif; cursor:pointer; background:#fff; transition:0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.05); color:#333;">${c}</button>`;
                 }).join('')}
             </div>
+            ${isLesson8PointRound ? '<div id="quizPointsFeedback" aria-live="polite" style="font-size:1.2rem;font-weight:bold;margin-top:14px;min-height:30px;"></div>' : ''}
         `;
         display.innerHTML = html;
-        // 日→英の出題時に正答の発音を流すと答えを教えてしまうため再生しない。
-        if (quizMode === 1 && typeof playWordAudio === 'function') playWordAudio(q.word);
-        startTimer();
+        if (isLesson8PointRound) {
+            startLesson8PointsClock();
+        } else {
+            // 2秒チャレンジ中は音声再生による待ち時間を発生させない。
+            if (quizMode === 1 && typeof playWordAudio === 'function') playWordAudio(q.word);
+            startTimer();
+        }
     } else {
         // モード2: Voice Speaking (PicFlash)
         html += `
@@ -199,6 +254,31 @@ function renderQuizQuestion() {
             if (currentMode === 'quiz' && quizMode === 2 && quizSessionId === sessionId && !isQuizTransitioning) startQuizSpeech(q.word);
         }, 100);
     }
+}
+
+// Lesson 8: 2秒を過ぎても問題は閉じず、以降の正解は0Pにする。
+function startLesson8PointsClock() {
+    quizPointsStartedAt = quizClockNow();
+    const sessionId = quizSessionId;
+    const index = currentQuizIndex;
+    quizTimer = setInterval(() => {
+        if (currentMode !== 'quiz' || quizSessionId !== sessionId ||
+            currentQuizIndex !== index || isQuizTransitioning) {
+            clearInterval(quizTimer);
+            return;
+        }
+        const remaining = Math.max(0,
+            lesson8QuizProgress.POINT_WINDOW_MS - (quizClockNow() - quizPointsStartedAt));
+        const bar = document.getElementById('tBar');
+        if (bar) bar.style.width = (remaining / lesson8QuizProgress.POINT_WINDOW_MS * 100) + '%';
+        const label = document.getElementById('quizPointsTimerLabel');
+        if (label) {
+            label.innerText = remaining > 0
+                ? (remaining / 1000).toFixed(1) + '秒　+10P'
+                : '2秒経過：正解しても0P（回答はできます）';
+        }
+        if (remaining === 0) clearInterval(quizTimer);
+    }, 50);
 }
 
 // --- タイマー処理（暴走対策済み） ---
@@ -236,7 +316,20 @@ function checkAnswer1(btn, selected, correct) {
     if (currentMode !== 'quiz' || (quizMode !== 1 && quizMode !== 3) || isQuizTransitioning) return;
     isQuizTransitioning = true;
     const sessionId = quizSessionId;
+    const isLesson8PointRound = lesson8QuizProgress.isPointsMode(quizPointsScope, quizMode);
+    const elapsedMs = isLesson8PointRound ? quizClockNow() - quizPointsStartedAt : 0;
+    const earnedPoints = isLesson8PointRound && selected === correct &&
+        elapsedMs >= 0 && elapsedMs <= lesson8QuizProgress.POINT_WINDOW_MS
+        ? lesson8QuizProgress.POINTS_PER_FAST_CORRECT : 0;
+    quizPoints += earnedPoints;
     clearInterval(quizTimer);
+    const feedback = document.getElementById('quizPointsFeedback');
+    if (feedback && isLesson8PointRound) {
+        feedback.innerText = selected !== correct ? '不正解：0P' :
+            earnedPoints > 0 ? '正解！ +10P' : '正解！ 2秒を過ぎたため0P';
+        const pointsLabel = document.getElementById('quizPointsValue');
+        if (pointsLabel) pointsLabel.innerText = quizPoints + 'P';
+    }
     const buttons = btn.parentElement.querySelectorAll('button');
     buttons.forEach(b => b.style.pointerEvents = 'none');
 
@@ -399,6 +492,18 @@ function showQuizHint(letter) {
     if (area) area.innerText = `ヒント: 頭文字は "${letter.toUpperCase()}" です`;
 }
 
+function advanceLesson8QuizPart() {
+    if (!quizPointsScope || quizMode !== 3) return;
+    const nextPartNumber = Number(quizPointsScope.slice(-1)) + 1;
+    if (nextPartNumber > 4) return;
+    const partSelect = document.getElementById('partSelect');
+    if (!partSelect) return;
+    partSelect.value = String(nextPartNumber);
+    if (typeof updateParaSelect === 'function') updateParaSelect();
+    if (typeof onScopeChange === 'function') onScopeChange();
+    startVocabQuiz();
+}
+
 // --- リザルト画面 ---
 function renderQuizResult() {
     isQuizTransitioning = true;
@@ -407,11 +512,40 @@ function renderQuizResult() {
 
     const display = document.getElementById('targetTextDisplay');
     let percent = Math.round((quizScore / quizQuestions.length) * 100);
+    const isLesson8PointRound = lesson8QuizProgress.isPointsMode(quizPointsScope, quizMode);
+    const isLesson8AnyMode = !!quizPointsScope;
+    const clearTarget = lesson8QuizProgress.targetForCount(quizQuestions.length);
+    const cleared = isLesson8PointRound && quizPoints >= clearTarget;
+    let saved = null;
+    if (isLesson8AnyMode && quizResultSavedSession !== quizSessionId) {
+        saved = lesson8QuizProgress.save(quizPointsScope, quizMode, {
+            points: quizPoints, correct: quizScore, questionCount: quizQuestions.length
+        });
+        quizResultSavedSession = quizSessionId;
+    } else if (isLesson8AnyMode) {
+        saved = lesson8QuizProgress.get(quizPointsScope, quizMode);
+    }
+    let progressionHtml = '';
+    if (isLesson8PointRound) {
+        progressionHtml = `
+            <div class="quiz-result-progress">
+                <div style="font-size:2rem;font-weight:900;">${quizPoints}P / ${lesson8QuizProgress.maxForCount(quizQuestions.length)}P</div>
+                <div>クリア目標：${clearTarget}P　・　自己ベスト：${saved.bestPoints}P</div>
+                <div style="font-weight:bold;color:${cleared ? '#25834d' : '#9b5120'};">${cleared ? 'CLEAR! 次のステージに進めます。' : 'もう一度挑戦してポイントをためよう！'}</div>
+                <div style="font-size:.82rem;color:#666;">${saved.persisted === false ? '保存できないブラウザ環境のため、今回は一時記録のみです。' : 'この端末に成績を保存しました。'}</div>
+            </div>
+            ${quizMode === 1 && cleared ? '<button onclick="setupQuizData(3)" class="quiz-next-stage-btn">次へ：日→英4択に挑戦</button>' : ''}
+            ${quizMode === 3 && cleared && quizPointsScope !== 'L08_P4' ? '<button onclick="advanceLesson8QuizPart()" class="quiz-next-stage-btn">次のPartのクイズへ</button>' : ''}
+        `;
+    } else if (isLesson8AnyMode) {
+        progressionHtml = `<div class="quiz-result-progress">発音練習の結果：${quizScore}問正解 ／ 自己ベスト：${saved.bestCorrect}問（Pポイント対象外）</div>`;
+    }
     display.innerHTML = `
         <div style="text-align:center; padding: 50px; font-family:'Nunito', sans-serif;">
             <div style="font-size: 2.5rem; font-weight:900; color:#333;">Quiz Result</div>
             <div style="font-size: 6rem; font-weight: 900; color: ${percent >= 80 ? '#4caf50' : '#764ba2'}; margin: 20px 0;">${percent}%</div>
             <p style="font-size: 1.8rem; font-weight:bold; color:#555;">${quizScore} / ${quizQuestions.length} Correct</p>
+            ${progressionHtml}
             <button onclick="startVocabQuiz()" style="margin-top:40px; padding: 20px 50px; font-size:1.5rem; font-weight:900; border-radius:40px; border:none; background:#333; color:white; cursor:pointer; font-family:'Noto Sans JP', sans-serif; box-shadow:0 5px 15px rgba(0,0,0,0.2);">メニューに戻る</button>
             <button onclick="closeVocabQuiz()" style="margin:15px; padding:15px 25px; border:1px solid #aaa; border-radius:30px; background:white;">終了</button>
         </div>
