@@ -11,14 +11,30 @@ let quizTimer = null;
 let timeLeft = 50; // 5.0秒 (0.1秒単位)
 
 let quizRecognition = null;
-let isQuizTransitioning = false; 
+let isQuizTransitioning = false;
+let quizSessionId = 0;
+function stopQuizRecognition() {
+    if (!quizRecognition) return;
+    const old = quizRecognition;
+    quizRecognition = null;
+    old.onend = null;
+    old.onresult = null;
+    try { old.abort(); } catch(e) {}
+}
+function closeVocabQuiz() {
+    resetAppMode();
+    if (window.innerWidth <= 768 && typeof openSpeechOverlay === 'function') openSpeechOverlay('reading');
+}
+
 
 // --- クイズメニューの表示 ---
 function startVocabQuiz() {
     resetAppMode();
     currentMode = 'quiz';
-    if (quizRecognition) { try { quizRecognition.stop(); } catch(e){} }
-    clearInterval(quizTimer); // タイマーを確実にリセット
+    document.body.classList.add('quiz-active');
+    stopQuizRecognition();
+    clearInterval(quizTimer);
+    quizSessionId++;
 
     const mainOverlay = document.getElementById('mainOverlay');
     const title = document.getElementById('overlayTitle');
@@ -45,6 +61,7 @@ function startVocabQuiz() {
                 <span class="quiz-mode-subtxt">正しい英単語を発音して回答します</span>
             </button>
 
+            <button class="quiz-mode-btn" style="background:#eee;color:#333;" onclick="closeVocabQuiz()">✕ 終了する</button>
             <div style="margin-top:30px; font-size:1.6rem; font-weight:900; color:#444; font-family:'Noto Sans JP', sans-serif;">
                 <label style="cursor:pointer; display:flex; align-items:center; gap:12px;">
                     <input type="checkbox" id="timerToggle" ${isTimerEnabled ? 'checked' : ''} onchange="isTimerEnabled=this.checked" style="width:28px; height:28px; cursor:pointer;"> 
@@ -57,6 +74,10 @@ function startVocabQuiz() {
 
 // --- クイズデータの準備 ---
 function setupQuizData(mode) {
+    quizSessionId++;
+    stopQuizRecognition();
+    clearInterval(quizTimer);
+    isQuizTransitioning = false;
     quizMode = mode;
     const baseKey = currentKey.split('_').slice(0, 2).join('_'); 
     const currentVocabArray = (typeof lessonVocab !== 'undefined') ? lessonVocab[baseKey] : null;
@@ -66,15 +87,8 @@ function setupQuizData(mode) {
         return;
     }
 
-    let allMeaningsPool = [];
-    if (typeof lessonVocab !== 'undefined') {
-        Object.values(lessonVocab).forEach(vArray => {
-            vArray.forEach(v => {
-                if (v.meaning) allMeaningsPool.push(v.meaning);
-            });
-        });
-    }
-    allMeaningsPool = [...new Set(allMeaningsPool)]; 
+    // 同じPartの語彙から誤答を生成する。
+    const allMeaningsPool = [...new Set(currentVocabArray.map(v => v.meaning).filter(Boolean))];
 
     quizQuestions = currentVocabArray.map(v => {
         let choices = [v.meaning]; 
@@ -129,8 +143,8 @@ function renderQuizQuestion() {
     if (quizMode === 1) {
         // モード1: 4択クイズ
         html += `
-            <div style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', sans-serif;">${q.word}</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto;">
+            <div class="quiz-word" style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', sans-serif;">${q.word}</div>
+            <div class="quiz-choices" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto;">
                 ${q.choices.map(c => {
                     const safeChoice = c ? c.replace(/'/g, "\\'") : "";
                     return `<button class="quiz-choice-btn" onclick="checkAnswer1(this, '${safeChoice}', '${safeCorrect}')" style="padding:25px 20px; border-radius:15px; border:2px solid #ddd; font-weight:900; font-size:1.5rem; font-family:'Noto Sans JP', sans-serif; cursor:pointer; background:#fff; transition:0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.05); color:#333;">${c}</button>`;
@@ -160,7 +174,10 @@ function renderQuizQuestion() {
         `;
         display.innerHTML = html;
         
-        setTimeout(() => startQuizSpeech(q.word), 100);
+        const sessionId = quizSessionId;
+        setTimeout(() => {
+            if (currentMode === 'quiz' && quizMode === 2 && quizSessionId === sessionId) startQuizSpeech(q.word);
+        }, 100);
     }
 }
 
@@ -187,13 +204,18 @@ function startTimer() {
 }
 
 function handleTimeOut() {
-    if (currentMode !== 'quiz') return;
+    if (currentMode !== 'quiz' || isQuizTransitioning) return;
+    isQuizTransitioning = true;
+    clearInterval(quizTimer);
     currentQuizIndex++;
     renderQuizQuestion();
 }
 
 // --- モード1(4択)の判定 ---
 function checkAnswer1(btn, selected, correct) {
+    if (currentMode !== 'quiz' || quizMode !== 1 || isQuizTransitioning) return;
+    isQuizTransitioning = true;
+    const sessionId = quizSessionId;
     clearInterval(quizTimer);
     const buttons = btn.parentElement.querySelectorAll('button');
     buttons.forEach(b => b.style.pointerEvents = 'none');
@@ -212,9 +234,9 @@ function checkAnswer1(btn, selected, correct) {
     }
 
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1200);
 }
@@ -279,9 +301,15 @@ function startQuizSpeech(targetWord) {
         }
     };
 
-    quizRecognition.onend = () => { 
-        if (currentMode === 'quiz' && quizMode === 2 && !isQuizTransitioning) { 
-            setTimeout(() => { try { quizRecognition.start(); } catch(err) {} }, 250); 
+    const activeRecognition = quizRecognition;
+    const activeSession = quizSessionId;
+    quizRecognition.onend = () => {
+        if (currentMode === 'quiz' && quizMode === 2 && !isQuizTransitioning && quizSessionId === activeSession) {
+            setTimeout(() => {
+                if (quizRecognition === activeRecognition && currentMode === 'quiz' && !isQuizTransitioning) {
+                    try { activeRecognition.start(); } catch(e) {}
+                }
+            }, 250);
         }
     };
     
@@ -291,6 +319,7 @@ function startQuizSpeech(targetWord) {
 }
 
 function handleCorrect2(transcript, targetWord) {
+    const sessionId = quizSessionId;
     const box = document.getElementById('quizSpeechBox');
     if (box) {
         box.style.background = '#e8f5e9';
@@ -302,14 +331,15 @@ function handleCorrect2(transcript, targetWord) {
     if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e=>{});
     
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1200);
 }
 
 function handleSkip2(targetWord) {
+    const sessionId = quizSessionId;
     const box = document.getElementById('quizSpeechBox');
     if (box) {
         box.style.background = '#ffebee';
@@ -319,9 +349,9 @@ function handleSkip2(targetWord) {
     }
     
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1500);
 }
@@ -334,7 +364,8 @@ function showQuizHint(letter) {
 // --- リザルト画面 ---
 function renderQuizResult() {
     isQuizTransitioning = true;
-    if (quizRecognition) { try { quizRecognition.stop(); } catch(e){} }
+    stopQuizRecognition();
+    clearInterval(quizTimer);
 
     const display = document.getElementById('targetTextDisplay');
     let percent = Math.round((quizScore / quizQuestions.length) * 100);
@@ -344,6 +375,7 @@ function renderQuizResult() {
             <div style="font-size: 6rem; font-weight: 900; color: ${percent >= 80 ? '#4caf50' : '#764ba2'}; margin: 20px 0;">${percent}%</div>
             <p style="font-size: 1.8rem; font-weight:bold; color:#555;">${quizScore} / ${quizQuestions.length} Correct</p>
             <button onclick="startVocabQuiz()" style="margin-top:40px; padding: 20px 50px; font-size:1.5rem; font-weight:900; border-radius:40px; border:none; background:#333; color:white; cursor:pointer; font-family:'Noto Sans JP', sans-serif; box-shadow:0 5px 15px rgba(0,0,0,0.2);">メニューに戻る</button>
+            <button onclick="closeVocabQuiz()" style="margin:15px; padding:15px 25px; border:1px solid #aaa; border-radius:30px; background:white;">終了</button>
         </div>
     `;
     if (percent >= 80 && typeof fireConfetti === 'function') fireConfetti();
