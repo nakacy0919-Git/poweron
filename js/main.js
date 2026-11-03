@@ -56,6 +56,7 @@ function updateParaSelect() {
 }
 
 function onScopeChange() {
+    if (currentMode === 'quiz') resetAppMode();
     const part = document.getElementById('partSelect')?.value || "1";
     const para = document.getElementById('paraSelect')?.value || "full";
     currentKey = `L${String(currentLesson).padStart(2, '0')}_P${part}_${para}`;
@@ -75,6 +76,9 @@ function onScopeChange() {
 }
 
 function resetAppMode() {
+    if (typeof stopQuizRecognition === 'function') stopQuizRecognition();
+    if (typeof quizTimer !== 'undefined') clearInterval(quizTimer);
+    document.body.classList.remove('quiz-active');
     const mainOverlay = document.getElementById('mainOverlay');
     if(mainOverlay) mainOverlay.style.display = 'none';
     

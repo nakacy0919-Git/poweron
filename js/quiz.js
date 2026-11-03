@@ -5,20 +5,36 @@
 let quizQuestions = [];
 let currentQuizIndex = 0;
 let quizScore = 0;
-let quizMode = 1; // 1: 4択, 2: Voice Speaking
+let quizMode = 1; // 1: 英→日4択, 2: Voice Speaking, 3: 日→英4択
 let isTimerEnabled = true;
 let quizTimer = null;
 let timeLeft = 50; // 5.0秒 (0.1秒単位)
 
 let quizRecognition = null;
-let isQuizTransitioning = false; 
+let isQuizTransitioning = false;
+let quizSessionId = 0;
+function stopQuizRecognition() {
+    if (!quizRecognition) return;
+    const old = quizRecognition;
+    quizRecognition = null;
+    old.onend = null;
+    old.onresult = null;
+    try { old.abort(); } catch(e) {}
+}
+function closeVocabQuiz() {
+    resetAppMode();
+    if (window.innerWidth <= 768 && typeof openSpeechOverlay === 'function') openSpeechOverlay('reading');
+}
+
 
 // --- クイズメニューの表示 ---
 function startVocabQuiz() {
     resetAppMode();
     currentMode = 'quiz';
-    if (quizRecognition) { try { quizRecognition.stop(); } catch(e){} }
-    clearInterval(quizTimer); // タイマーを確実にリセット
+    document.body.classList.add('quiz-active');
+    stopQuizRecognition();
+    clearInterval(quizTimer);
+    quizSessionId++;
 
     const mainOverlay = document.getElementById('mainOverlay');
     const title = document.getElementById('overlayTitle');
@@ -40,11 +56,19 @@ function startVocabQuiz() {
                 <span class="quiz-mode-subtxt">意味をリストから選択します</span>
             </button>
 
+            ${currentKey.startsWith("L08_") ? `
+            <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(3)">
+                🇯🇵 4択クイズ (日→英)
+                <span class="quiz-mode-subtxt">日本語の意味から英単語を選択します</span>
+            </button>
+            ` : ""}
+
             <button class="quiz-mode-btn btn-mode-2" onclick="setupQuizData(2)">
                 🎙️ Voice Speaking (日→英)
                 <span class="quiz-mode-subtxt">正しい英単語を発音して回答します</span>
             </button>
 
+            <button class="quiz-mode-btn" style="background:#eee;color:#333;" onclick="closeVocabQuiz()">✕ 終了する</button>
             <div style="margin-top:30px; font-size:1.6rem; font-weight:900; color:#444; font-family:'Noto Sans JP', sans-serif;">
                 <label style="cursor:pointer; display:flex; align-items:center; gap:12px;">
                     <input type="checkbox" id="timerToggle" ${isTimerEnabled ? 'checked' : ''} onchange="isTimerEnabled=this.checked" style="width:28px; height:28px; cursor:pointer;"> 
@@ -57,7 +81,16 @@ function startVocabQuiz() {
 
 // --- クイズデータの準備 ---
 function setupQuizData(mode) {
+    quizSessionId++;
+    stopQuizRecognition();
+    clearInterval(quizTimer);
+    isQuizTransitioning = false;
     quizMode = mode;
+    // 新しい日→英の選択クイズは今回Lesson 8だけに公開する。
+    if (mode === 3 && !currentKey.startsWith('L08_')) {
+        alert('日→英4択は現在Lesson 8に対応しています。');
+        return;
+    }
     const baseKey = currentKey.split('_').slice(0, 2).join('_'); 
     const currentVocabArray = (typeof lessonVocab !== 'undefined') ? lessonVocab[baseKey] : null;
 
@@ -66,19 +99,15 @@ function setupQuizData(mode) {
         return;
     }
 
-    let allMeaningsPool = [];
-    if (typeof lessonVocab !== 'undefined') {
-        Object.values(lessonVocab).forEach(vArray => {
-            vArray.forEach(v => {
-                if (v.meaning) allMeaningsPool.push(v.meaning);
-            });
-        });
-    }
-    allMeaningsPool = [...new Set(allMeaningsPool)]; 
+    // 日→英の場合だけ正答・誤答とも英単語とし、それ以外は日本語の意味とする。
+    const isReverseChoice = mode === 3;
+    const allChoicesPool = [...new Set(currentVocabArray
+        .map(v => isReverseChoice ? v.word : v.meaning).filter(Boolean))];
 
     quizQuestions = currentVocabArray.map(v => {
-        let choices = [v.meaning]; 
-        let fakes = allMeaningsPool.filter(m => m !== v.meaning);
+        const correct = isReverseChoice ? v.word : v.meaning;
+        let choices = [correct];
+        let fakes = allChoicesPool.filter(answer => answer !== correct);
         fakes.sort(() => 0.5 - Math.random());
         choices = choices.concat(fakes.slice(0, 3));
         
@@ -87,7 +116,7 @@ function setupQuizData(mode) {
         choices.sort(() => 0.5 - Math.random()); 
         
         let hintStr = v.word ? v.word.charAt(0) : "?";
-        return { word: v.word, correct: v.meaning, choices: choices, hint: hintStr };
+        return { word: v.word, meaning: v.meaning, correct, choices, hint: hintStr };
     });
 
     quizQuestions.sort(() => 0.5 - Math.random());
@@ -119,18 +148,21 @@ function renderQuizQuestion() {
             <div style="font-size: 1.4rem; font-family:'Nunito', sans-serif; color: #888; font-weight:900; margin-bottom: 15px;">Question ${currentQuizIndex + 1} / ${quizQuestions.length}</div>
     `;
 
-    if (isTimerEnabled && quizMode === 1) {
+    if (isTimerEnabled && (quizMode === 1 || quizMode === 3)) {
         html += `<div class="timer-container"><div id="tBar" class="timer-bar"></div></div>`;
     }
 
     const safeCorrect = q.correct ? q.correct.replace(/'/g, "\\'") : "";
     const safeWord = q.word ? q.word.replace(/'/g, "\\'") : "";
 
-    if (quizMode === 1) {
-        // モード1: 4択クイズ
+    if (quizMode === 1 || quizMode === 3) {
+        // モード1: 英→日4択 / モード3: 日→英4択
+        const questionLabel = quizMode === 3 ? "日本語の意味に合う英語を選んでください" : "英語の意味を選んでください";
+        const questionText = quizMode === 3 ? q.meaning : q.word;
         html += `
-            <div style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', sans-serif;">${q.word}</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto;">
+            <div style="font-size:1.05rem;color:#666;margin-bottom:12px;">${questionLabel}</div>
+            <div class="quiz-word" style="font-size: 4.5rem; font-weight: 900; color: #333; margin-bottom: 40px; font-family: 'Nunito', 'Noto Sans JP', sans-serif;">${questionText}</div>
+            <div class="quiz-choices" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto;">
                 ${q.choices.map(c => {
                     const safeChoice = c ? c.replace(/'/g, "\\'") : "";
                     return `<button class="quiz-choice-btn" onclick="checkAnswer1(this, '${safeChoice}', '${safeCorrect}')" style="padding:25px 20px; border-radius:15px; border:2px solid #ddd; font-weight:900; font-size:1.5rem; font-family:'Noto Sans JP', sans-serif; cursor:pointer; background:#fff; transition:0.2s; box-shadow:0 4px 6px rgba(0,0,0,0.05); color:#333;">${c}</button>`;
@@ -138,7 +170,8 @@ function renderQuizQuestion() {
             </div>
         `;
         display.innerHTML = html;
-        if(typeof playWordAudio === 'function') playWordAudio(q.word);
+        // 日→英の出題時に正答の発音を流すと答えを教えてしまうため再生しない。
+        if (quizMode === 1 && typeof playWordAudio === 'function') playWordAudio(q.word);
         startTimer();
     } else {
         // モード2: Voice Speaking (PicFlash)
@@ -156,11 +189,15 @@ function renderQuizQuestion() {
             <div style="display:flex; justify-content:center; gap:20px; margin-top:10px;">
                 <button class="hint-btn" onclick="showQuizHint('${q.hint}')" style="padding:15px 40px; font-size:1.3rem; font-weight:900; border-radius:30px; font-family:'Noto Sans JP', sans-serif; background:#f0f0f0; border:2px solid #ccc; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.05);">💡 ヒントを出す</button>
             </div>
-            <div style="margin-top:15px; font-size:1.1rem; color:#888; font-weight:bold;">※マイクに向かって「Skip」または「Next」と言うとパスできます</div>
+            <button class="hint-btn" onclick="skipQuizSpeaking()" style="margin-top:12px; padding:12px 30px; border:1px solid #bbb; border-radius:20px; background:#fff; font-size:1rem;">次へ（スキップ）</button>
+            <div style="margin-top:10px; font-size:1rem; color:#888;">マイクで「Skip」「Next」と言っても進めます</div>
         `;
         display.innerHTML = html;
         
-        setTimeout(() => startQuizSpeech(q.word), 100);
+        const sessionId = quizSessionId;
+        setTimeout(() => {
+            if (currentMode === 'quiz' && quizMode === 2 && quizSessionId === sessionId && !isQuizTransitioning) startQuizSpeech(q.word);
+        }, 100);
     }
 }
 
@@ -187,13 +224,18 @@ function startTimer() {
 }
 
 function handleTimeOut() {
-    if (currentMode !== 'quiz') return;
+    if (currentMode !== 'quiz' || isQuizTransitioning) return;
+    isQuizTransitioning = true;
+    clearInterval(quizTimer);
     currentQuizIndex++;
     renderQuizQuestion();
 }
 
 // --- モード1(4択)の判定 ---
 function checkAnswer1(btn, selected, correct) {
+    if (currentMode !== 'quiz' || (quizMode !== 1 && quizMode !== 3) || isQuizTransitioning) return;
+    isQuizTransitioning = true;
+    const sessionId = quizSessionId;
     clearInterval(quizTimer);
     const buttons = btn.parentElement.querySelectorAll('button');
     buttons.forEach(b => b.style.pointerEvents = 'none');
@@ -212,9 +254,9 @@ function checkAnswer1(btn, selected, correct) {
     }
 
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1200);
 }
@@ -248,6 +290,14 @@ function startQuizSpeech(targetWord) {
         stemmedTarget = cleanTarget.replace(/(es|s|ed|d|ing)$/, '');
     }
 
+    quizRecognition.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            const speechBox = document.getElementById('quizSpeechBox');
+            if (speechBox) speechBox.innerText = 'マイクを利用できません。スキップボタンを使ってください。';
+            if (quizRecognition) quizRecognition.onend = null;
+        }
+    };
+
     quizRecognition.onresult = (e) => {
         if (isQuizTransitioning || currentMode !== 'quiz') return;
 
@@ -279,9 +329,15 @@ function startQuizSpeech(targetWord) {
         }
     };
 
-    quizRecognition.onend = () => { 
-        if (currentMode === 'quiz' && quizMode === 2 && !isQuizTransitioning) { 
-            setTimeout(() => { try { quizRecognition.start(); } catch(err) {} }, 250); 
+    const activeRecognition = quizRecognition;
+    const activeSession = quizSessionId;
+    quizRecognition.onend = () => {
+        if (currentMode === 'quiz' && quizMode === 2 && !isQuizTransitioning && quizSessionId === activeSession) {
+            setTimeout(() => {
+                if (quizRecognition === activeRecognition && currentMode === 'quiz' && !isQuizTransitioning) {
+                    try { activeRecognition.start(); } catch(e) {}
+                }
+            }, 250);
         }
     };
     
@@ -291,6 +347,7 @@ function startQuizSpeech(targetWord) {
 }
 
 function handleCorrect2(transcript, targetWord) {
+    const sessionId = quizSessionId;
     const box = document.getElementById('quizSpeechBox');
     if (box) {
         box.style.background = '#e8f5e9';
@@ -302,14 +359,15 @@ function handleCorrect2(transcript, targetWord) {
     if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e=>{});
     
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1200);
 }
 
 function handleSkip2(targetWord) {
+    const sessionId = quizSessionId;
     const box = document.getElementById('quizSpeechBox');
     if (box) {
         box.style.background = '#ffebee';
@@ -319,11 +377,21 @@ function handleSkip2(targetWord) {
     }
     
     setTimeout(() => { 
-        if (currentMode === 'quiz') {
-            currentQuizIndex++; 
-            renderQuizQuestion(); 
+        if (currentMode === 'quiz' && quizSessionId === sessionId) {
+            currentQuizIndex++;
+            renderQuizQuestion();
         }
     }, 1500);
+}
+
+// 音声認識非対応・マイク拒否時も次の問題に進める。
+function skipQuizSpeaking() {
+    if (currentMode !== 'quiz' || quizMode !== 2 || isQuizTransitioning) return;
+    const q = quizQuestions[currentQuizIndex];
+    if (!q) return;
+    isQuizTransitioning = true;
+    stopQuizRecognition();
+    handleSkip2(q.word);
 }
 
 function showQuizHint(letter) {
@@ -334,7 +402,8 @@ function showQuizHint(letter) {
 // --- リザルト画面 ---
 function renderQuizResult() {
     isQuizTransitioning = true;
-    if (quizRecognition) { try { quizRecognition.stop(); } catch(e){} }
+    stopQuizRecognition();
+    clearInterval(quizTimer);
 
     const display = document.getElementById('targetTextDisplay');
     let percent = Math.round((quizScore / quizQuestions.length) * 100);
@@ -344,6 +413,7 @@ function renderQuizResult() {
             <div style="font-size: 6rem; font-weight: 900; color: ${percent >= 80 ? '#4caf50' : '#764ba2'}; margin: 20px 0;">${percent}%</div>
             <p style="font-size: 1.8rem; font-weight:bold; color:#555;">${quizScore} / ${quizQuestions.length} Correct</p>
             <button onclick="startVocabQuiz()" style="margin-top:40px; padding: 20px 50px; font-size:1.5rem; font-weight:900; border-radius:40px; border:none; background:#333; color:white; cursor:pointer; font-family:'Noto Sans JP', sans-serif; box-shadow:0 5px 15px rgba(0,0,0,0.2);">メニューに戻る</button>
+            <button onclick="closeVocabQuiz()" style="margin:15px; padding:15px 25px; border:1px solid #aaa; border-radius:30px; background:white;">終了</button>
         </div>
     `;
     if (percent >= 80 && typeof fireConfetti === 'function') fireConfetti();
