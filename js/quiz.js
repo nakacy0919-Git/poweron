@@ -177,7 +177,7 @@ function renderQuizQuestion() {
         
         const sessionId = quizSessionId;
         setTimeout(() => {
-            if (currentMode === 'quiz' && quizMode === 2 && quizSessionId === sessionId) startQuizSpeech(q.word);
+            if (currentMode === 'quiz' && quizMode === 2 && quizSessionId === sessionId && !isQuizTransitioning) startQuizSpeech(q.word);
         }, 100);
     }
 }
