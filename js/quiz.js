@@ -170,7 +170,8 @@ function renderQuizQuestion() {
             <div style="display:flex; justify-content:center; gap:20px; margin-top:10px;">
                 <button class="hint-btn" onclick="showQuizHint('${q.hint}')" style="padding:15px 40px; font-size:1.3rem; font-weight:900; border-radius:30px; font-family:'Noto Sans JP', sans-serif; background:#f0f0f0; border:2px solid #ccc; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.05);">💡 ヒントを出す</button>
             </div>
-            <div style="margin-top:15px; font-size:1.1rem; color:#888; font-weight:bold;">※マイクに向かって「Skip」または「Next」と言うとパスできます</div>
+            <button class="hint-btn" onclick="skipQuizSpeaking()" style="margin-top:12px; padding:12px 30px; border:1px solid #bbb; border-radius:20px; background:#fff; font-size:1rem;">次へ（スキップ）</button>
+            <div style="margin-top:10px; font-size:1rem; color:#888;">マイクで「Skip」「Next」と言っても進めます</div>
         `;
         display.innerHTML = html;
         
@@ -270,6 +271,14 @@ function startQuizSpeech(targetWord) {
         stemmedTarget = cleanTarget.replace(/(es|s|ed|d|ing)$/, '');
     }
 
+    quizRecognition.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            const speechBox = document.getElementById('quizSpeechBox');
+            if (speechBox) speechBox.innerText = 'マイクを利用できません。スキップボタンを使ってください。';
+            if (quizRecognition) quizRecognition.onend = null;
+        }
+    };
+
     quizRecognition.onresult = (e) => {
         if (isQuizTransitioning || currentMode !== 'quiz') return;
 
@@ -354,6 +363,16 @@ function handleSkip2(targetWord) {
             renderQuizQuestion();
         }
     }, 1500);
+}
+
+// 音声認識非対応・マイク拒否時も次の問題に進める。
+function skipQuizSpeaking() {
+    if (currentMode !== 'quiz' || quizMode !== 2 || isQuizTransitioning) return;
+    const q = quizQuestions[currentQuizIndex];
+    if (!q) return;
+    isQuizTransitioning = true;
+    stopQuizRecognition();
+    handleSkip2(q.word);
 }
 
 function showQuizHint(letter) {
