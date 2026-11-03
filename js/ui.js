@@ -84,7 +84,7 @@ function escapeTextHtml(text) {
     return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function escapeVocabRegExp(value) {
-    return String(value).replace(/[.*+?^$()|[\]{}\\]/g, '\\function renderDualText() {');
+    return String(value).replace(/[.*+?^$()|[\]{}\\]/g, '\\$&');
 }
 function getVocabMatches(collection) {
     if (!collection) return [];
