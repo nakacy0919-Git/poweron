@@ -304,6 +304,8 @@ function startTimer() {
 }
 
 function handleTimeOut() {
+    // Lesson 8の2秒はP付与の締切であり、解答の締切ではない。
+    if (lesson8QuizProgress.isPointsMode(quizPointsScope, quizMode)) return;
     if (currentMode !== 'quiz' || isQuizTransitioning) return;
     isQuizTransitioning = true;
     clearInterval(quizTimer);
