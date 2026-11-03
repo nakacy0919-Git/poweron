@@ -103,6 +103,7 @@ function resetAppMode() {
     // No previous onend/result callback may update a newly selected text.
     if (typeof abortSpeechSession === 'function') abortSpeechSession();
     document.body.classList.remove('speech-active');
+    document.body.classList.remove('text-active');
 
     currentMode = ''; isScriptOpen = false; isJapaneseOpen = false;
 }
