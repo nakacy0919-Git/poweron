@@ -19,7 +19,8 @@ function toggleMainAudio() {
     let newSrc = baseSrc;
 
     // 選ばれているレベルに合わせて、ファイル名のお尻に文字を付け足す
-    if (typeof currentLevel !== 'undefined') {
+    // Lesson 8 currently provides standard audio only; do not request missing advanced MP3s.
+    if (typeof currentLevel !== 'undefined' && !(typeof currentLesson !== 'undefined' && currentLesson === 8)) {
         if (currentLevel === 'pre1') newSrc = baseSrc.replace('.mp3', '_pre1.mp3');
         else if (currentLevel === 'grade1') newSrc = baseSrc.replace('.mp3', '_grade1.mp3');
     }
