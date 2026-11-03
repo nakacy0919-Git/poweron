@@ -2,7 +2,10 @@
 (function installLesson8Practice(){
     "use strict";
     const POINTS = 10;
-    const PASS_RATE = 0.8;
+    // 10P刻みの得点に合わせて設定した学習到達基準。
+    const MIN_MODULE_RATE = 0.6;
+    const PART_PASS_POINTS = Object.freeze({L08_P1:310, L08_P2:300, L08_P3:200, L08_P4:160});
+    const LESSON_PASS_POINTS = 1000;
     const STORAGE_KEY = "poweron_lesson8_progress_v1";
     const COPEAK_URL = "https://copeak.pic-speak-story.com/";
     const originalMenu = startVocabQuiz;
@@ -50,21 +53,69 @@
         const vm=maxFor(part,"vocab"),cm=maxFor(part,"chunk");
         const vp=record.vocab && record.vocab.max===vm ? Math.min(vm,Math.max(0,Number(record.vocab.points)||0)) : 0;
         const cp=record.chunk && record.chunk.max===cm ? Math.min(cm,Math.max(0,Number(record.chunk.points)||0)) : 0;
-        const ready=vm>0 && cm>0 && vp>=Math.ceil(vm*PASS_RATE) && cp>=Math.ceil(cm*PASS_RATE) && vp+cp>=Math.ceil((vm+cm)*PASS_RATE);
-        return {vp,vm,cp,cm,total:vp+cp,max:vm+cm,ready,
-            vocabDone:!!(record.vocab&&record.vocab.max===vm),
-            chunkDone:!!(record.chunk&&record.chunk.max===cm)};
+        const pass=PART_PASS_POINTS[part]||Infinity;
+        const minV=Math.ceil(vm*MIN_MODULE_RATE/POINTS)*POINTS;
+        const minC=Math.ceil(cm*MIN_MODULE_RATE/POINTS)*POINTS;
+        const vocabDone=!!(record.vocab&&record.vocab.max===vm);
+        const chunkDone=!!(record.chunk&&record.chunk.max===cm);
+        const vRemaining=Math.max(0,minV-vp);
+        const cRemaining=Math.max(0,minC-cp);
+        const remaining=Math.max(0,pass-vp-cp,vRemaining+cRemaining);
+        const ready=vm>0 && cm>0 && vocabDone && chunkDone &&
+            vp>=minV && cp>=minC && vp+cp>=pass;
+        return {vp,vm,cp,cm,total:vp+cp,max:vm+cm,pass,remaining,vRemaining,cRemaining,
+            minV,minC,ready,vocabDone,chunkDone};
+    }
+    function overview(){
+        const keys=Object.keys(PART_PASS_POINTS);
+        const parts=keys.map(part=>({part,...status(part)}));
+        const total=parts.reduce((sum,p)=>sum+p.total,0);
+        const max=parts.reduce((sum,p)=>sum+p.max,0);
+        return {parts,total,max,pass:LESSON_PASS_POINTS,
+            remaining:Math.max(0,LESSON_PASS_POINTS-total),
+            ready:parts.every(p=>p.ready)&&total>=LESSON_PASS_POINTS};
     }
     function summary(part){
         const s=status(part);
         const label=part.replace("L08_P","Part ");
-        return `<div class="l8-score-summary">
-            <div class="l8-score-heading">${label} 総合ポイント <strong>${s.total} / ${s.max} P</strong></div>
-            <div class="l8-score-grid">
-                <span>Vocabulary <b>${s.vp} / ${s.vm} P</b></span>
-                <span>Chunk Practice <b>${s.cp} / ${s.cm} P</b></span>
+        const completed=s.vocabDone&&s.chunkDone;
+        const moduleNeeds=[
+            s.vRemaining?`単語あと${s.vRemaining}P`:"",
+            s.cRemaining?`チャンクあと${s.cRemaining}P`:""
+        ].filter(Boolean).join("・");
+        const message=s.ready?"合格！ Copeakの音読練習へ進めます":
+            `合格ライン ${s.pass}Pまで、あと${s.remaining}P${moduleNeeds?`（${moduleNeeds}）`:""}`;
+        return `<section class="l8-score-summary" aria-label="${label}の現在の獲得ポイント">
+            <div class="l8-score-heading">
+              <span class="l8-score-label">${label} · 現在の獲得ポイント</span>
+              <strong class="l8-score-amount">${s.total}<small> / ${s.max} P</small></strong>
             </div>
-            <p class="l8-score-status">${s.ready?"合格：Copeakの音読練習へ進めます":"合格条件：Vocabulary・Chunkともに80%以上（両方の受験が必要）"}</p>
+            <div class="l8-score-track" role="progressbar" aria-label="${label}の進捗" aria-valuemin="0" aria-valuemax="${s.max}" aria-valuenow="${s.total}">
+              <div style="width:${s.max?Math.round(s.total/s.max*100):0}%"></div>
+            </div>
+            <div class="l8-score-grid">
+                <span>Vocabulary <b>${s.vp} / ${s.vm} P${s.vocabDone?"":" · 未挑戦"}</b></span>
+                <span>Chunk Practice <b>${s.cp} / ${s.cm} P${s.chunkDone?"":" · 未挑戦"}</b></span>
+            </div>
+            <p class="l8-score-status">${message}</p>
+            ${!completed?'<p class="l8-score-note">単語・チャンク両方の結果が必要です。各モードで60%以上が合格条件です。</p>':""}
+        </section>`;
+    }
+    function dashboard(part){
+        const all=overview();
+        return `<div class="l8-dashboard">
+          ${summary(part)}
+          <div class="l8-lesson-bar">
+            <strong>Lesson 8 合計 <span>${all.total} / ${all.max} P</span></strong>
+            <small>${all.ready?"全体合格！":"全体合格 1,000P以上＋全Part合格"}${all.remaining?" · あと"+all.remaining+"P":""}</small>
+          </div>
+          <div class="l8-part-overview" aria-label="Lesson 8各Partの獲得ポイント">
+            ${all.parts.map(p=>`<div class="l8-part-chip ${p.part===part?"is-current":""}">
+                <span>${p.part.replace("L08_P","Part ")}</span>
+                <strong>${p.total} / ${p.max} P</strong>
+                <small>${p.ready?"合格":p.pass+"Pで合格"}</small>
+            </div>`).join("")}
+          </div>
         </div>`;
     }
     window.startVocabQuiz=function(){
@@ -80,7 +131,14 @@
         el.innerHTML=el.innerHTML.replace('<button class="quiz-mode-btn btn-mode-2"',entry+'\n<button class="quiz-mode-btn btn-mode-2"');
         el.innerHTML=el.innerHTML.replace(/<div style="margin-top:30px;[\s\S]*?<\/label>\s*<\/div>/,
             '<p class="l8-score-note">採点ルール：単語は2秒、チャンクは5秒以内の正解で10P。Voice Speakingは総合点に含みません。</p>');
-        el.innerHTML+=summary(partKey());
+        // 得点をモード選択ボタンより上に配置し、開いた瞬間に確認できるようにする。
+        const headlineEnd=el.innerHTML.indexOf("</h2>");
+        if(headlineEnd!==-1){
+            const at=headlineEnd+"</h2>".length;
+            el.innerHTML=el.innerHTML.slice(0,at)+dashboard(partKey())+el.innerHTML.slice(at);
+        }else{
+            el.innerHTML=dashboard(partKey())+el.innerHTML;
+        }
     };
     window.startChunkPractice=function(){
         if(!supported()){alert("Chunk PracticeはLesson 8のPart 1〜4で利用できます。");return;}
@@ -206,6 +264,7 @@
           <p>${quizScore} / ${quizQuestions.length} 問正解　（制限時間内に正解すると10P）</p>
           ${summary(part)}
           <p class="l8-score-note">${saved?"この端末にベストスコアを保存しました。":"保存できませんでした。ブラウザの保存設定を確認してください。"}</p>
+          <div class="l8-result-overview">${dashboard(part)}</div>
           ${s.ready?`<button class="l8-next-btn" onclick="openCopeakPractice()">合格！ Copeakで音読練習へ</button>`:
             `<button class="l8-next-btn" onclick="setupQuizData(${quizMode})">もう一度挑戦する</button>`}
           <button class="l8-secondary-btn" onclick="startVocabQuiz()">クイズメニューへ</button>
@@ -215,9 +274,10 @@
     };
     window.openCopeakPractice=function(){
         if(!supported()||!status(partKey()).ready){
-            alert("VocabularyとChunk Practiceで、それぞれ80%以上を達成してください。");return;
+            alert("各Partの合格点と、Vocabulary・Chunkそれぞれ60%以上を達成してください。");return;
         }
         window.open(COPEAK_URL,"_blank","noopener,noreferrer");
     };
     window.getLesson8PracticeStatus=function(part){return status(part||partKey());};
+    window.getLesson8Overview=function(){return overview();};
 })();
