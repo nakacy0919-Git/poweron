@@ -80,3 +80,14 @@
         padding: 5px 10px; margin-left: 10px; cursor: pointer; border-radius: 50%;
     }
 }
+/* 単語テストは音読画面より前面に表示する。 */
+@media (max-width:768px) {
+    #mobileAudioControls { flex-wrap: wrap !important; gap: 6px !important; }
+    body.quiz-active #targetTextDisplay { display:block !important; flex:1 1 auto !important; min-height:0 !important; width:100% !important; box-sizing:border-box !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch !important; padding:12px !important; }
+    body.quiz-active #speechResultWindow, body.quiz-active #mobileAudioControls { display:none !important; }
+    body.quiz-active .quiz-choices { grid-template-columns:1fr !important; gap:10px !important; }
+    body.quiz-active .quiz-choice-btn { padding:12px 10px !important; font-size:1rem !important; min-height:52px !important; }
+    body.quiz-active .quiz-word { font-size:clamp(1.65rem,7vw,3rem) !important; margin-bottom:16px !important; overflow-wrap:anywhere; }
+    body.quiz-active .quiz-mode-title { font-size:1.3rem !important; }
+    body.quiz-active .quiz-mode-btn { font-size:1.05rem !important; padding:12px !important; }
+}
