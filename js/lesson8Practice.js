@@ -129,6 +129,7 @@
               <span class="quiz-mode-subtxt">本文のチャンクから正しい日本語訳を4択で選びます</span>
             </button>`;
         el.innerHTML=el.innerHTML.replace('<button class="quiz-mode-btn btn-mode-2"',entry+'\n<button class="quiz-mode-btn btn-mode-2"');
+        el.innerHTML=el.innerHTML.replace('class="quiz-menu-container"', 'class="quiz-menu-container l8-scored-menu"');
         el.innerHTML=el.innerHTML.replace(/<div style="margin-top:30px;[\s\S]*?<\/label>\s*<\/div>/,
             '<p class="l8-score-note">採点ルール：単語は2秒、チャンクは5秒以内の正解で10P。Voice Speakingは総合点に含みません。</p>');
         // 得点をモード選択ボタンより上に配置し、開いた瞬間に確認できるようにする。
@@ -262,9 +263,8 @@
           <h2>${title} · ${html(part.replace("L08_P","Part "))}</h2>
           <div class="l8-result-points">${earnedPoints} <small>/ ${max} P</small></div>
           <p>${quizScore} / ${quizQuestions.length} 問正解　（制限時間内に正解すると10P）</p>
-          ${summary(part)}
-          <p class="l8-score-note">${saved?"この端末にベストスコアを保存しました。":"保存できませんでした。ブラウザの保存設定を確認してください。"}</p>
           <div class="l8-result-overview">${dashboard(part)}</div>
+          <p class="l8-score-note">${saved?"この端末にベストスコアを保存しました。":"保存できませんでした。ブラウザの保存設定を確認してください。"}</p>
           ${s.ready?`<button class="l8-next-btn" onclick="openCopeakPractice()">合格！ Copeakで音読練習へ</button>`:
             `<button class="l8-next-btn" onclick="setupQuizData(${quizMode})">もう一度挑戦する</button>`}
           <button class="l8-secondary-btn" onclick="startVocabQuiz()">クイズメニューへ</button>
