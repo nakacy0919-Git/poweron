@@ -232,7 +232,8 @@ function openSpeechOverlay(mode) {
         if (currentLevel === 'grade1' && typeof lessonScriptsGrade1 !== 'undefined') safeScripts = lessonScriptsGrade1;
     }
     const activeKey = (typeof currentKey !== 'undefined') ? currentKey : "";
-    targetText = safeScripts[activeKey] || "※データ未登録";
+    // Advanced-level texts are available for limited lessons; keep standard text usable.
+    targetText = safeScripts[activeKey] || (typeof lessonScripts !== "undefined" && lessonScripts[activeKey]) || "※データ未登録";
     
     if (window.innerWidth <= 768) {
         // 10px was unreadable on portrait iPad / mobile. Maintain at least 18px.
