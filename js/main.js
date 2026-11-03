@@ -60,6 +60,10 @@ function onScopeChange() {
     const part = document.getElementById('partSelect')?.value || "1";
     const para = document.getElementById('paraSelect')?.value || "full";
     currentKey = `L${String(currentLesson).padStart(2, '0')}_P${part}_${para}`;
+    // Chunk Practice applies to Lesson 8 only; hide entries in other lessons.
+    document.querySelectorAll('.lesson8-only').forEach(button => {
+        button.style.display = currentLesson === 8 ? '' : 'none';
+    });
     
     if (typeof audioPlayer !== 'undefined' && audioPlayer) {
         audioPlayer.src = `lessons/lesson${currentLesson}/part${part}/audio/${currentKey}.mp3`;
