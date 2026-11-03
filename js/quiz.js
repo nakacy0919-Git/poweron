@@ -56,10 +56,12 @@ function startVocabQuiz() {
                 <span class="quiz-mode-subtxt">意味をリストから選択します</span>
             </button>
 
+            ${currentKey.startsWith("L08_") ? `
             <button class="quiz-mode-btn btn-mode-1" onclick="setupQuizData(3)">
                 🇯🇵 4択クイズ (日→英)
                 <span class="quiz-mode-subtxt">日本語の意味から英単語を選択します</span>
             </button>
+            ` : ""}
 
             <button class="quiz-mode-btn btn-mode-2" onclick="setupQuizData(2)">
                 🎙️ Voice Speaking (日→英)
@@ -84,6 +86,11 @@ function setupQuizData(mode) {
     clearInterval(quizTimer);
     isQuizTransitioning = false;
     quizMode = mode;
+    // 新しい日→英の選択クイズは今回Lesson 8だけに公開する。
+    if (mode === 3 && !currentKey.startsWith('L08_')) {
+        alert('日→英4択は現在Lesson 8に対応しています。');
+        return;
+    }
     const baseKey = currentKey.split('_').slice(0, 2).join('_'); 
     const currentVocabArray = (typeof lessonVocab !== 'undefined') ? lessonVocab[baseKey] : null;
 
