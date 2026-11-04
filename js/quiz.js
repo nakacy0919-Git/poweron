@@ -2,6 +2,35 @@
 // quiz.js: 多機能単語テスト（PowerSlide Power On Ⅲ 最終完成版）
 // ==========================================
 
+
+// A soft, short, original confirmation tone; no loud remote sound effect.
+// Generated only in response to a correct answer (browser user gesture).
+let gentleQuizAudioContext = null;
+function playGentleQuizSound() {
+    const Constructor = window.AudioContext || window.webkitAudioContext;
+    if (!Constructor) return; // Visual feedback remains available without Web Audio.
+    try {
+        if (!gentleQuizAudioContext) gentleQuizAudioContext = new Constructor();
+        const ctx = gentleQuizAudioContext;
+        if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume().catch(() => {});
+        const start = ctx.currentTime;
+        [523.25, 659.25].forEach((frequency, index) => {
+            const osc = ctx.createOscillator();
+            const volume = ctx.createGain();
+            const onset = start + index * 0.10;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, onset);
+            volume.gain.setValueAtTime(0.0001, onset);
+            volume.gain.linearRampToValueAtTime(0.018, onset + 0.025);
+            volume.gain.exponentialRampToValueAtTime(0.0001, onset + 0.22);
+            osc.connect(volume);
+            volume.connect(ctx.destination);
+            osc.start(onset);
+            osc.stop(onset + 0.23);
+        });
+    } catch (_) { /* Sound is optional; never interrupt the quiz. */ }
+}
+
 let quizQuestions = [];
 let currentQuizIndex = 0;
 let quizScore = 0;
@@ -243,7 +272,7 @@ function checkAnswer1(btn, selected, correct) {
     if (selected === correct) {
         btn.style.background = '#4caf50'; btn.style.color = 'white'; btn.style.borderColor = '#4caf50';
         quizScore++;
-        if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e=>{});
+        playGentleQuizSound();
     } else {
         btn.style.background = '#f44336'; btn.style.color = 'white'; btn.style.borderColor = '#f44336';
         buttons.forEach(b => {
@@ -356,7 +385,7 @@ function handleCorrect2(transcript, targetWord) {
         box.innerText = `${transcript} (OK!)`;
     }
     quizScore++;
-    if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e=>{});
+    playGentleQuizSound();
     
     setTimeout(() => { 
         if (currentMode === 'quiz' && quizSessionId === sessionId) {
