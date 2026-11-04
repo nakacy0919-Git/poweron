@@ -74,3 +74,72 @@
  .l8-lesson-bar { padding:4px 0 8px; }
  .l8-score-grid span { white-space:normal; }
 }
+
+/* Lesson 8 two-step mission menu: readable on photos and on classroom projectors. */
+.l8-scored-menu.l8-missions {
+  width:min(100%,960px);max-width:960px;box-sizing:border-box;
+  margin:0 auto;padding:18px 20px 17px;gap:12px;
+  background:rgba(255,255,255,.97);border:1px solid #d9e4e9;
+  border-radius:18px;box-shadow:0 10px 35px rgba(36,58,72,.13);
+  font-family:'Nunito','Noto Sans JP',sans-serif;
+}
+.l8-mission-header {text-align:center;color:#193e52;}
+.l8-eyebrow {display:block;font-size:.79rem;font-weight:900;letter-spacing:.14em;color:#467b90;}
+.l8-missions .quiz-menu-title {font-size:clamp(1.28rem,2.6vw,1.75rem);margin:1px 0 5px;}
+.l8-mission-header p {font-size:.92rem;line-height:1.55;margin:0;color:#4e6371;font-weight:650;}
+.l8-mission-cards {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;width:100%;}
+.l8-mission-card {
+  display:flex;flex-direction:column;align-items:stretch;gap:7px;text-align:left;
+  min-height:171px;padding:16px 18px;border:2px solid #c8dce6;border-radius:14px;
+  background:linear-gradient(145deg,#f7fcff,#edf5ff);color:#18394f;
+  font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;
+}
+.l8-mission-card:hover,.l8-mission-card:focus-visible {
+  transform:translateY(-2px);border-color:#3685a7;outline:2px solid transparent;
+  box-shadow:0 6px 15px rgba(38,98,122,.12);
+}
+.l8-mission-card:active {transform:translateY(0);}
+.l8-mission-chunk {border-color:#b8ddd6;background:linear-gradient(145deg,#f5fdfa,#edf7f4);}
+.l8-mission-chunk:hover,.l8-mission-chunk:focus-visible {border-color:#318c80;}
+.l8-mission-top {display:flex;justify-content:space-between;gap:8px;align-items:center;color:#37677e;font-size:.78rem;font-weight:900;letter-spacing:.05em;}
+.l8-mission-top small {border:1px solid #c9dce3;border-radius:99px;padding:2px 10px;background:white;font-size:.76rem;letter-spacing:0;}
+.l8-mission-card strong {font-size:clamp(1.1rem,2vw,1.35rem);font-weight:900;line-height:1.35;}
+.l8-mission-card strong span {display:block;font-size:.9rem;opacity:.85;margin-top:3px;}
+.l8-mission-description {font-size:.88rem;line-height:1.5;color:#4d6574;flex:1;}
+.l8-mission-points {font-size:1.04rem;font-weight:900;color:#155b7a;font-variant-numeric:tabular-nums;}
+.l8-mission-points span {font-size:.76rem;font-weight:700;color:#54727e;}
+.l8-mission-chunk .l8-mission-points {color:#226b60;}
+.l8-missions .l8-dashboard {max-width:100%;}
+.l8-missions .l8-score-summary {max-width:100%;padding:12px 15px;margin:0;}
+.l8-missions .l8-score-heading {font-size:1.02rem;}
+.l8-missions .l8-score-amount {font-size:1.65rem;}
+.l8-missions .l8-score-grid {font-size:.89rem;margin-top:7px;}
+.l8-missions .l8-score-status {font-size:.87rem;margin-top:7px;}
+.l8-missions .l8-score-note {font-size:.76rem;margin-top:6px;}
+.l8-overview-details {border:1px solid #d7e4eb;border-radius:10px;padding:0 12px;background:#fff;margin-top:9px;color:#31536a;}
+.l8-overview-details summary {display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;padding:11px 2px;cursor:pointer;}
+.l8-overview-details summary strong {font-size:.9rem;}
+.l8-overview-details summary span {font-size:.75rem;color:#657989;}
+.l8-overview-details .l8-part-overview {padding-top:2px;padding-bottom:10px;}
+.l8-mission-rule {color:#4d6370;font-size:.81rem;text-align:center;line-height:1.55;margin:0;}
+.l8-optional {width:100%;box-sizing:border-box;font-size:.82rem;color:#647987;text-align:center;}
+.l8-optional summary {cursor:pointer;padding:5px;text-decoration:underline;text-underline-offset:3px;}
+.l8-optional .l8-secondary-btn {font-size:.86rem;margin-top:7px;}
+.l8-close-button {align-self:center;background:none;border:0;color:#566b78;font-size:.84rem;font-weight:800;padding:5px 12px;cursor:pointer;}
+.l8-vocab-question {font-size:clamp(1.4rem,3vw,2rem);}
+.l8-pass-message {font-weight:900;color:#126c59;font-size:1.1rem;}
+.l8-result .l8-dashboard {max-width:800px;}
+@media(max-width:768px) {
+ .l8-scored-menu.l8-missions {padding:11px;gap:10px;border-radius:10px;box-shadow:none;}
+ .l8-mission-cards {grid-template-columns:1fr;gap:9px;}
+ .l8-mission-card {min-height:0;padding:11px 13px;gap:4px;}
+ .l8-mission-header p {font-size:.84rem;}
+ .l8-mission-card strong {font-size:1.13rem;}
+ .l8-mission-card strong span {display:inline;font-size:.85rem;margin-left:5px;}
+ .l8-mission-description {font-size:.81rem;}
+ .l8-mission-points {font-size:.95rem;}
+ .l8-missions .l8-score-summary {padding:9px 10px;}
+ .l8-overview-details summary {align-items:flex-start;}
+ .l8-optional {font-size:.79rem;}
+}
+@media(prefers-reduced-motion:reduce) {.l8-mission-card {transition:none;}}
