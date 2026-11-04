@@ -101,13 +101,11 @@
         </section>`;
     }
     function dashboard(part){
-        const all=overview();
-        return `<div class="l8-dashboard">
-          ${summary(part)}
-          <div class="l8-lesson-bar">
-            <strong>Lesson 8 合計 <span>${all.total} / ${all.max} P</span></strong>
-            <small>${all.ready?"全体合格！":"全体合格 1,000P以上＋全Part合格"}${all.remaining?" · あと"+all.remaining+"P":""}</small>
-          </div>
+    const all=overview();
+    return `<div class="l8-dashboard">
+        ${summary(part)}
+        <details class="l8-overview-details">
+          <summary><strong>Lesson 8 全体：${all.total} / ${all.max} P</strong><span>${all.ready?"全体合格！":"最終目標 1,000P＋各Part合格"} · Part別の成績を見る</span></summary>
           <div class="l8-part-overview" aria-label="Lesson 8各Partの獲得ポイント">
             ${all.parts.map(p=>`<div class="l8-part-chip ${p.part===part?"is-current":""}">
                 <span>${p.part.replace("L08_P","Part ")}</span>
@@ -115,8 +113,9 @@
                 <small>${p.ready?"合格":p.pass+"Pで合格"}</small>
             </div>`).join("")}
           </div>
-        </div>`;
-    }
+        </details>
+    </div>`;
+}
     function renderMissionMenu(part) {
     const score=status(part), num=part.replace("L08_P","");
     const vocabLabel=score.vp>=score.minV && score.vocabDone ? "達成" : score.vocabDone ? "再挑戦" : "未挑戦";
