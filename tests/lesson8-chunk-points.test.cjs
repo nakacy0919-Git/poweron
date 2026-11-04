@@ -79,55 +79,52 @@ test('chunk score is awarded once within five seconds and stored',()=>{
     assert.equal(run("getLesson8PracticeStatus('L08_P1').cp"),10);
     assert.ok(saved.has('poweron_lesson8_progress_v1'));
 });
-test('correct vocab answer after two seconds earns no points',()=>{
+test('a mixed vocabulary answer after two seconds earns zero points',()=>{
     const app=createApp(),{run,ctx,clock}=app;
     ctx.currentKey='L08_P2_full';
-    run('setupQuizData(1)');
-    const q=run('quizQuestions[0]'),{selected}=choiceButton(q);
-    ctx.answerButton=selected;ctx.answer=q.correct;
+    run('setupQuizData(5)');
+    const q=run('quizQuestions[0]'),{selected,index}=choiceButton(q);
+    ctx.answerButton=selected;ctx.answerIndex=index;
     clock(2200);
-    run('checkAnswer1(answerButton,answer,answer)');
-    assert.equal(run('quizScore'),1);
+    run('checkLesson8MixedAnswer(answerButton,answerIndex)');
+    assert.equal(run('quizScore'),0);
     run('currentQuizIndex=quizQuestions.length;renderQuizResult()');
     assert.equal(run("getLesson8PracticeStatus('L08_P2').vp"),0);
 });
-test('correct vocab answer within two seconds earns 10 P and best score persists',()=>{
+test('one mixed vocabulary question earns 10 P and preserves previous best',()=>{
     const app=createApp(),{run,ctx,clock}=app;
-    run('setupQuizData(3)');
-    const q=run('quizQuestions[0]'),{selected}=choiceButton(q);
-    ctx.answerButton=selected;ctx.answer=q.correct;
+    run('setupQuizData(5)');
+    const q=run('quizQuestions[0]'),{selected,index}=choiceButton(q);
+    ctx.answerButton=selected;ctx.answerIndex=index;
     clock(500);
-    run('checkAnswer1(answerButton,answer,answer)');
-    run('checkAnswer1(answerButton,answer,answer)');
+    run('checkLesson8MixedAnswer(answerButton,answerIndex)');
+    run('checkLesson8MixedAnswer(answerButton,answerIndex)');
     assert.equal(run('quizScore'),1);
     run('currentQuizIndex=quizQuestions.length;renderQuizResult()');
     assert.equal(run("getLesson8PracticeStatus('L08_P1').vp"),10);
     ctx.currentMode='quiz';
-    run('setupQuizData(1)');
+    run('setupQuizData(5)');
     run('currentQuizIndex=quizQuestions.length;renderQuizResult()');
     assert.equal(run("getLesson8PracticeStatus('L08_P1').vp"),10);
 });
-test('combined gate needs both module results and opens Copeak only when passing',()=>{
-    const app=createApp(),{run,ctx,saved,opens,alerts}=app;
+test('combined gate needs both missions, with no external Copeak referral',()=>{
+    const app=createApp(),{run,ctx,saved,nodes}=app;
     let p=run("getLesson8PracticeStatus('L08_P1')");
     assert.equal(p.ready,false);
-    ctx.currentKey='L08_P1_full';
-    run('openCopeakPractice()');
-    assert.equal(opens.length,0);
-    assert.equal(alerts.length,1);
     saved.set('poweron_lesson8_progress_v1',JSON.stringify({L08_P1:{
         vocab:{points:150,max:180},chunk:{points:200,max:250}
     }}));
     p=run("getLesson8PracticeStatus('L08_P1')");
     assert.equal(p.ready,true);
     assert.equal(p.total,350);
-    run('openCopeakPractice()');
-    assert.equal(opens.length,1);
-    assert.equal(opens[0].url,'https://copeak.pic-speak-story.com/');
+    ctx.currentKey='L08_P1_full';
+    run('startVocabQuiz()');
+    assert.ok(nodes.targetTextDisplay.innerHTML.includes('2つのミッション'));
+    assert.ok(!nodes.targetTextDisplay.innerHTML.includes('Copeak'));
+    assert.equal(run("typeof openCopeakPractice"),'undefined');
     saved.set('poweron_lesson8_progress_v1',JSON.stringify({L08_P1:{
         vocab:{points:100,max:180},chunk:{points:210,max:250}
     }}));
-    // 310P alone is insufficient when Vocabulary has not reached 60%.
     assert.equal(run("getLesson8PracticeStatus('L08_P1').ready"),false);
 });
 test('desktop, mobile, and score CSS are wired',()=>{
@@ -154,8 +151,10 @@ test('quiz menu shows saved points first, then mode buttons, and all four parts'
     assert.ok(view.includes('200 / 310 P'));
     assert.ok(view.includes('あと30P'));
     for(const p of [1,2,3,4])assert.ok(view.includes('Part '+p));
-    assert.ok(view.indexOf('現在の獲得ポイント')<view.indexOf('setupQuizData(1)'));
-    assert.ok(view.includes('class="quiz-menu-container l8-scored-menu"'));
+    assert.ok(view.includes('MISSION 1') && view.includes('MISSION 2'));
+    assert.ok(view.includes('setupQuizData(5)') && view.includes('setupQuizData(4)'));
+    assert.ok(!view.includes('setupQuizData(1)') && !view.includes('setupQuizData(3)'));
+    assert.ok(view.includes('class="quiz-menu-container l8-scored-menu l8-missions"'));
     assert.equal(run("getLesson8PracticeStatus('L08_P2').ready"),false);
 });
 test('part-specific pass thresholds and module 60% floor apply',()=>{
@@ -200,4 +199,35 @@ test('overall 1,000P threshold is separate from individual part passes',()=>{
     assert.equal(summary.total,1000);
     assert.equal(summary.remaining,0);
     assert.equal(summary.ready,true);
+});
+
+test('one combined vocabulary quiz contains both directions and never doubles the score max',()=>{
+    const {ctx,run}=createApp();
+    for(const [part,words] of [[1,18],[2,11],[3,9],[4,10]]){
+        ctx.currentKey='L08_P'+part+'_full';
+        ctx.currentMode='quiz';
+        run('setupQuizData(5)');
+        const questions=run('quizQuestions');
+        assert.equal(questions.length,words);
+        assert.equal(new Set(questions.map(q=>q.word)).size,words);
+        assert.equal(new Set(questions.map(q=>q.direction)).size,2);
+        for(const q of questions){
+            assert.equal(q.correct,q.direction==='en-ja'?q.meaning:q.word);
+            assert.equal(q.choices.length,4);
+            assert.equal(new Set(q.choices).size,4);
+            assert.equal(q.choices.filter(c=>c===q.correct).length,1);
+        }
+    }
+});
+test('all answers use the soft synthesized sound instead of the loud audio sample',()=>{
+    const quiz=fs.readFileSync(path.join(root,'js/quiz.js'),'utf8');
+    const practice=fs.readFileSync(path.join(root,'js/lesson8Practice.js'),'utf8');
+    const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+    assert.match(quiz,/function playGentleQuizSound\(/);
+    assert.match(quiz,/linearRampToValueAtTime\(0\.018/);
+    assert.doesNotMatch(quiz,/successSound\.play\(/);
+    assert.match(practice,/playGentleQuizSound\(\)/);
+    assert.doesNotMatch(practice,/Copeak/);
+    assert.doesNotMatch(html,/onclick="startChunkPractice\(\)"/);
+    assert.match(html,/lesson8Practice\.js\?v=3/);
 });
