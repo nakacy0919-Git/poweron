@@ -29,5 +29,7 @@ const lessonStructure = {
 // オーディオ要素
 let audioPlayer = document.getElementById('mainAudioPlayer');
 let successSound = document.getElementById('successSound');
+// Legacy Reading Check sound remains subtle too; Quiz missions use Web Audio chime.
+if (successSound) successSound.volume = 0.08;
 // 現在選択されているレベルを記憶する変数（初期値は標準）
 let currentLevel = 'standard';
