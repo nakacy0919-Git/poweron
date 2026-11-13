@@ -354,6 +354,8 @@
           <button class="l8-secondary-btn" onclick="startVocabQuiz()">クイズメニューへ</button>
           <button class="l8-secondary-btn" onclick="closeVocabQuiz()">終了</button>
         </section>`;
+        if(typeof PowerOnPractice!=="undefined" && quizQuestions.length)
+            PowerOnPractice.captureLegacy('vocabulary',Math.round(quizScore/quizQuestions.length*100));
         if(s.ready && typeof fireConfetti==="function")fireConfetti();
     };
     window.getLesson8PracticeStatus=function(part){return status(part||partKey());};
