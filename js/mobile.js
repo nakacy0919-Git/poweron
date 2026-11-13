@@ -40,6 +40,7 @@ if (window.innerWidth <= 768) {
 
 // グローバル関数
 window.syncMobileMenu = function() {
+    const previousStudyMode = currentMode === 'practice' && window.PowerOnPractice ? PowerOnPractice.mode() : null;
     const lesson = document.getElementById('mobileLessonSelect')?.value || '';
     const part = document.getElementById('mobilePartSelect')?.value || '';
     const para = document.getElementById('mobileParaSelect')?.value || '';
@@ -62,9 +63,12 @@ window.syncMobileMenu = function() {
     if (desktopPara) desktopPara.value = para;
     if (typeof onScopeChange === 'function') onScopeChange();
 
-    // Preserve Shadowing when the learner intentionally changed the scope.
-    const nextMode = currentMode === 'shadowing' ? 'shadowing' : 'reading';
-    if (typeof openSpeechOverlay === 'function') openSpeechOverlay(nextMode);
+    // Keep the chosen Study Lab mode when an iPad learner switches lesson/part.
+    if (previousStudyMode && window.PowerOnPractice) PowerOnPractice.open(previousStudyMode);
+    else {
+        const nextMode = currentMode === 'shadowing' ? 'shadowing' : 'reading';
+        if (typeof openSpeechOverlay === 'function') openSpeechOverlay(nextMode);
+    }
 };
 
 window.openCustomSubmitModal = function() {
