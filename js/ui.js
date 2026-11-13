@@ -13,6 +13,7 @@ function changeLevel(level) {
     if (typeof currentMode !== 'undefined') {
         if (currentMode === 'text') renderDualText();
         else if (currentMode === 'reading' || currentMode === 'shadowing') openSpeechOverlay(currentMode);
+        else if (currentMode === 'practice' && window.PowerOnPractice && PowerOnPractice.mode()) PowerOnPractice.open(PowerOnPractice.mode());
     }
 }
 
