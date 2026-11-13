@@ -6,6 +6,9 @@ test('English sentence splitter keeps abbreviations, numbers and quoted endings'
     assert.deepEqual(core.splitSentences('Dr. Green came at 3.5 p.m. "Really?" Yes!'), [
         'Dr. Green came at 3.5 p.m.', '"Really?"', 'Yes!'
     ]);
+    assert.deepEqual(core.splitSentences('1. Do you understand? 2. Try again.'), [
+        '1. Do you understand?', '2. Try again.'
+    ]);
     assert.deepEqual(core.splitSentences(''), []);
     assert.deepEqual(core.splitSentences('One sentence without a final period'), [
         'One sentence without a final period'
