@@ -75,6 +75,10 @@
 .po-lesson-card .po-track { margin: 9px 0; }
 .po-parts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px 13px; }
 .po-parts span { display: flex; justify-content: space-between; font-size: 12px; color: #4d6680; }
+.po-legacy { display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.po-legacy > div { background: #f4f8ff; border: 1px solid #dbe6f5; border-radius: 10px; padding: 10px; }
+.po-legacy strong, .po-legacy span { display: block; font-size: 13px; }
+.po-legacy span { color: #64748b; margin-top: 4px; }
 .po-mobile-actions { display: none; }
 body.po-practice-active #floatingSubmitBtn { display: none !important; }
 @media (max-width: 768px) {
@@ -96,9 +100,9 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
     .po-switcher button { font-size: 12px; padding: 8px; flex: 1 1 auto; }
     .po-sentence { margin: 11px 0; }
     .po-action-row button { flex: 1 1 auto; }
-    .po-stats { grid-template-columns: 1fr; }
+    .po-stats, .po-legacy { grid-template-columns: 1fr; }
     .po-lessons { grid-template-columns: 1fr; }
 }
 @media (min-width: 769px) and (max-width: 1100px) {
-    .po-stats { grid-template-columns: 1fr; }
+    .po-stats, .po-legacy { grid-template-columns: 1fr; }
 }
