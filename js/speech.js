@@ -62,6 +62,10 @@ function finishRecognition() {
     mainRecognition = null;
     processSpeechMatch(lastSpokenText);
     setRecordingButtons(false, true);
+    if (typeof PowerOnPractice !== 'undefined' && recordStartTime &&
+        (currentMode === 'reading' || currentMode === 'shadowing')) {
+        PowerOnPractice.captureLegacy(currentMode === 'reading' ? 'readingcheck' : 'shadowing', currentScore);
+    }
     const submit = document.getElementById('floatingSubmitBtn');
     if (submit) submit.style.display = currentScore > 0 ? 'block' : 'none';
     if (typeof checkCelebration === 'function') checkCelebration();
