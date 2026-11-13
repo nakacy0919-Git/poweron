@@ -270,6 +270,28 @@
                     '" onclick="PowerOnPractice.open(\'' + mode + '\')">' + esc(MODES[mode]) + '</button>';
             }).join('') + '<button onclick="PowerOnPractice.close()" aria-label="学習を終了">✕ 閉じる</button></div>';
     }
+    function captureLegacy(mode, score) {
+        if (!['readingcheck', 'shadowing', 'vocabulary'].includes(mode) ||
+            !Number.isFinite(Number(score))) return false;
+        const scope = String(currentLevel) + ':' + String(currentKey);
+        const sig = core.fingerprint([dataOf('script'), mode]);
+        // Completion means "attempted", not "passed"; the existing grading stays authoritative.
+        return store.record(scope, mode, 0, 1, sig, {
+            attempt:true, complete:true, accuracy:Number(score)
+        });
+    }
+    function legacySummary() {
+        const labels = {readingcheck:'Reading Check', shadowing:'Shadowing', vocabulary:'Vocabulary'};
+        const sigBase = dataOf('script');
+        return '<h3>既存メニューの学習履歴 <small>選択中の範囲</small></h3><div class="po-legacy">' +
+            Object.keys(labels).map(function (mode) {
+                const row = store.get(app.scope, mode, 1, core.fingerprint([sigBase, mode]));
+                const score = row.bestAccuracy == null ? '—' : row.bestAccuracy + '%';
+                return '<div><strong>' + esc(labels[mode]) + '</strong><span>実施回数 ' +
+                    row.attempts + ' 回</span><span>最高スコア ' + score + '</span></div>';
+            }).join('') + '</div>' +
+            '<p class="po-note">実施回数と最高スコアを記録します。Lesson 8の合格基準やポイントには影響しません。</p>';
+    }
     function progressDashboard() {
         const all = store.snapshot().scopes;
         const lessonItems = [];
@@ -306,7 +328,7 @@
             '<div class="po-stats">' + scopeBar('1文ずつ音読','reading') +
             scopeBar('じっくり','deep') + scopeBar('リスニングパズル','puzzle') + '</div>' +
             '<h3>Lesson 1–10 の進捗 <small>各Partの最高進捗を集計</small></h3>' +
-            '<div class="po-lessons">' + lessonItems.join('') + '</div>' +
+            '<div class="po-lessons">' + lessonItems.join('') + '</div>' + legacySummary() +
             '<div class="po-action-row"><button onclick="PowerOnPractice.exportCSV()">📥 進捗CSVを保存</button></div>' +
             '<p class="po-note">' + (store.isPersistent() ?
                 '保存先：この端末のブラウザ（別端末や教師画面との自動同期はまだありません）。' :
@@ -395,7 +417,7 @@
         const rows = [['Level','Scope','Mode','Completed','Total','Percent','Attempts','BestWordMatchPercent','LastStudied']];
         const all = store.snapshot().scopes;
         Object.keys(all).sort().forEach(function (key) {
-            ['reading','deep','puzzle'].forEach(function (mode) {
+            ['reading','deep','puzzle','readingcheck','shadowing','vocabulary'].forEach(function (mode) {
                 const row = all[key][mode];
                 if (!row || !row.total) return;
                 const count = Object.keys(row.completed || {}).filter(function (index) {
@@ -421,6 +443,6 @@
         go:go, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
-        getProgress:function () {return store.snapshot();}
+        captureLegacy:captureLegacy, getProgress:function () {return store.snapshot();}
     };
 })();
