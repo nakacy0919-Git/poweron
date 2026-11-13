@@ -56,7 +56,7 @@ function updateParaSelect() {
 }
 
 function onScopeChange() {
-    if (currentMode === 'quiz') resetAppMode();
+    if (currentMode === 'quiz' || currentMode === 'practice') resetAppMode();
     const part = document.getElementById('partSelect')?.value || "1";
     const para = document.getElementById('paraSelect')?.value || "full";
     currentKey = `L${String(currentLesson).padStart(2, '0')}_P${part}_${para}`;
@@ -84,6 +84,7 @@ function onScopeChange() {
 }
 
 function resetAppMode() {
+    if (typeof PowerOnPractice !== 'undefined') PowerOnPractice.stop();
     if (typeof stopQuizRecognition === 'function') stopQuizRecognition();
     if (typeof quizTimer !== 'undefined') clearInterval(quizTimer);
     document.body.classList.remove('quiz-active');
@@ -108,6 +109,7 @@ function resetAppMode() {
     if (typeof abortSpeechSession === 'function') abortSpeechSession();
     document.body.classList.remove('speech-active');
     document.body.classList.remove('text-active');
+    document.body.classList.remove('po-practice-active');
 
     currentMode = ''; isScriptOpen = false; isJapaneseOpen = false;
 }
