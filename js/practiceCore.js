@@ -18,6 +18,7 @@
             if (!/[.!?]/.test(source[i])) continue;
             const prev = source.slice(start, i + 1).trim();
             if (/\b(?:Mr|Mrs|Ms|Dr|Prof|St|Jr|Sr|vs|U\.S|U\.K)\.$/i.test(prev)) continue;
+            if (source[i] === '.' && /^\d{1,2}\.$/.test(prev)) continue; // numbered questions
             if (source[i] === '.' && /\d/.test(source[i-1] || '') && /\d/.test(source[i+1] || '')) continue;
             let end = i + 1;
             while (end < source.length && /["'”’)\]]/.test(source[end])) end++;
