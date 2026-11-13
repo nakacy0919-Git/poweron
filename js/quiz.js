@@ -445,5 +445,7 @@ function renderQuizResult() {
             <button onclick="closeVocabQuiz()" style="margin:15px; padding:15px 25px; border:1px solid #aaa; border-radius:30px; background:white;">終了</button>
         </div>
     `;
+    if (typeof PowerOnPractice !== 'undefined' && Number.isFinite(percent))
+        PowerOnPractice.captureLegacy('vocabulary', percent);
     if (percent >= 80 && typeof fireConfetti === 'function') fireConfetti();
 }
