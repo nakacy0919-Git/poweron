@@ -6,7 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'poweron_study_progress_v1';
-    const MODES = ['reading', 'deep', 'puzzle'];
+    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary'];
 
     function splitSentences(value) {
         const source = String(value || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')
