@@ -33,7 +33,10 @@
 
     const LESSON8_SCENE_SIZES = Object.freeze({
         L08_P1_p1: Object.freeze([2, 2]),
-        L08_P1_p2: Object.freeze([1, 2, 2, 1, 2, 1])
+        L08_P1_p2: Object.freeze([1, 2, 2, 1, 2, 1]),
+        L08_P2_p3: Object.freeze([2, 2, 2]),
+        L08_P2_p4: Object.freeze([1, 2]),
+        L08_P2_p5: Object.freeze([1, 3, 1, 2, 2, 2, 1])
     });
 
     function buildScenes(paragraphs, split, sceneSizes) {
@@ -41,7 +44,7 @@
         for (const paragraph of paragraphs) {
             const sentences = split(paragraph.english);
             const requested = sceneSizes && sceneSizes[paragraph.key];
-            const fixed = Array.isArray(requested) && requested.every(n => n === 1 || n === 2) &&
+            const fixed = Array.isArray(requested) && requested.every(n => Number.isInteger(n) && n >= 1 && n <= 3) &&
                 requested.reduce((sum,n) => sum+n,0) === sentences.length ? requested : null;
             let offset = 0, group = 0;
             while (offset < sentences.length) {

@@ -31,3 +31,17 @@ test('Lesson 8 Part 1 uses eight curated scenes and registered paths',()=>{
  assert.deepEqual(plan.map(s=>s.id),scenes.map(s=>s.id));
  scenes.forEach((s,i)=>assert.equal(mediaContext.window.PowerOnSceneMedia[s.id].image,'lessons/lesson8/part1/images/L08_P1_'+String(i+1).padStart(2,'0')+'.webp'));
 });
+
+test('Lesson 8 Part 2 uses twelve curated scenes and all twenty-one sentences',()=>{
+ const fs=require('node:fs'), vm=require('node:vm'), path=require('node:path');
+ const dir=path.join(__dirname,'..','lessons');
+ const ctx=vm.createContext({});vm.runInContext(fs.readFileSync(path.join(dir,'lessonData.js'),'utf8')+'\n;this.__lessonScripts=lessonScripts;',ctx);
+ const paras=[3,4,5].map(number=>({number,key:'L08_P2_p'+number,english:ctx.__lessonScripts['L08_P2_p'+number]}));
+ const scenes=core.buildScenes(paras,core.splitSentences,core.LESSON8_SCENE_SIZES);
+ assert.equal(scenes.length,12);assert.equal(scenes.flatMap(s=>s.sentences).length,21);
+ assert.deepEqual(scenes.flatMap(s=>s.sentences),paras.flatMap(p=>core.splitSentences(p.english)));
+ const mediaContext=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(dir,'sceneMedia.js'),'utf8'),mediaContext);
+ const plan=JSON.parse(fs.readFileSync(path.join(dir,'scene-plan.json'),'utf8')).scenes.filter(s=>s.part==='L08_P2');
+ assert.deepEqual(plan.map(s=>[s.id,s.firstSentence,s.lastSentence]),scenes.map(s=>[s.id,s.firstSentence,s.lastSentence]));
+ scenes.forEach((s,i)=>{const image='lessons/lesson8/part2/images/L08_P2_'+String(i+1).padStart(2,'0')+'.webp';assert.equal(mediaContext.window.PowerOnSceneMedia[s.id].image,image);const b=fs.readFileSync(path.join(dir,'..',image));assert.equal(b.subarray(0,4).toString(),'RIFF');assert.equal(b.subarray(8,12).toString(),'WEBP');});
+});
