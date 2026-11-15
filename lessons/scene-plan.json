@@ -1,0 +1,2006 @@
+{
+  "version": 1,
+  "level": "standard",
+  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words.",
+  "status": "planned, scene-specific media not yet created",
+  "scenes": [
+    {
+      "id": "L01_P1_p1_s01",
+      "part": "L01_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p1_s01.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L01_P1_p2_s01",
+      "part": "L01_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p2_s01.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L01_P1_p2_s03",
+      "part": "L01_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p2_s03.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L01_P1_p3_s01",
+      "part": "L01_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p3_s01.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L01_P1_p3_s03",
+      "part": "L01_P1",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p3_s03.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p3_s03.mp3"
+    },
+    {
+      "id": "L01_P1_p3_s05",
+      "part": "L01_P1",
+      "paragraph": 3,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson1/part1/scenes/L01_P1_p3_s05.webp",
+      "audio": "lessons/lesson1/part1/scenes/L01_P1_p3_s05.mp3"
+    },
+    {
+      "id": "L01_P2_p1_s01",
+      "part": "L01_P2",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p1_s01.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p1_s01.mp3"
+    },
+    {
+      "id": "L01_P2_p1_s02",
+      "part": "L01_P2",
+      "paragraph": 1,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p1_s02.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p1_s02.mp3"
+    },
+    {
+      "id": "L01_P2_p1_s04",
+      "part": "L01_P2",
+      "paragraph": 1,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p1_s04.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p1_s04.mp3"
+    },
+    {
+      "id": "L01_P2_p1_s05",
+      "part": "L01_P2",
+      "paragraph": 1,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p1_s05.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p1_s05.mp3"
+    },
+    {
+      "id": "L01_P2_p2_s01",
+      "part": "L01_P2",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p2_s01.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p2_s01.mp3"
+    },
+    {
+      "id": "L01_P2_p2_s03",
+      "part": "L01_P2",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson1/part2/scenes/L01_P2_p2_s03.webp",
+      "audio": "lessons/lesson1/part2/scenes/L01_P2_p2_s03.mp3"
+    },
+    {
+      "id": "L02_P1_p1_s01",
+      "part": "L02_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p1_s01.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L02_P1_p1_s03",
+      "part": "L02_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p1_s03.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L02_P1_p1_s05",
+      "part": "L02_P1",
+      "paragraph": 1,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p1_s05.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p1_s05.mp3"
+    },
+    {
+      "id": "L02_P1_p2_s01",
+      "part": "L02_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p2_s01.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L02_P1_p2_s03",
+      "part": "L02_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p2_s03.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L02_P1_p2_s04",
+      "part": "L02_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p2_s04.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L02_P1_p3_s01",
+      "part": "L02_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p3_s01.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L02_P1_p3_s02",
+      "part": "L02_P1",
+      "paragraph": 3,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p3_s02.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p3_s02.mp3"
+    },
+    {
+      "id": "L02_P1_p3_s04",
+      "part": "L02_P1",
+      "paragraph": 3,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson2/part1/scenes/L02_P1_p3_s04.webp",
+      "audio": "lessons/lesson2/part1/scenes/L02_P1_p3_s04.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s01",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s01.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s01.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s02",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s02.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s02.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s03",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s03.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s03.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s05",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s05.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s05.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s07",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 7,
+      "lastSentence": 7,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s07.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s07.mp3"
+    },
+    {
+      "id": "L02_P2_p1_s08",
+      "part": "L02_P2",
+      "paragraph": 1,
+      "firstSentence": 8,
+      "lastSentence": 8,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p1_s08.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p1_s08.mp3"
+    },
+    {
+      "id": "L02_P2_p2_s01",
+      "part": "L02_P2",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p2_s01.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p2_s01.mp3"
+    },
+    {
+      "id": "L02_P2_p2_s03",
+      "part": "L02_P2",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson2/part2/scenes/L02_P2_p2_s03.webp",
+      "audio": "lessons/lesson2/part2/scenes/L02_P2_p2_s03.mp3"
+    },
+    {
+      "id": "L03_P1_p1_s01",
+      "part": "L03_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p1_s01.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L03_P1_p1_s03",
+      "part": "L03_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p1_s03.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L03_P1_p2_s01",
+      "part": "L03_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p2_s01.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L03_P1_p2_s03",
+      "part": "L03_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p2_s03.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L03_P1_p2_s04",
+      "part": "L03_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p2_s04.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L03_P1_p2_s06",
+      "part": "L03_P1",
+      "paragraph": 2,
+      "firstSentence": 6,
+      "lastSentence": 7,
+      "image": "lessons/lesson3/part1/scenes/L03_P1_p2_s06.webp",
+      "audio": "lessons/lesson3/part1/scenes/L03_P1_p2_s06.mp3"
+    },
+    {
+      "id": "L03_P2_p1_s01",
+      "part": "L03_P2",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p1_s01.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p1_s01.mp3"
+    },
+    {
+      "id": "L03_P2_p1_s03",
+      "part": "L03_P2",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p1_s03.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p1_s03.mp3"
+    },
+    {
+      "id": "L03_P2_p1_s04",
+      "part": "L03_P2",
+      "paragraph": 1,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p1_s04.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p1_s04.mp3"
+    },
+    {
+      "id": "L03_P2_p1_s06",
+      "part": "L03_P2",
+      "paragraph": 1,
+      "firstSentence": 6,
+      "lastSentence": 6,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p1_s06.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p1_s06.mp3"
+    },
+    {
+      "id": "L03_P2_p2_s01",
+      "part": "L03_P2",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p2_s01.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p2_s01.mp3"
+    },
+    {
+      "id": "L03_P2_p2_s03",
+      "part": "L03_P2",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p2_s03.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p2_s03.mp3"
+    },
+    {
+      "id": "L03_P2_p2_s05",
+      "part": "L03_P2",
+      "paragraph": 2,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p2_s05.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p2_s05.mp3"
+    },
+    {
+      "id": "L03_P2_p3_s01",
+      "part": "L03_P2",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson3/part2/scenes/L03_P2_p3_s01.webp",
+      "audio": "lessons/lesson3/part2/scenes/L03_P2_p3_s01.mp3"
+    },
+    {
+      "id": "L04_P1_p1_s01",
+      "part": "L04_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p1_s01.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L04_P1_p1_s03",
+      "part": "L04_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p1_s03.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L04_P1_p1_s05",
+      "part": "L04_P1",
+      "paragraph": 1,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p1_s05.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p1_s05.mp3"
+    },
+    {
+      "id": "L04_P1_p2_s01",
+      "part": "L04_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p2_s01.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L04_P1_p2_s02",
+      "part": "L04_P1",
+      "paragraph": 2,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p2_s02.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p2_s02.mp3"
+    },
+    {
+      "id": "L04_P1_p3_s01",
+      "part": "L04_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p3_s01.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L04_P1_p3_s03",
+      "part": "L04_P1",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p3_s03.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p3_s03.mp3"
+    },
+    {
+      "id": "L04_P1_p3_s05",
+      "part": "L04_P1",
+      "paragraph": 3,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p3_s05.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p3_s05.mp3"
+    },
+    {
+      "id": "L04_P1_p3_s06",
+      "part": "L04_P1",
+      "paragraph": 3,
+      "firstSentence": 6,
+      "lastSentence": 6,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p3_s06.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p3_s06.mp3"
+    },
+    {
+      "id": "L04_P1_p3_s07",
+      "part": "L04_P1",
+      "paragraph": 3,
+      "firstSentence": 7,
+      "lastSentence": 7,
+      "image": "lessons/lesson4/part1/scenes/L04_P1_p3_s07.webp",
+      "audio": "lessons/lesson4/part1/scenes/L04_P1_p3_s07.mp3"
+    },
+    {
+      "id": "L04_P2_p1_s01",
+      "part": "L04_P2",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson4/part2/scenes/L04_P2_p1_s01.webp",
+      "audio": "lessons/lesson4/part2/scenes/L04_P2_p1_s01.mp3"
+    },
+    {
+      "id": "L04_P2_p1_s03",
+      "part": "L04_P2",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson4/part2/scenes/L04_P2_p1_s03.webp",
+      "audio": "lessons/lesson4/part2/scenes/L04_P2_p1_s03.mp3"
+    },
+    {
+      "id": "L04_P2_p1_s05",
+      "part": "L04_P2",
+      "paragraph": 1,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson4/part2/scenes/L04_P2_p1_s05.webp",
+      "audio": "lessons/lesson4/part2/scenes/L04_P2_p1_s05.mp3"
+    },
+    {
+      "id": "L04_P2_p2_s01",
+      "part": "L04_P2",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson4/part2/scenes/L04_P2_p2_s01.webp",
+      "audio": "lessons/lesson4/part2/scenes/L04_P2_p2_s01.mp3"
+    },
+    {
+      "id": "L04_P2_p2_s03",
+      "part": "L04_P2",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson4/part2/scenes/L04_P2_p2_s03.webp",
+      "audio": "lessons/lesson4/part2/scenes/L04_P2_p2_s03.mp3"
+    },
+    {
+      "id": "L04_P3_p1_s01",
+      "part": "L04_P3",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson4/part3/scenes/L04_P3_p1_s01.webp",
+      "audio": "lessons/lesson4/part3/scenes/L04_P3_p1_s01.mp3"
+    },
+    {
+      "id": "L04_P3_p1_s02",
+      "part": "L04_P3",
+      "paragraph": 1,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson4/part3/scenes/L04_P3_p1_s02.webp",
+      "audio": "lessons/lesson4/part3/scenes/L04_P3_p1_s02.mp3"
+    },
+    {
+      "id": "L04_P3_p2_s01",
+      "part": "L04_P3",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson4/part3/scenes/L04_P3_p2_s01.webp",
+      "audio": "lessons/lesson4/part3/scenes/L04_P3_p2_s01.mp3"
+    },
+    {
+      "id": "L04_P3_p2_s02",
+      "part": "L04_P3",
+      "paragraph": 2,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson4/part3/scenes/L04_P3_p2_s02.webp",
+      "audio": "lessons/lesson4/part3/scenes/L04_P3_p2_s02.mp3"
+    },
+    {
+      "id": "L04_P3_p2_s04",
+      "part": "L04_P3",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson4/part3/scenes/L04_P3_p2_s04.webp",
+      "audio": "lessons/lesson4/part3/scenes/L04_P3_p2_s04.mp3"
+    },
+    {
+      "id": "L05_P1_p1_s01",
+      "part": "L05_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p1_s01.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L05_P1_p2_s01",
+      "part": "L05_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p2_s01.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L05_P1_p2_s02",
+      "part": "L05_P1",
+      "paragraph": 2,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p2_s02.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p2_s02.mp3"
+    },
+    {
+      "id": "L05_P1_p2_s04",
+      "part": "L05_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p2_s04.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L05_P1_p3_s01",
+      "part": "L05_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p3_s01.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L05_P1_p3_s03",
+      "part": "L05_P1",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson5/part1/scenes/L05_P1_p3_s03.webp",
+      "audio": "lessons/lesson5/part1/scenes/L05_P1_p3_s03.mp3"
+    },
+    {
+      "id": "L05_P2_p1_s01",
+      "part": "L05_P2",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p1_s01.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p1_s01.mp3"
+    },
+    {
+      "id": "L05_P2_p1_s03",
+      "part": "L05_P2",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p1_s03.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p1_s03.mp3"
+    },
+    {
+      "id": "L05_P2_p1_s04",
+      "part": "L05_P2",
+      "paragraph": 1,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p1_s04.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p1_s04.mp3"
+    },
+    {
+      "id": "L05_P2_p2_s01",
+      "part": "L05_P2",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p2_s01.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p2_s01.mp3"
+    },
+    {
+      "id": "L05_P2_p2_s03",
+      "part": "L05_P2",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p2_s03.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p2_s03.mp3"
+    },
+    {
+      "id": "L05_P2_p2_s05",
+      "part": "L05_P2",
+      "paragraph": 2,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson5/part2/scenes/L05_P2_p2_s05.webp",
+      "audio": "lessons/lesson5/part2/scenes/L05_P2_p2_s05.mp3"
+    },
+    {
+      "id": "L05_P3_p1_s01",
+      "part": "L05_P3",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p1_s01.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p1_s01.mp3"
+    },
+    {
+      "id": "L05_P3_p1_s03",
+      "part": "L05_P3",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p1_s03.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p1_s03.mp3"
+    },
+    {
+      "id": "L05_P3_p1_s04",
+      "part": "L05_P3",
+      "paragraph": 1,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p1_s04.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p1_s04.mp3"
+    },
+    {
+      "id": "L05_P3_p2_s01",
+      "part": "L05_P3",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p2_s01.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p2_s01.mp3"
+    },
+    {
+      "id": "L05_P3_p2_s03",
+      "part": "L05_P3",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p2_s03.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p2_s03.mp3"
+    },
+    {
+      "id": "L05_P3_p2_s05",
+      "part": "L05_P3",
+      "paragraph": 2,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p2_s05.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p2_s05.mp3"
+    },
+    {
+      "id": "L05_P3_p3_s01",
+      "part": "L05_P3",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson5/part3/scenes/L05_P3_p3_s01.webp",
+      "audio": "lessons/lesson5/part3/scenes/L05_P3_p3_s01.mp3"
+    },
+    {
+      "id": "L06_P1_p1_s01",
+      "part": "L06_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p1_s01.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L06_P1_p2_s01",
+      "part": "L06_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p2_s01.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L06_P1_p2_s03",
+      "part": "L06_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p2_s03.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L06_P1_p2_s04",
+      "part": "L06_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p2_s04.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L06_P1_p3_s01",
+      "part": "L06_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p3_s01.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L06_P1_p3_s03",
+      "part": "L06_P1",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson6/part1/scenes/L06_P1_p3_s03.webp",
+      "audio": "lessons/lesson6/part1/scenes/L06_P1_p3_s03.mp3"
+    },
+    {
+      "id": "L06_P2_p4_s01",
+      "part": "L06_P2",
+      "paragraph": 4,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part2/scenes/L06_P2_p4_s01.webp",
+      "audio": "lessons/lesson6/part2/scenes/L06_P2_p4_s01.mp3"
+    },
+    {
+      "id": "L06_P2_p4_s03",
+      "part": "L06_P2",
+      "paragraph": 4,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson6/part2/scenes/L06_P2_p4_s03.webp",
+      "audio": "lessons/lesson6/part2/scenes/L06_P2_p4_s03.mp3"
+    },
+    {
+      "id": "L06_P2_p5_s01",
+      "part": "L06_P2",
+      "paragraph": 5,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson6/part2/scenes/L06_P2_p5_s01.webp",
+      "audio": "lessons/lesson6/part2/scenes/L06_P2_p5_s01.mp3"
+    },
+    {
+      "id": "L06_P2_p5_s02",
+      "part": "L06_P2",
+      "paragraph": 5,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson6/part2/scenes/L06_P2_p5_s02.webp",
+      "audio": "lessons/lesson6/part2/scenes/L06_P2_p5_s02.mp3"
+    },
+    {
+      "id": "L06_P3_p6_s01",
+      "part": "L06_P3",
+      "paragraph": 6,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part3/scenes/L06_P3_p6_s01.webp",
+      "audio": "lessons/lesson6/part3/scenes/L06_P3_p6_s01.mp3"
+    },
+    {
+      "id": "L06_P3_p6_s03",
+      "part": "L06_P3",
+      "paragraph": 6,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson6/part3/scenes/L06_P3_p6_s03.webp",
+      "audio": "lessons/lesson6/part3/scenes/L06_P3_p6_s03.mp3"
+    },
+    {
+      "id": "L06_P3_p7_s01",
+      "part": "L06_P3",
+      "paragraph": 7,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson6/part3/scenes/L06_P3_p7_s01.webp",
+      "audio": "lessons/lesson6/part3/scenes/L06_P3_p7_s01.mp3"
+    },
+    {
+      "id": "L06_P3_p7_s02",
+      "part": "L06_P3",
+      "paragraph": 7,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part3/scenes/L06_P3_p7_s02.webp",
+      "audio": "lessons/lesson6/part3/scenes/L06_P3_p7_s02.mp3"
+    },
+    {
+      "id": "L06_P4_p8_s01",
+      "part": "L06_P4",
+      "paragraph": 8,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part4/scenes/L06_P4_p8_s01.webp",
+      "audio": "lessons/lesson6/part4/scenes/L06_P4_p8_s01.mp3"
+    },
+    {
+      "id": "L06_P4_p8_s03",
+      "part": "L06_P4",
+      "paragraph": 8,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson6/part4/scenes/L06_P4_p8_s03.webp",
+      "audio": "lessons/lesson6/part4/scenes/L06_P4_p8_s03.mp3"
+    },
+    {
+      "id": "L06_P4_p8_s05",
+      "part": "L06_P4",
+      "paragraph": 8,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson6/part4/scenes/L06_P4_p8_s05.webp",
+      "audio": "lessons/lesson6/part4/scenes/L06_P4_p8_s05.mp3"
+    },
+    {
+      "id": "L06_P4_p9_s01",
+      "part": "L06_P4",
+      "paragraph": 9,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson6/part4/scenes/L06_P4_p9_s01.webp",
+      "audio": "lessons/lesson6/part4/scenes/L06_P4_p9_s01.mp3"
+    },
+    {
+      "id": "L06_P4_p9_s02",
+      "part": "L06_P4",
+      "paragraph": 9,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson6/part4/scenes/L06_P4_p9_s02.webp",
+      "audio": "lessons/lesson6/part4/scenes/L06_P4_p9_s02.mp3"
+    },
+    {
+      "id": "L07_P1_p1_s01",
+      "part": "L07_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p1_s01.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L07_P1_p1_s03",
+      "part": "L07_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p1_s03.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L07_P1_p2_s01",
+      "part": "L07_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p2_s01.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L07_P1_p2_s03",
+      "part": "L07_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p2_s03.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L07_P1_p2_s05",
+      "part": "L07_P1",
+      "paragraph": 2,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p2_s05.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p2_s05.mp3"
+    },
+    {
+      "id": "L07_P1_p2_s07",
+      "part": "L07_P1",
+      "paragraph": 2,
+      "firstSentence": 7,
+      "lastSentence": 7,
+      "image": "lessons/lesson7/part1/scenes/L07_P1_p2_s07.webp",
+      "audio": "lessons/lesson7/part1/scenes/L07_P1_p2_s07.mp3"
+    },
+    {
+      "id": "L07_P2_p3_s01",
+      "part": "L07_P2",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p3_s01.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p3_s01.mp3"
+    },
+    {
+      "id": "L07_P2_p3_s03",
+      "part": "L07_P2",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p3_s03.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p3_s03.mp3"
+    },
+    {
+      "id": "L07_P2_p3_s04",
+      "part": "L07_P2",
+      "paragraph": 3,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p3_s04.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p3_s04.mp3"
+    },
+    {
+      "id": "L07_P2_p4_s01",
+      "part": "L07_P2",
+      "paragraph": 4,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p4_s01.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p4_s01.mp3"
+    },
+    {
+      "id": "L07_P2_p4_s03",
+      "part": "L07_P2",
+      "paragraph": 4,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p4_s03.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p4_s03.mp3"
+    },
+    {
+      "id": "L07_P2_p4_s05",
+      "part": "L07_P2",
+      "paragraph": 4,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson7/part2/scenes/L07_P2_p4_s05.webp",
+      "audio": "lessons/lesson7/part2/scenes/L07_P2_p4_s05.mp3"
+    },
+    {
+      "id": "L07_P3_p5_s01",
+      "part": "L07_P3",
+      "paragraph": 5,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p5_s01.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p5_s01.mp3"
+    },
+    {
+      "id": "L07_P3_p5_s03",
+      "part": "L07_P3",
+      "paragraph": 5,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p5_s03.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p5_s03.mp3"
+    },
+    {
+      "id": "L07_P3_p5_s05",
+      "part": "L07_P3",
+      "paragraph": 5,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p5_s05.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p5_s05.mp3"
+    },
+    {
+      "id": "L07_P3_p6_s01",
+      "part": "L07_P3",
+      "paragraph": 6,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p6_s01.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p6_s01.mp3"
+    },
+    {
+      "id": "L07_P3_p6_s03",
+      "part": "L07_P3",
+      "paragraph": 6,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p6_s03.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p6_s03.mp3"
+    },
+    {
+      "id": "L07_P3_p6_s05",
+      "part": "L07_P3",
+      "paragraph": 6,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p6_s05.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p6_s05.mp3"
+    },
+    {
+      "id": "L07_P3_p6_s06",
+      "part": "L07_P3",
+      "paragraph": 6,
+      "firstSentence": 6,
+      "lastSentence": 6,
+      "image": "lessons/lesson7/part3/scenes/L07_P3_p6_s06.webp",
+      "audio": "lessons/lesson7/part3/scenes/L07_P3_p6_s06.mp3"
+    },
+    {
+      "id": "L07_P4_p7_s01",
+      "part": "L07_P4",
+      "paragraph": 7,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p7_s01.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p7_s01.mp3"
+    },
+    {
+      "id": "L07_P4_p7_s02",
+      "part": "L07_P4",
+      "paragraph": 7,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p7_s02.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p7_s02.mp3"
+    },
+    {
+      "id": "L07_P4_p7_s03",
+      "part": "L07_P4",
+      "paragraph": 7,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p7_s03.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p7_s03.mp3"
+    },
+    {
+      "id": "L07_P4_p7_s04",
+      "part": "L07_P4",
+      "paragraph": 7,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p7_s04.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p7_s04.mp3"
+    },
+    {
+      "id": "L07_P4_p7_s05",
+      "part": "L07_P4",
+      "paragraph": 7,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p7_s05.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p7_s05.mp3"
+    },
+    {
+      "id": "L07_P4_p8_s01",
+      "part": "L07_P4",
+      "paragraph": 8,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p8_s01.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p8_s01.mp3"
+    },
+    {
+      "id": "L07_P4_p8_s03",
+      "part": "L07_P4",
+      "paragraph": 8,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p8_s03.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p8_s03.mp3"
+    },
+    {
+      "id": "L07_P4_p8_s05",
+      "part": "L07_P4",
+      "paragraph": 8,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson7/part4/scenes/L07_P4_p8_s05.webp",
+      "audio": "lessons/lesson7/part4/scenes/L07_P4_p8_s05.mp3"
+    },
+    {
+      "id": "L08_P1_p1_s01",
+      "part": "L08_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p1_s01.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L08_P1_p1_s03",
+      "part": "L08_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p1_s03.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s01",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s01.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s02",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s02.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s02.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s04",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 5,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s04.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s06",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 6,
+      "lastSentence": 7,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s06.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s06.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s08",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 8,
+      "lastSentence": 9,
+      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s08.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s08.mp3"
+    },
+    {
+      "id": "L08_P2_p3_s01",
+      "part": "L08_P2",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p3_s01.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p3_s01.mp3"
+    },
+    {
+      "id": "L08_P2_p3_s03",
+      "part": "L08_P2",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p3_s03.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p3_s03.mp3"
+    },
+    {
+      "id": "L08_P2_p3_s05",
+      "part": "L08_P2",
+      "paragraph": 3,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p3_s05.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p3_s05.mp3"
+    },
+    {
+      "id": "L08_P2_p4_s01",
+      "part": "L08_P2",
+      "paragraph": 4,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p4_s01.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p4_s01.mp3"
+    },
+    {
+      "id": "L08_P2_p4_s03",
+      "part": "L08_P2",
+      "paragraph": 4,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p4_s03.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p4_s03.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s01",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s01.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s01.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s03",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s03.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s03.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s05",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s05.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s05.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s06",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 6,
+      "lastSentence": 6,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s06.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s06.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s07",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s07.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s07.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s09",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 9,
+      "lastSentence": 10,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s09.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s09.mp3"
+    },
+    {
+      "id": "L08_P2_p5_s11",
+      "part": "L08_P2",
+      "paragraph": 5,
+      "firstSentence": 11,
+      "lastSentence": 12,
+      "image": "lessons/lesson8/part2/scenes/L08_P2_p5_s11.webp",
+      "audio": "lessons/lesson8/part2/scenes/L08_P2_p5_s11.mp3"
+    },
+    {
+      "id": "L08_P3_p6_s01",
+      "part": "L08_P3",
+      "paragraph": 6,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p6_s01.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p6_s01.mp3"
+    },
+    {
+      "id": "L08_P3_p6_s03",
+      "part": "L08_P3",
+      "paragraph": 6,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p6_s03.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p6_s03.mp3"
+    },
+    {
+      "id": "L08_P3_p6_s05",
+      "part": "L08_P3",
+      "paragraph": 6,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p6_s05.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p6_s05.mp3"
+    },
+    {
+      "id": "L08_P3_p6_s07",
+      "part": "L08_P3",
+      "paragraph": 6,
+      "firstSentence": 7,
+      "lastSentence": 7,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p6_s07.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p6_s07.mp3"
+    },
+    {
+      "id": "L08_P3_p7_s01",
+      "part": "L08_P3",
+      "paragraph": 7,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p7_s01.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p7_s01.mp3"
+    },
+    {
+      "id": "L08_P3_p8_s01",
+      "part": "L08_P3",
+      "paragraph": 8,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p8_s01.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p8_s01.mp3"
+    },
+    {
+      "id": "L08_P3_p8_s03",
+      "part": "L08_P3",
+      "paragraph": 8,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson8/part3/scenes/L08_P3_p8_s03.webp",
+      "audio": "lessons/lesson8/part3/scenes/L08_P3_p8_s03.mp3"
+    },
+    {
+      "id": "L08_P4_p9_s01",
+      "part": "L08_P4",
+      "paragraph": 9,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part4/scenes/L08_P4_p9_s01.webp",
+      "audio": "lessons/lesson8/part4/scenes/L08_P4_p9_s01.mp3"
+    },
+    {
+      "id": "L08_P4_p10_s01",
+      "part": "L08_P4",
+      "paragraph": 10,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson8/part4/scenes/L08_P4_p10_s01.webp",
+      "audio": "lessons/lesson8/part4/scenes/L08_P4_p10_s01.mp3"
+    },
+    {
+      "id": "L08_P4_p10_s03",
+      "part": "L08_P4",
+      "paragraph": 10,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson8/part4/scenes/L08_P4_p10_s03.webp",
+      "audio": "lessons/lesson8/part4/scenes/L08_P4_p10_s03.mp3"
+    },
+    {
+      "id": "L08_P4_p10_s04",
+      "part": "L08_P4",
+      "paragraph": 10,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson8/part4/scenes/L08_P4_p10_s04.webp",
+      "audio": "lessons/lesson8/part4/scenes/L08_P4_p10_s04.mp3"
+    },
+    {
+      "id": "L09_P1_p1_s01",
+      "part": "L09_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p1_s01.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L09_P1_p1_s03",
+      "part": "L09_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p1_s03.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L09_P1_p2_s01",
+      "part": "L09_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s01.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L09_P1_p2_s03",
+      "part": "L09_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s03.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L09_P1_p2_s05",
+      "part": "L09_P1",
+      "paragraph": 2,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s05.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s05.mp3"
+    },
+    {
+      "id": "L09_P1_p2_s06",
+      "part": "L09_P1",
+      "paragraph": 2,
+      "firstSentence": 6,
+      "lastSentence": 7,
+      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s06.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s06.mp3"
+    },
+    {
+      "id": "L09_P2_p3_s01",
+      "part": "L09_P2",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p3_s01.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p3_s01.mp3"
+    },
+    {
+      "id": "L09_P2_p3_s03",
+      "part": "L09_P2",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p3_s03.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p3_s03.mp3"
+    },
+    {
+      "id": "L09_P2_p3_s04",
+      "part": "L09_P2",
+      "paragraph": 3,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p3_s04.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p3_s04.mp3"
+    },
+    {
+      "id": "L09_P2_p4_s01",
+      "part": "L09_P2",
+      "paragraph": 4,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p4_s01.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s01.mp3"
+    },
+    {
+      "id": "L09_P2_p4_s03",
+      "part": "L09_P2",
+      "paragraph": 4,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p4_s03.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s03.mp3"
+    },
+    {
+      "id": "L09_P2_p4_s05",
+      "part": "L09_P2",
+      "paragraph": 4,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p4_s05.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s05.mp3"
+    },
+    {
+      "id": "L09_P2_p4_s07",
+      "part": "L09_P2",
+      "paragraph": 4,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p4_s07.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s07.mp3"
+    },
+    {
+      "id": "L09_P2_p4_s09",
+      "part": "L09_P2",
+      "paragraph": 4,
+      "firstSentence": 9,
+      "lastSentence": 10,
+      "image": "lessons/lesson9/part2/scenes/L09_P2_p4_s09.webp",
+      "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s09.mp3"
+    },
+    {
+      "id": "L09_P3_p5_s01",
+      "part": "L09_P3",
+      "paragraph": 5,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p5_s01.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p5_s01.mp3"
+    },
+    {
+      "id": "L09_P3_p5_s03",
+      "part": "L09_P3",
+      "paragraph": 5,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p5_s03.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p5_s03.mp3"
+    },
+    {
+      "id": "L09_P3_p5_s05",
+      "part": "L09_P3",
+      "paragraph": 5,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p5_s05.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p5_s05.mp3"
+    },
+    {
+      "id": "L09_P3_p5_s07",
+      "part": "L09_P3",
+      "paragraph": 5,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p5_s07.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p5_s07.mp3"
+    },
+    {
+      "id": "L09_P3_p5_s09",
+      "part": "L09_P3",
+      "paragraph": 5,
+      "firstSentence": 9,
+      "lastSentence": 9,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p5_s09.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p5_s09.mp3"
+    },
+    {
+      "id": "L09_P3_p6_s01",
+      "part": "L09_P3",
+      "paragraph": 6,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p6_s01.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p6_s01.mp3"
+    },
+    {
+      "id": "L09_P3_p6_s03",
+      "part": "L09_P3",
+      "paragraph": 6,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson9/part3/scenes/L09_P3_p6_s03.webp",
+      "audio": "lessons/lesson9/part3/scenes/L09_P3_p6_s03.mp3"
+    },
+    {
+      "id": "L09_P4_p7_s01",
+      "part": "L09_P4",
+      "paragraph": 7,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p7_s01.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p7_s01.mp3"
+    },
+    {
+      "id": "L09_P4_p7_s03",
+      "part": "L09_P4",
+      "paragraph": 7,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p7_s03.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p7_s03.mp3"
+    },
+    {
+      "id": "L09_P4_p7_s05",
+      "part": "L09_P4",
+      "paragraph": 7,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p7_s05.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p7_s05.mp3"
+    },
+    {
+      "id": "L09_P4_p7_s07",
+      "part": "L09_P4",
+      "paragraph": 7,
+      "firstSentence": 7,
+      "lastSentence": 7,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p7_s07.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p7_s07.mp3"
+    },
+    {
+      "id": "L09_P4_p7_s08",
+      "part": "L09_P4",
+      "paragraph": 7,
+      "firstSentence": 8,
+      "lastSentence": 8,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p7_s08.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p7_s08.mp3"
+    },
+    {
+      "id": "L09_P4_p8_s01",
+      "part": "L09_P4",
+      "paragraph": 8,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p8_s01.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p8_s01.mp3"
+    },
+    {
+      "id": "L09_P4_p8_s03",
+      "part": "L09_P4",
+      "paragraph": 8,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p8_s03.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p8_s03.mp3"
+    },
+    {
+      "id": "L09_P4_p8_s05",
+      "part": "L09_P4",
+      "paragraph": 8,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p8_s05.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p8_s05.mp3"
+    },
+    {
+      "id": "L09_P4_p9_s01",
+      "part": "L09_P4",
+      "paragraph": 9,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p9_s01.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p9_s01.mp3"
+    },
+    {
+      "id": "L09_P4_p9_s03",
+      "part": "L09_P4",
+      "paragraph": 9,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson9/part4/scenes/L09_P4_p9_s03.webp",
+      "audio": "lessons/lesson9/part4/scenes/L09_P4_p9_s03.mp3"
+    },
+    {
+      "id": "L10_P1_p1_s01",
+      "part": "L10_P1",
+      "paragraph": 1,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p1_s01.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p1_s01.mp3"
+    },
+    {
+      "id": "L10_P1_p1_s02",
+      "part": "L10_P1",
+      "paragraph": 1,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p1_s02.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p1_s02.mp3"
+    },
+    {
+      "id": "L10_P1_p1_s03",
+      "part": "L10_P1",
+      "paragraph": 1,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p1_s03.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p1_s03.mp3"
+    },
+    {
+      "id": "L10_P1_p2_s01",
+      "part": "L10_P1",
+      "paragraph": 2,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p2_s01.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L10_P1_p2_s03",
+      "part": "L10_P1",
+      "paragraph": 2,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p2_s03.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p2_s03.mp3"
+    },
+    {
+      "id": "L10_P1_p2_s04",
+      "part": "L10_P1",
+      "paragraph": 2,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p2_s04.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p2_s04.mp3"
+    },
+    {
+      "id": "L10_P1_p3_s01",
+      "part": "L10_P1",
+      "paragraph": 3,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p3_s01.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p3_s01.mp3"
+    },
+    {
+      "id": "L10_P1_p3_s03",
+      "part": "L10_P1",
+      "paragraph": 3,
+      "firstSentence": 3,
+      "lastSentence": 3,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p3_s03.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p3_s03.mp3"
+    },
+    {
+      "id": "L10_P1_p3_s04",
+      "part": "L10_P1",
+      "paragraph": 3,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part1/scenes/L10_P1_p3_s04.webp",
+      "audio": "lessons/lesson10/part1/scenes/L10_P1_p3_s04.mp3"
+    },
+    {
+      "id": "L10_P2_p4_s01",
+      "part": "L10_P2",
+      "paragraph": 4,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p4_s01.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p4_s01.mp3"
+    },
+    {
+      "id": "L10_P2_p4_s03",
+      "part": "L10_P2",
+      "paragraph": 4,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p4_s03.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p4_s03.mp3"
+    },
+    {
+      "id": "L10_P2_p4_s05",
+      "part": "L10_P2",
+      "paragraph": 4,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p4_s05.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p4_s05.mp3"
+    },
+    {
+      "id": "L10_P2_p5_s01",
+      "part": "L10_P2",
+      "paragraph": 5,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p5_s01.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p5_s01.mp3"
+    },
+    {
+      "id": "L10_P2_p5_s03",
+      "part": "L10_P2",
+      "paragraph": 5,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p5_s03.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p5_s03.mp3"
+    },
+    {
+      "id": "L10_P2_p6_s01",
+      "part": "L10_P2",
+      "paragraph": 6,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p6_s01.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p6_s01.mp3"
+    },
+    {
+      "id": "L10_P2_p6_s03",
+      "part": "L10_P2",
+      "paragraph": 6,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part2/scenes/L10_P2_p6_s03.webp",
+      "audio": "lessons/lesson10/part2/scenes/L10_P2_p6_s03.mp3"
+    },
+    {
+      "id": "L10_P3_p7_s01",
+      "part": "L10_P3",
+      "paragraph": 7,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p7_s01.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p7_s01.mp3"
+    },
+    {
+      "id": "L10_P3_p7_s03",
+      "part": "L10_P3",
+      "paragraph": 7,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p7_s03.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p7_s03.mp3"
+    },
+    {
+      "id": "L10_P3_p7_s05",
+      "part": "L10_P3",
+      "paragraph": 7,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p7_s05.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p7_s05.mp3"
+    },
+    {
+      "id": "L10_P3_p8_s01",
+      "part": "L10_P3",
+      "paragraph": 8,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p8_s01.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p8_s01.mp3"
+    },
+    {
+      "id": "L10_P3_p8_s03",
+      "part": "L10_P3",
+      "paragraph": 8,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p8_s03.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p8_s03.mp3"
+    },
+    {
+      "id": "L10_P3_p8_s05",
+      "part": "L10_P3",
+      "paragraph": 8,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p8_s05.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p8_s05.mp3"
+    },
+    {
+      "id": "L10_P3_p8_s07",
+      "part": "L10_P3",
+      "paragraph": 8,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p8_s07.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p8_s07.mp3"
+    },
+    {
+      "id": "L10_P3_p8_s09",
+      "part": "L10_P3",
+      "paragraph": 8,
+      "firstSentence": 9,
+      "lastSentence": 9,
+      "image": "lessons/lesson10/part3/scenes/L10_P3_p8_s09.webp",
+      "audio": "lessons/lesson10/part3/scenes/L10_P3_p8_s09.mp3"
+    },
+    {
+      "id": "L10_P4_p9_s01",
+      "part": "L10_P4",
+      "paragraph": 9,
+      "firstSentence": 1,
+      "lastSentence": 2,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p9_s01.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p9_s01.mp3"
+    },
+    {
+      "id": "L10_P4_p9_s03",
+      "part": "L10_P4",
+      "paragraph": 9,
+      "firstSentence": 3,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p9_s03.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p9_s03.mp3"
+    },
+    {
+      "id": "L10_P4_p9_s05",
+      "part": "L10_P4",
+      "paragraph": 9,
+      "firstSentence": 5,
+      "lastSentence": 6,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p9_s05.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p9_s05.mp3"
+    },
+    {
+      "id": "L10_P4_p9_s07",
+      "part": "L10_P4",
+      "paragraph": 9,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p9_s07.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p9_s07.mp3"
+    },
+    {
+      "id": "L10_P4_p9_s09",
+      "part": "L10_P4",
+      "paragraph": 9,
+      "firstSentence": 9,
+      "lastSentence": 9,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p9_s09.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p9_s09.mp3"
+    },
+    {
+      "id": "L10_P4_p10_s01",
+      "part": "L10_P4",
+      "paragraph": 10,
+      "firstSentence": 1,
+      "lastSentence": 1,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p10_s01.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p10_s01.mp3"
+    },
+    {
+      "id": "L10_P4_p10_s02",
+      "part": "L10_P4",
+      "paragraph": 10,
+      "firstSentence": 2,
+      "lastSentence": 3,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p10_s02.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p10_s02.mp3"
+    },
+    {
+      "id": "L10_P4_p10_s04",
+      "part": "L10_P4",
+      "paragraph": 10,
+      "firstSentence": 4,
+      "lastSentence": 4,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p10_s04.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p10_s04.mp3"
+    },
+    {
+      "id": "L10_P4_p10_s05",
+      "part": "L10_P4",
+      "paragraph": 10,
+      "firstSentence": 5,
+      "lastSentence": 5,
+      "image": "lessons/lesson10/part4/scenes/L10_P4_p10_s05.webp",
+      "audio": "lessons/lesson10/part4/scenes/L10_P4_p10_s05.mp3"
+    }
+  ]
+}
