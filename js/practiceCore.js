@@ -6,7 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'poweron_study_progress_v1';
-    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary'];
+    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides'];
 
     function splitSentences(value) {
         const source = String(value || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')
@@ -29,6 +29,30 @@
         }
         if (source.slice(start).trim()) items.push(source.slice(start).trim());
         return items.filter(Boolean);
+    }
+
+    function buildScenes(paragraphs, split) {
+        const result = [];
+        for (const paragraph of paragraphs) {
+            const sentences = split(paragraph.english);
+            let offset = 0;
+            while (offset < sentences.length) {
+                const first = sentences[offset], second = sentences[offset + 1];
+                // Keep long sentences by themselves, and never span paragraph boundaries.
+                const size = second && (first + ' ' + second).trim().split(/\s+/).length <= 32 ? 2 : 1;
+                const selected = sentences.slice(offset, offset + size);
+                const index = offset + 1;
+                result.push({
+                    id: paragraph.key + '_s' + String(index).padStart(2, '0'),
+                    paragraphKey: paragraph.key, paragraph: paragraph.number,
+                    firstSentence: index, lastSentence: index + size - 1,
+                    sentences: selected, english: selected.join(' '),
+                    japanese: paragraph.japanese || ''
+                });
+                offset += size;
+            }
+        }
+        return result;
     }
 
     function fingerprint(sentences) {
@@ -138,7 +162,7 @@
             isPersistent:function(){return persisted;}, key:KEY
         };
     }
-    return {splitSentences:splitSentences, fingerprint:fingerprint, normalizeWords:normalizeWords,
+    return {splitSentences:splitSentences, buildScenes:buildScenes, fingerprint:fingerprint, normalizeWords:normalizeWords,
         transcriptAccuracy:transcriptAccuracy, makePuzzle:makePuzzle, puzzleCorrect:puzzleCorrect,
         createProgressStore:createProgressStore};
 });
