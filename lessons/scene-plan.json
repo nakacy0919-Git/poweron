@@ -1,8 +1,8 @@
 {
   "version": 1,
   "level": "standard",
-  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words.",
-  "status": "planned, scene-specific media not yet created",
+  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words. Lesson 8 Part 1 standard uses eight curated groups matched to the supplied illustrations.",
+  "status": "Planned; Lesson 8 Part 1 image paths registered, binary assets pending upload.",
   "scenes": [
     {
       "id": "L01_P1_p1_s01",
@@ -1162,7 +1162,7 @@
       "paragraph": 1,
       "firstSentence": 1,
       "lastSentence": 2,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p1_s01.webp",
+      "image": "lessons/lesson8/part1/images/L08_P1_01.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p1_s01.mp3"
     },
     {
@@ -1171,7 +1171,7 @@
       "paragraph": 1,
       "firstSentence": 3,
       "lastSentence": 4,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p1_s03.webp",
+      "image": "lessons/lesson8/part1/images/L08_P1_02.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p1_s03.mp3"
     },
     {
@@ -1180,7 +1180,7 @@
       "paragraph": 2,
       "firstSentence": 1,
       "lastSentence": 1,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s01.webp",
+      "image": "lessons/lesson8/part1/images/L08_P1_03.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s01.mp3"
     },
     {
@@ -1189,7 +1189,7 @@
       "paragraph": 2,
       "firstSentence": 2,
       "lastSentence": 3,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s02.webp",
+      "image": "lessons/lesson8/part1/images/L08_P1_04.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s02.mp3"
     },
     {
@@ -1198,7 +1198,7 @@
       "paragraph": 2,
       "firstSentence": 4,
       "lastSentence": 5,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s04.webp",
+      "image": "lessons/lesson8/part1/images/L08_P1_05.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s04.mp3"
     },
     {
@@ -1206,18 +1206,27 @@
       "part": "L08_P1",
       "paragraph": 2,
       "firstSentence": 6,
-      "lastSentence": 7,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s06.webp",
+      "lastSentence": 6,
+      "image": "lessons/lesson8/part1/images/L08_P1_06.webp",
       "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s06.mp3"
     },
     {
-      "id": "L08_P1_p2_s08",
+      "id": "L08_P1_p2_s07",
       "part": "L08_P1",
       "paragraph": 2,
-      "firstSentence": 8,
+      "firstSentence": 7,
+      "lastSentence": 8,
+      "image": "lessons/lesson8/part1/images/L08_P1_07.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s07.mp3"
+    },
+    {
+      "id": "L08_P1_p2_s09",
+      "part": "L08_P1",
+      "paragraph": 2,
+      "firstSentence": 9,
       "lastSentence": 9,
-      "image": "lessons/lesson8/part1/scenes/L08_P1_p2_s08.webp",
-      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s08.mp3"
+      "image": "lessons/lesson8/part1/images/L08_P1_08.webp",
+      "audio": "lessons/lesson8/part1/scenes/L08_P1_p2_s09.mp3"
     },
     {
       "id": "L08_P2_p3_s01",

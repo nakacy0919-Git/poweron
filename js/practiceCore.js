@@ -31,15 +31,23 @@
         return items.filter(Boolean);
     }
 
-    function buildScenes(paragraphs, split) {
+    const LESSON8_SCENE_SIZES = Object.freeze({
+        L08_P1_p1: Object.freeze([2, 2]),
+        L08_P1_p2: Object.freeze([1, 2, 2, 1, 2, 1])
+    });
+
+    function buildScenes(paragraphs, split, sceneSizes) {
         const result = [];
         for (const paragraph of paragraphs) {
             const sentences = split(paragraph.english);
-            let offset = 0;
+            const requested = sceneSizes && sceneSizes[paragraph.key];
+            const fixed = Array.isArray(requested) && requested.every(n => n === 1 || n === 2) &&
+                requested.reduce((sum,n) => sum+n,0) === sentences.length ? requested : null;
+            let offset = 0, group = 0;
             while (offset < sentences.length) {
                 const first = sentences[offset], second = sentences[offset + 1];
                 // Keep long sentences by themselves, and never span paragraph boundaries.
-                const size = second && (first + ' ' + second).trim().split(/\s+/).length <= 32 ? 2 : 1;
+                const size = fixed ? fixed[group++] : (second && (first + ' ' + second).trim().split(/\s+/).length <= 32 ? 2 : 1);
                 const selected = sentences.slice(offset, offset + size);
                 const index = offset + 1;
                 result.push({
@@ -162,7 +170,7 @@
             isPersistent:function(){return persisted;}, key:KEY
         };
     }
-    return {splitSentences:splitSentences, buildScenes:buildScenes, fingerprint:fingerprint, normalizeWords:normalizeWords,
+    return {splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
         transcriptAccuracy:transcriptAccuracy, makePuzzle:makePuzzle, puzzleCorrect:puzzleCorrect,
         createProgressStore:createProgressStore};
 });

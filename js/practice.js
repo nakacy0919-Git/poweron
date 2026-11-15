@@ -80,7 +80,7 @@
         app.slides = core.buildScenes(nums.map(function(number){
             const key = partKey + '_p' + number;
             return {key:key, number:number, english:dataOf('script',key), japanese:dataOf('translation',key)};
-        }), core.splitSentences);
+        }), core.splitSentences, currentLevel === 'standard' ? core.LESSON8_SCENE_SIZES : undefined);
         app.candidates = app.sentences.map(function (sentence, i) {
             return {sentence:sentence, i:i};
         }).filter(function (item) {
