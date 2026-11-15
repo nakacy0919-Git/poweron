@@ -7,10 +7,10 @@
     let storage = null;
     try { storage = window.localStorage; } catch (_) {}
     const store = core.createProgressStore(storage);
-    const MODES = {progress:'学習進捗', reading:'1文ずつ音読', deep:'じっくりモード', puzzle:'Listening Puzzle'};
+    const MODES = {progress:'学習進捗', reading:'1文ずつ音読', deep:'じっくりモード', puzzle:'Listening Puzzle', slides:'Story Slides'};
     const app = {
         mode:null, index:0, sentences:[], candidates:[], scope:'', translation:'',
-        showJapanese:false, puzzle:null, selected:[], feedback:'', hearing:'',
+        slides:[], slideScope:'', sceneAudio:null, showJapanese:false, puzzle:null, selected:[], feedback:'', hearing:'',
         recognizer:null, micToken:0, micStart:0, rate:0.85
     };
 
@@ -19,7 +19,8 @@
             return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
         });
     }
-    function dataOf(kind) {
+    function dataOf(kind, key) {
+        key = key || currentKey;
         const base = kind === 'script' ? (typeof lessonScripts !== 'undefined' ? lessonScripts : {}) :
             (typeof lessonTranslations !== 'undefined' ? lessonTranslations : {});
         let advanced = null;
@@ -30,15 +31,16 @@
             if (currentLevel === 'pre1' && typeof lessonTranslationsPre1 !== 'undefined') advanced = lessonTranslationsPre1;
             if (currentLevel === 'grade1' && typeof lessonTranslationsGrade1 !== 'undefined') advanced = lessonTranslationsGrade1;
         }
-        return String((advanced && advanced[currentKey]) || base[currentKey] || '');
+        return String((advanced && advanced[key]) || base[key] || '');
     }
     function modeSentences(mode) {
+        if (mode === 'slides') return app.slides.map(function(s){return s.english;});
         return mode === 'puzzle' ? app.candidates.map(function (i) {return app.sentences[i];}) : app.sentences;
     }
     function signature(mode) { return core.fingerprint(modeSentences(mode)); }
     function state(mode) {
         const total = modeSentences(mode).length;
-        return store.get(app.scope, mode, total, signature(mode));
+        return store.get(mode === 'slides' ? app.slideScope : app.scope, mode, total, signature(mode));
     }
     function percent(row) {
         return row.total ? Math.round(Object.keys(row.completed).filter(function (key) {
@@ -47,11 +49,13 @@
     }
     function completedCount(row) { return Math.round(percent(row) * row.total / 100); }
     function currentText() {
+        if (app.mode === 'slides') return app.slides[app.index] ? app.slides[app.index].english : '';
         return app.mode === 'puzzle' ? (app.sentences[app.candidates[app.index]] || '') :
             (app.sentences[app.index] || '');
     }
     function stopSpeech() {
         app.micToken++;
+        if(app.sceneAudio){app.sceneAudio.pause(); app.sceneAudio = null;}
         if (app.recognizer) {
             const prev = app.recognizer;
             app.recognizer = null;
@@ -69,6 +73,14 @@
         app.scope = String(currentLevel) + ':' + String(currentKey);
         app.sentences = core.splitSentences(dataOf('script'));
         app.translation = dataOf('translation');
+        const partKey = currentKey.split('_').slice(0,2).join('_');
+        const part = Number(partKey.split('_P')[1]);
+        const nums = ((typeof lessonStructure !== 'undefined' && lessonStructure[currentLesson]) || {})[part] || [];
+        app.slideScope = String(currentLevel) + ':' + partKey + '_full';
+        app.slides = core.buildScenes(nums.map(function(number){
+            const key = partKey + '_p' + number;
+            return {key:key, number:number, english:dataOf('script',key), japanese:dataOf('translation',key)};
+        }), core.splitSentences);
         app.candidates = app.sentences.map(function (sentence, i) {
             return {sentence:sentence, i:i};
         }).filter(function (item) {
@@ -87,6 +99,12 @@
             for (let i = 0; i < count; i++) {
                 if (!saved.completed[i]) {app.index = i; break;}
             }
+        }
+        if (mode === 'slides' && /_p\d+$/.test(currentKey)) {
+            const saved=state('slides');
+            const first=app.slides.findIndex(function(s,i){return s.paragraphKey===currentKey && !saved.completed[i];});
+            const match=app.slides.findIndex(function(s){return s.paragraphKey===currentKey;});
+            if(first>=0 || match>=0) app.index=first>=0?first:match;
         }
         if (mode === 'puzzle') resetPuzzle();
     }
@@ -138,15 +156,24 @@
         render();
     }
     function markRead(manual) {
-        if (app.mode !== 'reading' && app.mode !== 'deep') return;
+        if (!['reading','deep','slides'].includes(app.mode)) return;
         const mode = app.mode;
-        store.record(app.scope, mode, app.index, app.sentences.length, signature(mode),
+        store.record(mode === 'slides' ? app.slideScope : app.scope, mode, app.index, modeSentences(mode).length, signature(mode),
             {complete:true, attempt:!manual});
         app.feedback = manual ? '自己申告で完了を記録しました。' : '音読完了を記録しました。';
         render();
     }
     function play() {
         if (!currentText()) return;
+        if (app.mode === 'slides') {
+            const scene=app.slides[app.index]; const media=sceneMedia(scene);
+            if(media.audio){
+                stopSpeech(); const player=new Audio(media.audio); app.sceneAudio=player; player.playbackRate=app.rate;
+                player.onended=function(){if(app.sceneAudio===player)status('再生終了。');};
+                player.play().then(function(){if(app.sceneAudio===player)status('モデル音声を再生中…');}).catch(function(){if(app.sceneAudio===player){app.sceneAudio=null;status('モデル音声を再生できません。');}});
+                return;
+            }
+        }
         if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
             status('このブラウザでは音声読み上げを利用できません。');
             return;
@@ -326,7 +353,7 @@
             esc(currentKey.split('_')[1] || '') + ' · ' + esc(currentLevel) +
             '。各モードの進捗は端末内に保存します。</p>' +
             '<div class="po-stats">' + scopeBar('1文ずつ音読','reading') +
-            scopeBar('じっくり','deep') + scopeBar('リスニングパズル','puzzle') + '</div>' +
+            scopeBar('じっくり','deep') + scopeBar('リスニングパズル','puzzle') + scopeBar('Story Slides（Part全体）','slides') + '</div>' +
             '<h3>Lesson 1–10 の進捗 <small>各Partの最高進捗を集計</small></h3>' +
             '<div class="po-lessons">' + lessonItems.join('') + '</div>' + legacySummary() +
             '<div class="po-action-row"><button onclick="PowerOnPractice.exportCSV()">📥 進捗CSVを保存</button></div>' +
@@ -335,7 +362,33 @@
                 '注意：ブラウザの保存が利用できないため、記録はこの画面を開いている間だけ保持されます。') +
             ' Lesson 8 の既存ポイント制度は変更しません。進捗は学習操作の記録で、成績や発音の厳密な評価ではありません。</p>';
     }
+    function sceneMedia(scene) {
+        // Only registered media is loaded; missing images never masquerade as scene-specific art.
+        if (!scene || currentLevel !== 'standard') return {};
+        return (window.PowerOnSceneMedia || {})[scene.id] || {};
+    }
+    function sceneJump(index) {
+        const n=Number(index);
+        if(app.mode==='slides' && Number.isInteger(n) && n>=0 && n<app.slides.length) go(n-app.index);
+    }
+    function slideBody() {
+        const scene=app.slides[app.index], count=app.slides.length;
+        if(!scene) return '<p class="po-note">このPartにスライド用の本文がありません。</p>';
+        const row=state('slides'), media=sceneMedia(scene), done=!!row.completed[app.index];
+        const cover='img/L'+Number(currentLesson)+'.webp';
+        let html='<div class="po-study-meta"><strong>Scene '+(app.index+1)+' / '+count+'</strong><span>Paragraph '+scene.paragraph+' · Sentence '+scene.firstSentence+(scene.lastSentence!==scene.firstSentence?'–'+scene.lastSentence:'')+'</span><span>'+completedCount(row)+' / '+count+' 完了</span></div>'+
+            '<div class="po-track" role="progressbar" aria-label="スライド進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent(row)+'"><div style="width:'+percent(row)+'%"></div></div>'+
+            '<div class="po-scene-grid"><figure class="po-scene-picture"><img id="po-scene-image" src="'+esc(media.image||cover)+'" alt="'+(media.image?'英文の場面画像':'Lessonの既存カバー画像')+'"><figcaption id="po-scene-caption">'+(media.image?'Scene '+(app.index+1):'Lessonカバー · 場面画像は未登録')+'</figcaption></figure>'+
+            '<div class="po-scene-text"><div class="po-sentence">'+esc(scene.english)+'</div>'+
+            '<div class="po-action-row"><button onclick="PowerOnPractice.switchJapanese()">'+(app.showJapanese?'和訳を隠す':'日本語訳')+'</button><button class="po-primary" onclick="PowerOnPractice.markRead(true)">'+(done?'✓ 学習済み':'✓ 理解した')+'</button></div>';
+        if(app.showJapanese) html+='<div class="po-translation"><strong>Paragraph '+scene.paragraph+' の和訳（段落全体）</strong><p>'+esc(String(scene.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,''))+'</p></div>';
+        html+='</div></div><p class="po-note">'+(media.audio?'登録済みモデル音声':'このSceneの専用MP3は未登録：端末読み上げを使用')+'</p>'+
+            '<div class="po-navigation"><button onclick="PowerOnPractice.go(-1)" '+(app.index===0?'disabled':'')+'>← 前へ</button><div class="po-scene-jumps" aria-label="Sceneを選択">';
+        for(let i=0;i<count;i++) html+='<button aria-label="Scene '+(i+1)+(row.completed[i]?' 学習済み':'')+'" aria-current="'+(i===app.index?'true':'false')+'" class="'+(i===app.index?'po-primary ':'')+(row.completed[i]?'po-scene-complete':'')+'" onclick="PowerOnPractice.sceneJump('+i+')">'+(i+1)+'</button>';
+        return html+'</div><button onclick="PowerOnPractice.go(1)" '+(app.index===count-1?'disabled':'')+'>次へ →</button></div>';
+    }
     function studyBody() {
+        if(app.mode==='slides')return slideBody();
         const count = modeSentences(app.mode).length;
         if (!count) return '<p class="po-note">この範囲には利用可能な英文がありません。Lesson・Part・段落を変更してください。</p>';
         const row = state(app.mode);
@@ -399,7 +452,7 @@
         if (!display) return;
         let body = app.mode === 'progress' ? progressDashboard() : studyBody();
         if (app.mode !== 'progress') {
-            body = '<div class="po-speech-controls"><button class="po-primary" onclick="PowerOnPractice.play()">▶ この1文を聞く</button>' +
+            body = '<div class="po-speech-controls"><button class="po-primary" onclick="PowerOnPractice.play()">▶ '+(app.mode==='slides'?'このSceneを聞く':'この1文を聞く')+'</button>' +
                 '<label>速度 <select aria-label="音声速度" onchange="PowerOnPractice.rate(this.value)">' +
                 [0.65,0.85,1].map(function (v) {
                     return '<option value="' + v + '"' + (app.rate === v ? ' selected' : '') + '>' +
@@ -407,17 +460,22 @@
                 }).join('') + '</select></label></div>' +
                 '<p class="po-audio-status" id="po-audio-status" role="status"></p>' + body;
         }
-        display.innerHTML = '<section class="po-practice"><header class="po-heading"><div><span>POWER ON Ⅲ · STUDY LAB</span><h2>' +
+        display.innerHTML = '<section class="po-practice'+(app.mode==='slides'?' po-slides':'')+'"><header class="po-heading"><div><span>POWER ON Ⅲ · STUDY LAB</span><h2>' +
             esc(MODES[app.mode]) + '</h2><p>Lesson ' + currentLesson + ' / ' +
             esc(currentKey.split('_')[1] || '') + ' / ' +
             esc(currentKey.split('_')[2] || '') + ' / ' + esc(currentLevel) + '</p></div>' +
             '</header>' + nav() + '<div class="po-content">' + body + '</div></section>';
+        if(app.mode==='slides'){
+            const image=document.getElementById('po-scene-image');
+            const caption=document.getElementById('po-scene-caption');
+            if(image){const fallback='img/L'+Number(currentLesson)+'.webp';const fail=function(){if(image.getAttribute('src')!==fallback){image.src=fallback;caption.textContent='Lessonカバー · 場面画像を読み込めません';}else {image.hidden=true;caption.textContent='画像準備中';}};image.addEventListener('error',fail);if(image.complete && !image.naturalWidth) fail();}
+        }
     }
     function exportCSV() {
         const rows = [['Level','Scope','Mode','Completed','Total','Percent','Attempts','BestWordMatchPercent','LastStudied']];
         const all = store.snapshot().scopes;
         Object.keys(all).sort().forEach(function (key) {
-            ['reading','deep','puzzle','readingcheck','shadowing','vocabulary'].forEach(function (mode) {
+            ['reading','deep','puzzle','readingcheck','shadowing','vocabulary','slides'].forEach(function (mode) {
                 const row = all[key][mode];
                 if (!row || !row.total) return;
                 const count = Object.keys(row.completed || {}).filter(function (index) {
@@ -440,7 +498,7 @@
     }
     window.PowerOnPractice = {
         open:open, close:close, stop:stop, mode:function(){return app.mode;},
-        go:go, play:play, rate:rate, microphone:microphone, markRead:markRead,
+        go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
         captureLegacy:captureLegacy, getProgress:function () {return store.snapshot();}
