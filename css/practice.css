@@ -106,3 +106,24 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
 @media (min-width: 769px) and (max-width: 1100px) {
     .po-stats, .po-legacy { grid-template-columns: 1fr; }
 }
+
+/* Story Slides: picture + text, kept inside the existing Study Lab. */
+.po-slides .po-heading{padding:10px 15px;margin-bottom:6px}
+.po-slides .po-switcher{margin:6px 0 9px}
+.po-slides .po-content{padding:12px}
+.po-slides .po-track{margin:6px 0 10px}
+.po-slides .po-audio-status{min-height:0;margin:0}
+.po-slides .po-speech-controls{margin:0 0 6px}
+.po-scene-grid{display:grid;grid-template-columns:minmax(0,55fr) minmax(0,45fr);gap:14px;align-items:center}
+.po-scene-picture{margin:0;min-width:0;background:#eaf0f8;border:1px solid #dce6f1;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;text-align:center;justify-content:center;min-height:120px}
+.po-scene-picture img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#e4ebf3;max-height:38vh}
+.po-scene-picture img[hidden]{display:none}
+.po-scene-picture figcaption{font-size:12px;color:#49637d;padding:5px 8px}
+.po-scene-text{min-width:0}
+.po-slides .po-sentence{font-size:clamp(1.12rem,2.15vw,1.75rem);line-height:1.55;margin:0 0 8px;padding:12px;overflow-wrap:break-word}
+.po-slides .po-action-row{margin:5px 0;gap:7px}
+.po-slides .po-navigation{margin:8px 0 0;padding-top:8px;flex-wrap:nowrap}
+.po-scene-jumps{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;flex:1;min-width:0}
+.po-scene-jumps button{min-width:40px;min-height:40px;padding:5px}
+.po-scene-jumps button.po-scene-complete:not(.po-primary){border-color:#22875d;background:#e1f6eb;color:#125d40}
+@media(max-width:680px) and (orientation:portrait){.po-scene-grid{grid-template-columns:1fr;gap:8px}.po-scene-picture img{max-height:25vh}.po-slides .po-navigation{flex-wrap:wrap}.po-scene-jumps{order:3;flex-basis:100%}}
