@@ -6,6 +6,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'poweron_study_progress_v1';
+    const READING_PASS = 75;
+    const readingMode=mode=>mode==='reading'||mode==='sceneReading';
+    function promoteReadingScores(entry){if(!entry||!Number.isInteger(entry.total)||entry.total<1||entry.total>250)return false;let changed=false;for(const [k,score] of Object.entries(entry.scores||{})){const index=Number(k);if(Number.isInteger(index)&&String(index)===k&&index>=0&&index<entry.total&&Number.isFinite(score)&&score>=READING_PASS&&score<=100&&!entry.completed?.[k]){if(!entry.completed||typeof entry.completed!=='object')entry.completed={};entry.completed[k]=true;changed=true;}}return changed;}
     const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides', 'sceneReading', 'listening', 'vocabEnJa', 'vocabJaEn', 'vocabVoice', 'storyPuzzle', 'storyRandom', 'storyListen', 'compEn', 'compJa', 'contextVocab'];
 
     function splitSentences(value) {
@@ -140,6 +143,8 @@
                     !Array.isArray(parsed.scopes)) state = parsed;
             }
             persisted = !!storage;
+            let changed=false;for(const scope of Object.values(state.scopes)){if(scope&&typeof scope==='object')for(const mode of ['reading','sceneReading'])if(promoteReadingScores(scope[mode]))changed=true;}
+            if(changed&&storage)storage.setItem(keyName,JSON.stringify(state));
         } catch (_) { persisted = false; }
         function read(scope, mode, count, sig) {
             const previous = state.scopes[scope] && typeof state.scopes[scope]==='object' && state.scopes[scope][mode];
@@ -160,7 +165,7 @@
                 !Number.isInteger(index) || index < 0 || index >= count || count > 250) return false;
             const entry = read(scope, mode, count, sig);
             options = options || {};
-            if (options.complete) entry.completed[index] = true;
+            if (options.complete||(readingMode(mode)&&Number.isFinite(options.accuracy)&&options.accuracy>=READING_PASS)) entry.completed[index] = true;
             if (options.attempt) entry.attempts += 1;
             if(Number.isFinite(options.points)&&options.points>=0){if(Number.isInteger(options.questionCount)&&options.questionCount>0&&options.questionCount<=250){entry.bestByCount=entry.bestByCount||{};entry.bestByCount[options.questionCount]=Math.max(entry.bestByCount[options.questionCount]||0,options.points);}if(options.full!==false)entry.bestPoints=Math.max(entry.bestPoints||0,options.points);}
             if(Number.isFinite(options.seconds)&&options.seconds>=0){if([1,2,3].includes(options.gameLevel)){entry.bestByLevel=entry.bestByLevel||{};entry.bestByLevel[options.gameLevel]=Math.min(entry.bestByLevel[options.gameLevel]??Infinity,options.seconds);}if(!options.gameLevel||options.gameLevel===3)entry.bestSeconds=Math.min(entry.bestSeconds==null?Infinity:entry.bestSeconds,options.seconds);}
@@ -187,7 +192,7 @@
             isPersistent:function(){return persisted;}, key:keyName
         };
     }
-    return {splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
+    return {READING_PASS,splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
         transcriptAccuracy:transcriptAccuracy, makePuzzle:makePuzzle, puzzleCorrect:puzzleCorrect,
         createProgressStore:createProgressStore};
 });
