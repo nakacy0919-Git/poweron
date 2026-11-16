@@ -392,3 +392,22 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
 }
 @media(max-width:767px){.po-match-columns{grid-template-columns:minmax(0,1fr);gap:6px}.po-match-deck{grid-template-columns:repeat(4,minmax(0,1fr))}.po-match-slot{min-height:85px!important}.po-game-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.po-compact-nav{font-size:11px}.po-game-prompt{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.po-practice *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Keep the game controls at the bottom and use the remaining height for cards. */
+@media(min-width:768px) and (max-width:1366px){
+ .po-game .po-content{overflow:auto;min-height:0}
+ .po-game .po-match-intro{flex:1}
+ .po-game .po-match-board{min-height:300px}
+ .po-game .po-match-columns{min-height:200px}
+ .po-game .po-game-footer{flex-shrink:0}
+ .po-practice.po-mode-slides .po-scene-grid{flex:1;min-height:0}
+ .po-practice.po-mode-slides .po-scene-text{max-height:40dvh;overflow:auto}
+ .po-practice.po-mode-slides .po-scene-picture img{max-height:32dvh}
+ .po-practice .po-puzzle-answer{min-height:54px;margin:7px 0;padding:7px}
+ .po-practice .po-puzzle-cards{margin:7px 0;gap:6px}
+ body.po-practice-active .nav-container{flex-shrink:0}
+}
+@media(min-width:768px) and (max-width:900px) and (orientation:portrait){
+ .po-practice .th-analytics-cards,.po-practice .th-analytics-group[data-tone=sky] .th-analytics-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .po-practice .th-analytics-card{min-height:53px}
+}

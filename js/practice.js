@@ -350,13 +350,13 @@
     function gameScenes(){return currentLevel==='standard'&&app.slides.length>=2&&app.slides.every(s=>sceneMedia(s).image)?app.slides:[];}
     function gameSig(){return core.fingerprint(gameScenes().map(s=>s.id+'|'+s.english+'|'+sceneMedia(s).image));}
     function gameRow(mode){return store.get(app.slideScope,mode,1,gameSig());}
-    function gameMetric(mode){const n=gameScenes().length,r=gameRow(mode),v=mode==='storyPuzzle'?(r.bestSeconds==null?0:Math.min(100,30/Math.max(1,r.bestSeconds)*100)):(r.bestPoints==null?0:Math.min(100,r.bestPoints/Math.max(1,games?games.target(n):1)*100));return {value:n?v:0,meta:!n?'場面画像の準備中':mode==='storyPuzzle'?'Best '+(r.bestSeconds==null?'—':r.bestSeconds.toFixed(1)+'s')+' · 目標30秒':'Best '+(r.bestPoints==null?'—':r.bestPoints)+' pts · 目標'+(games?games.target(n):0)+'点'};}
+    function gameMetric(mode){const n=gameScenes().length,r=gameRow(mode),v=mode==='storyPuzzle'?(r.bestSeconds==null?0:Math.min(100,30/Math.max(1,r.bestSeconds)*100)):(r.bestPoints==null?0:Math.min(100,r.bestPoints/Math.max(1,games?games.target(n):1)*100));return {value:n?v:0,meta:!n?'場面画像の準備中':mode==='storyPuzzle'?'Best '+(r.bestSeconds==null?'—':r.bestSeconds.toFixed(1)+'s')+' · Level 3 / 目標30秒':'Best '+(r.bestPoints==null?'—':r.bestPoints)+' pts · 目標'+(games?games.target(n):0)+'点'};}
     function gameImage(i){const s=gameScenes()[i];return s?'<img src="'+esc(sceneMedia(s).image)+'" alt="場面の選択肢" draggable="false">':'';}
     function gameStart(level){
         if(!games||!GAME_MODES.includes(app.mode)||!gameScenes().length)return;
         clearGameTimer();stopSpeech();const n=gameScenes().length,mode=app.mode;
         game={mode,level:Number(level)||3,placed:[],selected:null,page:0,score:0,index:0,queue:games.makeQuestions(n,'ALL'),choices:[],started:Date.now(),questionStart:0,ready:false,done:false,message:'',deferred:0,answering:false};
-        if(mode==='storyPuzzle'){game.placed=games.hints(n,game.level);game.deck=games.shuffle(Array.from({length:n},(_,i)=>i));gameTimer=setInterval(()=>{const el=document.getElementById('po-game-time');if(el&&game&&!game.done)el.textContent=((Date.now()-game.started)/1000).toFixed(1)+'s';},250);}
+        if(mode==='storyPuzzle'){game.placed=games.hints(n,game.level);game.deck=games.shuffle(Array.from({length:n},(_,i)=>i));game.page=Math.floor(gameScenes().findIndex((_,i)=>!game.placed.includes(i))/4);gameTimer=setInterval(()=>{const el=document.getElementById('po-game-time');if(el&&game&&!game.done)el.textContent=((Date.now()-game.started)/1000).toFixed(1)+'s';},250);}
         else gameQuestion();
         render();
     }
@@ -364,8 +364,8 @@
     function gameFinish(){
         if(!game||game.done)return;
         clearGameTimer();stopSpeech();game.done=true;game.seconds=Math.max(0,(Date.now()-game.started)/1000);
-        const puzzle=game.mode==='storyPuzzle',target=games.target(gameScenes().length),passed=puzzle||game.score>=target;
-        store.record(app.slideScope,game.mode,0,1,gameSig(),{attempt:true,complete:passed,...(puzzle?{seconds:game.seconds}:{points:game.score})});
+        const puzzle=game.mode==='storyPuzzle',target=games.target(gameScenes().length),passed=puzzle?game.level===3:game.score>=target;
+        store.record(app.slideScope,game.mode,0,1,gameSig(),{attempt:true,complete:passed,...(puzzle?{seconds:game.seconds,gameLevel:game.level}:{points:game.score})});
         if(passed&&typeof fireConfetti==='function')try{fireConfetti();}catch(_){}
         render();
     }
@@ -432,7 +432,7 @@
             {name:'VOCABULARY & SKILLS',tone:'teal',items:[['listening','段落リスニング','🔊',{value:listenTotal?listenCount*100/(listenTotal*3):0,meta:completedCount(listening)+' / '+listenTotal+' 段落で3回達成'}],['vocabEnJa','英語 → 日本語','📘',mark('vocabEnJa')],(currentLesson===8?['vocabJaEn','日本語 → 英語','⇄',mark('vocabJaEn')]:['vocabulary','Vocabulary 総合','⇄',mark('vocabulary')]),['vocabVoice','Voice Speaking','🎤',mark('vocabVoice')]]},
             {name:'STORY MATCH',tone:'violet',items:[['sceneReading','じっくり学習','▣',per('sceneReading')],['storyPuzzle','画像パズル','🧩',gameMetric('storyPuzzle')],['storyRandom','ランダム','⚡',gameMetric('storyRandom')],['storyListen','ゲームリスニング','🔊',gameMetric('storyListen')]]},{name:'MORE PRACTICE',tone:'sky',items:[['puzzle','Listening Puzzle','🧩',per('puzzle')],['slides','Story Slides','▧',per('slides')],['deep','理解チェック','✓',per('deep')]]}
         ];
-        const items=groups.flatMap(g=>g.items), total=items.length, overall=Math.round(items.reduce((n,i)=>n+Math.round(i[3].value),0)/total), complete=items.filter(i=>Math.round(i[3].value)===100).length;
+        const items=groups.flatMap(g=>g.items).filter(i=>!GAME_MODES.includes(i[0])||gameScenes().length), total=items.length, overall=Math.round(items.reduce((n,i)=>n+Math.round(i[3].value),0)/total), complete=items.filter(i=>Math.round(i[3].value)===100).length;
         const profile=learner?'<span class="th-learner-name">● '+esc(learner.name)+' <span>'+esc(learner.class)+' · '+esc(learner.number)+'番</span><button type="button" class="th-switch-learner" onclick="PowerOnPractice.switchLearner()">変更</button></span>':'<span class="th-learner-name">匿名記録 · 学習者を登録すると個人別で保存</span>';
         const form=(!learner||editing)?'<form class="th-analytics-register" onsubmit="PowerOnPractice.register(event)" aria-label="学習者を登録"><strong>学習記録を開始</strong><input name="class" aria-label="クラス" placeholder="クラス" maxlength="40" required><input name="number" aria-label="番号" placeholder="番号" maxlength="12" required><input name="name" aria-label="氏名" placeholder="氏名" maxlength="50" required><button type="submit">記録を開始</button>'+(learner?'<button type="button" onclick="PowerOnPractice.anonymous()">匿名に戻る</button>':'')+'<small id="po-register-error" role="alert"></small></form>':'';
         return '<div class="th-analytics"><section class="th-analytics-hero"><a class="th-share-qr" id="po-share-link" aria-label="PowerOnを共有" target="_blank" rel="noopener noreferrer"><span class="th-share-qr-image" id="po-share-qr"></span><span class="th-share-qr-caption">SCAN &amp; SHARE</span></a><div class="th-analytics-intro"><span class="th-analytics-kicker">LEARNING ANALYTICS · LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+'</span><h2>Learning Progress</h2><p>学習スキルを分析。カードから練習へ進めます。</p>'+profile+'</div>'+ring(overall,true)+'<div class="th-analytics-summary"><span>COMPLETED</span><strong>'+complete+'<small> / '+total+'</small></strong><p>各項目の達成度を均等集計</p><button onclick="PowerOnPractice.openActivity(\'script\')">本文から学ぶ →</button></div></section>'+form+'<div class="th-analytics-sections">'+groups.map(g=>'<section class="th-analytics-group" data-tone="'+g.tone+'"><h3>'+g.name+'</h3><div class="th-analytics-cards">'+g.items.map(i=>'<button type="button" class="th-analytics-card" onclick="PowerOnPractice.openActivity(\''+i[0]+'\')"><span class="th-activity-icon" aria-hidden="true">'+activityIcon(i[0])+'</span><span class="th-analytics-card-info"><strong>'+i[1]+'</strong><small>'+esc(i[3].meta)+'</small></span>'+ring(i[3].value)+'</button>').join('')+'</div></section>').join('')+'</div><p class="th-analytics-footnote">選択中のLesson・Part・レベルの記録。段落指定時もじっくり学習・Story Slides・段落リスニングはPart全体。匿名の旧記録は匿名モードで保持し、登録者の記録には混ぜません。</p></div>';
@@ -619,6 +619,7 @@
             esc(currentKey.split('_')[1] || '') + ' / ' +
             esc(currentKey.split('_')[2] || '') + ' / ' + esc(currentLevel) + '</p></div>' +
             '</header>' + compactNav() + '<div class="po-content">' + body + '</div></section>';
+        if(GAME_MODES.includes(app.mode)&&display.querySelectorAll){display.querySelectorAll('.po-match-board img').forEach(img=>{const fail=()=>{if(!game||game.done)return;clearGameTimer();stopSpeech();game=null;const board=display.querySelector('.po-match-board');if(board)board.innerHTML='<div class="po-match-intro"><h2>画像を読み込めません</h2><p>通信環境を確認して、もう一度お試しください。</p><button onclick="PowerOnPractice.open(\''+app.mode+'\')">戻る</button></div>';};img.addEventListener('error',fail,{once:true});if(img.complete&&!img.naturalWidth)fail();});}
         if(app.mode==='progress'){const link=document.getElementById('po-share-link'),qr=document.getElementById('po-share-qr');if(link&&qr){try{const url=window.location.origin+window.location.pathname;link.href=url;if(typeof QRCode==='function')new QRCode(qr,{text:url,width:90,height:90,colorDark:'#123958',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});else qr.textContent='PowerOn';}catch(_){qr.textContent='PowerOn';}}}
         if(['slides','sceneReading'].includes(app.mode)){
             const image=document.getElementById('po-scene-image');

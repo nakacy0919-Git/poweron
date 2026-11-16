@@ -151,7 +151,7 @@
                 attempts:Number(previous.attempts) || 0,
                 bestAccuracy:Number.isFinite(previous.bestAccuracy) ? previous.bestAccuracy : null,
                 lastAt:previous.lastAt || null,
-                bestPoints:Number.isFinite(previous.bestPoints)?previous.bestPoints:null,bestSeconds:Number.isFinite(previous.bestSeconds)?previous.bestSeconds:null,
+                bestPoints:Number.isFinite(previous.bestPoints)?previous.bestPoints:null,bestSeconds:Number.isFinite(previous.bestSeconds)?previous.bestSeconds:null,bestByLevel:Object.assign({},previous.bestByLevel||{}),
                 scores:Object.assign({}, previous.scores || {}), counts:Object.assign({}, previous.counts || {})
             };
         }
@@ -163,7 +163,7 @@
             if (options.complete) entry.completed[index] = true;
             if (options.attempt) entry.attempts += 1;
             if(Number.isFinite(options.points))entry.bestPoints=Math.max(entry.bestPoints||0,options.points);
-            if(Number.isFinite(options.seconds)&&options.seconds>=0)entry.bestSeconds=Math.min(entry.bestSeconds==null?Infinity:entry.bestSeconds,options.seconds);
+            if(Number.isFinite(options.seconds)&&options.seconds>=0){if([1,2,3].includes(options.gameLevel)){entry.bestByLevel=entry.bestByLevel||{};entry.bestByLevel[options.gameLevel]=Math.min(entry.bestByLevel[options.gameLevel]??Infinity,options.seconds);}if(!options.gameLevel||options.gameLevel===3)entry.bestSeconds=Math.min(entry.bestSeconds==null?Infinity:entry.bestSeconds,options.seconds);}
             entry.scores = entry.scores || {}; entry.counts = entry.counts || {};
             if (Number.isFinite(options.accuracy)) entry.scores[index] = Math.max(entry.scores[index] || 0, Math.min(100, Math.max(0, Math.round(options.accuracy))));
             if (options.listen) {entry.counts[index] = (Number(entry.counts[index]) || 0) + 1; if (entry.counts[index] >= 3) entry.completed[index] = true;}
