@@ -12,7 +12,7 @@
     function learnerStore(){return core.createProgressStore(storage,learner?'poweron_study_progress_v1:'+JSON.stringify([learner.class,learner.number,learner.name]):undefined);}
     let store=learnerStore();
     function register(event){event.preventDefault();if(app.mode!=='progress')return;const form=event.currentTarget||event.target;const next={class:form.elements.namedItem('class').value.trim(),number:form.elements.namedItem('number').value.trim(),name:form.elements.namedItem('name').value.trim()};if(!next.class||!next.number||!next.name)return;try{storage.setItem(PROFILE_KEY,JSON.stringify(next));}catch(_){const msg=document.getElementById('po-register-error');if(msg)msg.textContent='この端末では保存できません。';return;} stopSpeech();learner=next;store=learnerStore();editing=false;render();}
-    function switchLearner(){editing=true;render();}
+    function switchLearner(){if(app.mode!=='progress')return;editing=true;render();}
     function anonymous(){if(app.mode!=='progress')return;try{storage.removeItem(PROFILE_KEY);}catch(_){}stopSpeech();learner=null;store=learnerStore();editing=false;render();}
     const games=window.PowerOnStoryGameCore,readingTools=window.PowerOnReadingScore;
     const GAME_MODES=['storyPuzzle','storyRandom','storyListen'];
@@ -126,6 +126,7 @@
     }
     function open(mode) {
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
+        if(GAME_MODES.includes(mode)&&!games)return;
         if (typeof resetAppMode === 'function') resetAppMode();
         prepare(mode);
         currentMode = 'practice';
@@ -205,7 +206,7 @@
         const valid=()=>app.micToken===token&&app.mode==='sceneReading'&&app.index===index&&app.slideScope===scope;
         controller=readingTools.createReadingSpeechController({host:window,calculate:readingTools.score,getThreshold:()=>80,onChange:view=>{
             if(!valid()||!attached)return;const old=lastPhase;lastPhase=view.phase;app.recording=view.phase!=='idle';app.feedback=view.status||'';app.hearing=view.transcript||'';
-            if(view.phase==='idle')app.recognizer=null;
+            if(view.phase==='idle')app.recognizer=null;else app.recognizer={stop:()=>controller.stop(),abort:()=>controller.cancel()};
             if(view.phase!==old)render();else{status(app.feedback);const node=document.getElementById('po-live-transcript');if(node)node.textContent=app.hearing||'音読すると、ここに英文が表示されます。';}
         },onScore:(score,spoken)=>{if(!valid())return;app.result=score;app.hearing=spoken;store.record(scope,'sceneReading',index,modeSentences('sceneReading').length,signature('sceneReading'),{attempt:true,accuracy:score,complete:score>=80});app.feedback='語句一致率 '+score+'% · 約'+Math.round(core.normalizeWords(spoken).length/Math.max(1,(Date.now()-started)/1000)*60)+' WPM'+(score>=80?' ／ 80%以上でクリア！':' ／ 再挑戦できます');sound(score>=80?'correct':'wrong');if(score>=80&&typeof fireConfetti==='function')try{fireConfetti();}catch(_){}render();}});
         controller.setItem({id:scope+':'+index,sentence});attached=true;app.result=null;app.hearing='';app.recognizer={stop:()=>controller.stop(),abort:()=>controller.cancel()};controller.begin();if(lastPhase==='idle'){app.recognizer=null;render();}
@@ -434,7 +435,7 @@
         if(app.mode!=='storyPuzzle'||!game||game.done||!display.querySelectorAll)return;
         display.querySelectorAll('[data-picture]').forEach(button=>{
             let drag=null,ghost=null;const cleanup=()=>{ghost?.remove();ghost=null;drag=null;};dragCleanup.push(cleanup);const run=game;
-            button.onpointerdown=ev=>{if(ev.button!==0||game!==run||drag)return;drag={id:Number(button.dataset.picture),x:ev.clientX,y:ev.clientY,pointer:ev.pointerId,moved:false};try{button.setPointerCapture(ev.pointerId);}catch(_){}};
+            button.onpointerdown=ev=>{if(ev.button!==0||game!==run||drag)return;if(game.started===null)game.started=Date.now();drag={id:Number(button.dataset.picture),x:ev.clientX,y:ev.clientY,pointer:ev.pointerId,moved:false};try{button.setPointerCapture(ev.pointerId);}catch(_){}};
             button.onpointermove=ev=>{if(!drag||drag.pointer!==ev.pointerId)return;if(!drag.moved&&Math.hypot(ev.clientX-drag.x,ev.clientY-drag.y)>7){drag.moved=true;ghost=button.querySelector('img')?.cloneNode();if(ghost){ghost.className='po-drag-ghost';document.body.appendChild(ghost);}}if(ghost){ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';}};
             button.onpointerup=ev=>{if(!drag||drag.pointer!==ev.pointerId)return;const d=drag;cleanup();if(game!==run)return;if(d.moved){ev.preventDefault();const slot=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('[data-slot]');if(slot&&display.contains(slot)){game.selected=d.id;gamePlace(Number(slot.dataset.slot));}else gamePick(d.id);}};
             button.onpointercancel=cleanup;button.onlostpointercapture=cleanup;
@@ -665,7 +666,7 @@
         const all = store.snapshot().scopes;
         Object.keys(all).sort().forEach(function (key) {
             ['reading','deep','puzzle','readingcheck','shadowing','vocabulary','slides','sceneReading','listening','vocabEnJa','vocabJaEn','vocabVoice','storyPuzzle','storyRandom','storyListen'].forEach(function (mode) {
-                const row = all[key][mode];
+                const row = all[key]?.[mode];
                 if (!row || !row.total) return;
                 const count = Object.keys(row.completed || {}).filter(function (index) {
                     return row.completed[index] && Number(index) >= 0 && Number(index) < row.total;
@@ -685,7 +686,7 @@
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () {URL.revokeObjectURL(url);}, 1000);
     }
-    if(typeof window.addEventListener==='function'){window.addEventListener('DOMContentLoaded',()=>{if(window.location&&window.location.hash==='#story-match')launchStory();});window.addEventListener('pagehide',()=>{stopSpeech();clearGameTimer();clearDrag();});}
+    if(typeof window.addEventListener==='function'){window.addEventListener('DOMContentLoaded',()=>{if(window.location&&window.location.hash==='#story-match')launchStory();});window.addEventListener('pagehide',()=>{stopSpeech();clearGameTimer();clearDrag();});window.addEventListener('pageshow',event=>{if(event.persisted&&app.mode)open(GAME_MODES.includes(app.mode)?'storyHub':app.mode);});}
     if(typeof document.addEventListener==='function')document.addEventListener('visibilitychange',()=>{if(!document.hidden||!app.mode)return;const wasMic=!!app.recognizer;stopSpeech();clearDrag();if(wasMic){app.feedback='画面を離れたため音読を停止しました。再試行してください。';render();}else if(game&&game.mode==='storyListen'&&!game.done&&!game.answering){game.ready=false;game.message='画面に戻り、もう一度音声を聞いてください。';render();}});
     window.PowerOnPractice = {
         open:open, close:close, stop:stop, mode:function(){return app.mode;},

@@ -142,7 +142,7 @@
             persisted = !!storage;
         } catch (_) { persisted = false; }
         function read(scope, mode, count, sig) {
-            const previous = state.scopes[scope] && state.scopes[scope][mode];
+            const previous = state.scopes[scope] && typeof state.scopes[scope]==='object' && state.scopes[scope][mode];
             if (!MODES.includes(mode) || !previous || previous.fingerprint !== sig ||
                 previous.total !== count) return {total:count, completed:{}, attempts:0, bestAccuracy:null};
             return {
@@ -172,7 +172,7 @@
                     Math.min(100, Math.max(0, Math.round(options.accuracy))));
             entry.fingerprint = sig;
             entry.lastAt = new Date().toISOString();
-            if (!state.scopes[scope]) state.scopes[scope] = {};
+            if (!state.scopes[scope]||typeof state.scopes[scope]!=='object'||Array.isArray(state.scopes[scope])) state.scopes[scope] = {};
             state.scopes[scope][mode] = entry;
             try {
                 if (storage) {
