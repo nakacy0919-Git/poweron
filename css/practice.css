@@ -411,3 +411,286 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
  .po-practice .th-analytics-cards,.po-practice .th-analytics-group[data-tone=sky] .th-analytics-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
  .po-practice .th-analytics-card{min-height:53px}
 }
+
+/* Treasure Hunt mission menu: scoped original design rules */
+.po-story-dashboard .dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+.po-story-dashboard }
+.dashboard-heading h2 {
+  font-size: 28px;
+  letter-spacing: -0.7px;
+  margin: 4px 0 0;
+.po-story-dashboard }
+.mission-count {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #70849d;
+.po-story-dashboard }
+.mission-count b {
+  font-size: 34px;
+  letter-spacing: -1px;
+  color: #263e66;
+.po-story-dashboard }
+.mission-count span {
+  font-size: 10px;
+  letter-spacing: 1px;
+.po-story-dashboard }
+.mission-count.all-clear {
+  color: #11775f;
+.po-story-dashboard }
+.mission-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  max-height: 460px;
+.po-story-dashboard }
+.mission-card {
+  --accent: #218961;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 22px;
+  border-radius: 23px;
+  border: 1px solid #fff;
+  background: linear-gradient(150deg, #fff 35%, #f0f8f4);
+  box-shadow:
+    0 12px 30px #324b7012,
+    inset 0 1px 0 #fff;
+  color: #263c55;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
+  position: relative;
+  overflow: hidden;
+.po-story-dashboard }
+.mission-card:before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--accent);
+.po-story-dashboard }
+.mission-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px #324b7026;
+.po-story-dashboard }
+.mission-card.puzzle {
+  --accent: #d66455;
+  background: linear-gradient(150deg, #fff 35%, #fff2ec);
+.po-story-dashboard }
+.mission-card.random {
+  --accent: #128d9a;
+  background: linear-gradient(150deg, #fff 35%, #eaf8fa);
+.po-story-dashboard }
+.mission-card.listening {
+  --accent: #8a59b1;
+  background: linear-gradient(150deg, #fff 35%, #f4effb);
+.po-story-dashboard }
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+.po-story-dashboard }
+.mode-icon {
+  font-size: 40px;
+.po-story-dashboard }
+.badge {
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  border-radius: 30px;
+  padding: 6px 9px;
+  background: #edf1f6;
+  color: #65758b;
+  font-weight: 800;
+  white-space: nowrap;
+.po-story-dashboard }
+.badge.complete {
+  background: #daf5e9;
+  color: #117554;
+.po-story-dashboard }
+.mission-card h3 {
+  font-size: clamp(16px, 1.7vw, 25px);
+  margin: 18px 0 10px;
+  color: var(--accent);
+.po-story-dashboard }
+.mission-card p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+  color: #647389;
+.po-story-dashboard }
+.mode-metric {
+  margin-top: auto;
+  padding-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+.po-story-dashboard }
+.mode-metric strong {
+  font-size: clamp(25px, 3vw, 42px);
+  letter-spacing: -1px;
+.po-story-dashboard }
+.mode-metric strong small {
+  font-size: 12px;
+  letter-spacing: 0;
+  font-weight: 500;
+.po-story-dashboard }
+.mode-metric > span {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #6c7a8f;
+  min-height: 15px;
+.po-story-dashboard }
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #dfe7ec;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+.po-story-dashboard }
+.card-footer b {
+  font-size: 20px;
+.po-story-dashboard }
+.scene-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+.po-story-dashboard }
+.scene-strip > span {
+  flex: 1;
+  text-align: center;
+  background: #e3eaf4;
+  padding: 7px 2px;
+  border-radius: 6px;
+  color: #71849e;
+  font-size: 11px;
+.po-story-dashboard }
+.scene-strip > span:first-child {
+  flex: 1.7;
+  background: none;
+.po-story-dashboard }
+.scene-strip > span.passed {
+  background: #d9f1e7;
+  color: #137b59;
+  font-weight: 700;
+.po-story-dashboard }
+.dashboard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+.po-story-dashboard }
+.dashboard-footer p {
+  font-size: 12px;
+  color: #536b88;
+  margin: 0;
+.po-story-dashboard }
+.dashboard-footer small {
+  display: block;
+  font-size: 10px;
+  color: #8190a5;
+  margin-top: 5px;
+}
+
+.nav-container{grid-template-columns:repeat(10,minmax(0,1fr)) minmax(115px,1.3fr)!important}
+.po-story-launch,.po-mobile-story{background:#254f78!important;color:white!important;font-weight:900;border:0;border-radius:10px;cursor:pointer}
+body.po-story-active .sidebar,body.po-story-active #drag-handle{display:none!important}
+body.po-story-active .main-screen{padding:0!important;overflow:hidden!important}
+body.po-story-active #mainOverlay{padding:0 8px 5px!important;overflow:hidden!important}
+body.po-story-active #windowHeader,body.po-story-active .po-mobile-actions{display:none!important}
+body.po-story-active #targetTextDisplay{display:block!important;flex:1 1 0;min-height:0;width:100%;padding:4px!important;overflow:auto!important;touch-action:pan-y}
+body.po-story-active .po-practice{height:100%;max-width:none;display:flex;flex-direction:column;padding:0}
+body.po-story-active .po-heading{display:none}
+body.po-story-active .po-content{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px;background:transparent;border:0;box-shadow:none;overflow:auto}
+.po-story-dashboard{display:flex;flex-direction:column;gap:14px;padding:clamp(6px,1.5vw,20px);color:#233b58;min-height:0;flex:1}
+.po-story-eyebrow{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#5e7891}
+.po-story-dashboard .mission-cards{flex:1;min-height:240px;max-height:460px}
+.po-practice .po-story-dashboard .mission-card{background:linear-gradient(150deg,#fff 35%,#f0f8f4);border:1px solid white;padding:clamp(12px,1.5vw,22px);min-width:0;color:#263c55}
+.po-practice .po-story-dashboard .mission-card.puzzle{background:linear-gradient(150deg,#fff 35%,#fff2ec)}
+.po-practice .po-story-dashboard .mission-card.random{background:linear-gradient(150deg,#fff 35%,#eaf8fa)}
+.po-practice .po-story-dashboard .mission-card.listening{background:linear-gradient(150deg,#fff 35%,#f4effb)}
+.po-practice .po-story-dashboard .mission-card h3{margin:10px 0 7px;font-size:clamp(15px,1.8vw,24px)}
+.po-story-dashboard .mode-metric{padding-top:12px}
+.po-story-dashboard .card-footer{margin-top:10px;padding-top:8px}
+.po-story-dashboard .scene-strip{display:flex;gap:4px;flex-wrap:wrap}
+.po-practice .po-story-dashboard .scene-strip button{flex:1;min-width:25px;min-height:28px;background:#e3eaf4;border:0;border-radius:6px;padding:3px;font-size:11px;font-weight:600;color:#71849e}
+.po-practice .po-story-dashboard .scene-strip button.passed{background:#d9f1e7;color:#137b59}
+.po-story-dashboard .scene-strip>span:first-child{flex:0 0 auto;min-width:45px}
+.po-story-notice{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px;background:#fff7e8;border-radius:9px;font-size:12px}
+.po-story-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 6px;font-size:13px;color:#1b3b57}
+.po-story-toolbar button{font-size:12px;min-height:34px;padding:4px 10px}
+@media(min-width:769px){body.po-story-active .nav-btn{padding:3px!important;font-size:12px!important}body.po-story-active .nav-btn .num{font-size:20px!important}}
+@media(max-width:768px){.po-story-dashboard .mission-cards{grid-template-columns:repeat(2,minmax(0,1fr));min-height:350px}.po-story-dashboard .mission-card h3{font-size:15px}.po-story-dashboard .mission-card p{font-size:11px}.po-story-dashboard .mode-icon{font-size:26px}.po-story-dashboard .dashboard-footer p{font-size:10px}.po-story-dashboard .mission-count b{font-size:24px}}
+
+/* Full-scene board and quiz surfaces adapted from Treasure Hunt mission-active layout. */
+body.po-story-active .po-game .po-content{overflow:auto}
+.po-story-settings,.po-story-result{flex:1}
+.po-story-settings .mode-icon{font-size:42px}
+.po-settings-options{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.po-practice .po-settings-options button{background:#fff;border:1px solid #ccd7e7;border-radius:18px;padding:20px 28px;font-size:20px;color:#385779;min-width:120px}
+.po-settings-options small{display:block;font-size:12px;margin-top:8px}
+.po-full-puzzle{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:5px;min-height:0;flex:1}
+.po-puzzle-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#253d55}
+.po-puzzle-meta strong{color:#db6145;font-size:19px;white-space:nowrap}
+.po-puzzle-instruction{font-size:11px;color:#53718b;text-align:right}
+.po-full-puzzle .po-match-columns{display:grid;grid-template-columns:minmax(0,3.5fr) minmax(0,1.35fr);min-height:0;gap:7px}
+.po-full-puzzle .po-match-slots{display:grid;grid-template-columns:repeat(var(--slot-cols),minmax(0,1fr));grid-template-rows:repeat(var(--slot-rows),minmax(0,1fr));gap:5px;min-height:0}
+.po-full-puzzle .po-match-deck{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(var(--deck-rows),minmax(0,1fr));gap:5px;min-height:0;background:#e0e9f4;padding:4px;border-radius:12px}
+.po-puzzle-cell{display:grid;grid-template-rows:auto 18px minmax(0,1fr);min-height:0;min-width:0;padding:5px;gap:2px;background:white;border:1px solid #d4dfef;border-radius:10px;overflow:hidden}
+.po-puzzle-cell p{font-size:clamp(10px,1.05vw,15px);line-height:1.23;margin:0;color:#173650;overflow-wrap:anywhere;max-height:8.6em;overflow:auto;touch-action:pan-y}
+.po-practice .po-hint-button{justify-self:start;padding:1px 5px;min-height:0;font-size:9px;color:#997026;background:#fff4d9;border:0;border-radius:5px}
+.po-practice .po-drop-target{min-height:0;width:100%;height:100%;background:linear-gradient(140deg,#f5f9ff,#e9f0fa);border:1px dashed #a9bfdf;border-radius:8px;display:grid;place-items:center;padding:2px;color:#718da9;font-size:11px}
+.po-practice .matched .po-drop-target{opacity:1;background:#e3f7eb;border-color:#74bd9b}
+.po-drop-target img{width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
+.po-full-puzzle .po-match-picture{touch-action:none;user-select:none;border:0;border-radius:8px;padding:3px}
+.po-full-puzzle .po-match-picture.is-selected{outline:3px solid #1eaaab;outline-offset:-3px}
+.po-drag-ghost{position:fixed;z-index:100000;width:130px;transform:translate(-50%,-50%);pointer-events:none;opacity:.85;border-radius:8px;box-shadow:0 6px 20px #0005}
+.po-hint-overlay{position:fixed;inset:0;background:#1b335a88;display:grid;place-items:center;z-index:9999;padding:16px}
+.po-hint-overlay>div{max-width:670px;max-height:85dvh;overflow:auto;background:white;border-radius:16px;padding:24px}
+.po-quiz-full{display:grid;grid-template-rows:32px minmax(0,1fr) minmax(0,1fr) 20px;max-width:1200px;width:100%;margin:auto;flex:1;min-height:0;gap:9px}
+.po-quiz-full .po-game-hud{background:transparent;color:#203e5c;padding:0 10%;font-size:clamp(15px,2vw,22px)}
+.po-random-full .po-game-hud strong:last-child{color:#f78b00}
+.po-listening-full .po-game-hud strong:last-child{color:#9829a8}
+.po-quiz-full .po-game-prompt{height:100%;min-height:0;background:#fff;border:2px solid #e5e8ec;border-radius:18px;justify-content:flex-start;text-align:left;padding:clamp(12px,2vw,26px);font-size:clamp(19px,2.4vw,33px);overflow:auto;touch-action:pan-y}
+.po-listening-full .po-game-prompt{background:#f4e6f5;border:2px solid #d29cde;justify-content:center;text-align:center;color:#8c249e}
+.po-quiz-full .po-game-choices{height:100%;min-height:0;max-height:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.po-practice .po-quiz-full .po-game-choices button{min-height:0;height:100%;border:0;background:white;padding:5px;border-radius:15px;}
+.po-quiz-full .po-game-choices img{height:100%;width:100%;object-fit:contain;aspect-ratio:auto}
+.po-quiz-full .po-game-footer{min-height:0;font-size:11px;justify-content:center}
+.po-listening-inner{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.po-listening-inner h2{font-size:clamp(17px,2.1vw,26px);margin:0}
+.po-listening-inner p{font-size:12px;margin:0;color:#81549c}
+.po-sound-wave{display:flex;gap:5px;align-items:center;height:35px}
+.po-sound-wave i{width:7px;height:25px;border-radius:6px;background:#b457c4}.po-sound-wave i:nth-child(2),.po-sound-wave i:nth-child(4){height:32px}.po-sound-wave i:nth-child(3){height:35px}
+.po-listen-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.po-practice .po-listen-actions button{border:1px solid #c794d5;color:#9a36aa;background:#fff;border-radius:22px;min-height:34px;padding:6px 12px;font-size:12px}
+.po-listen-actions label{font-size:12px}.po-listen-actions select{font-size:12px;padding:4px;border-radius:7px}
+@media(max-width:768px){.po-full-puzzle .po-match-columns{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(220px,3fr) minmax(110px,1fr)}.po-full-puzzle .po-match-deck{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(38px,1fr)}.po-puzzle-cell p{font-size:10px}.po-quiz-full{min-height:355px}.po-quiz-full .po-game-prompt{font-size:16px}.po-listening-inner{gap:4px}}
+
+/* Reading studio: image on the left, text and audio inside the right panel. */
+body.po-story-active .po-mode-sceneReading .reading-studio{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto auto;flex:1;min-height:0;gap:7px;background:transparent;padding:0 clamp(3px,1.5vw,22px)}
+body.po-story-active .po-mode-sceneReading .reading-main{display:grid;grid-template-columns:minmax(0,35fr) minmax(0,65fr);gap:0;min-height:0;height:100%;background:#fff;border:1px solid #d7e3f1;border-radius:20px;overflow:hidden;align-items:stretch}
+body.po-story-active .po-mode-sceneReading .reading-image{height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:12px;background:#e8eef7;border-radius:0}
+body.po-story-active .po-mode-sceneReading .reading-image img{height:100%;width:100%;min-height:0;max-height:none;aspect-ratio:auto;object-fit:contain;flex:1}
+body.po-story-active .po-mode-sceneReading .reading-image figcaption{flex-shrink:0}
+body.po-story-active .po-mode-sceneReading .reading-text{align-self:center;min-height:0;max-height:100%;padding:clamp(12px,2vw,28px);overflow:auto;touch-action:pan-y}
+.po-reading-model{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}.po-reading-model button{font-size:12px;min-height:36px;padding:7px 10px;background:white}.po-reading-model label{font-size:12px;display:flex;align-items:center;gap:6px;font-weight:700;white-space:nowrap}.po-reading-model select{background:#fff;padding:7px;border-radius:9px;border:1px solid #c7d7ec;color:#203e5c;font-weight:700}
+body.po-story-active .reading-english{font-size:clamp(18px,2.1vw,31px);line-height:1.45;color:#1d3c5f;margin:8px 0 14px}
+body.po-story-active .reading-japanese{border-top:1px solid #dbe4ee;padding-top:12px;font-size:clamp(12px,1.2vw,17px);line-height:1.6}
+body.po-story-active .reading-evaluation{padding:8px 12px;grid-template-columns:118px minmax(0,1fr) auto;background:rgba(255,255,255,.8);min-height:76px}
+body.po-story-active .accuracy{background:#eef4fc;border:1px solid #d6e0ef;border-radius:13px;padding:6px}
+body.po-story-active .reading-controls{justify-content:center;gap:10px}body.po-story-active .reading-controls button{flex:0 1 auto;min-height:42px;padding:8px 22px}
+body.po-story-active .reading-controls .po-primary{background:linear-gradient(135deg,#4678ba,#2d538f);border:0}body.po-story-active .reading-controls .po-reading-next{background:#219a7f}
+body.po-story-active .po-mode-sceneReading .po-note{font-size:10px;margin:0}
+@media(max-width:768px) and (orientation:portrait){body.po-story-active .po-mode-sceneReading .reading-main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}body.po-story-active .po-mode-sceneReading .reading-image{padding:6px}body.po-story-active .po-mode-sceneReading .reading-image img{max-height:25dvh}body.po-story-active .po-mode-sceneReading .reading-text{padding:8px}body.po-story-active .reading-evaluation{grid-template-columns:80px minmax(0,1fr)}body.po-story-active .reading-evaluation>button{grid-column:1/-1}body.po-story-active .reading-controls button{flex:1 1 40%;padding:6px}}
+@media(max-height:650px) and (min-width:769px){.po-story-dashboard{gap:7px;padding:8px}.po-story-dashboard .mission-cards{min-height:205px}.po-story-dashboard .mode-icon{font-size:28px}.po-story-dashboard .mode-metric{padding-top:4px}.po-practice .po-story-dashboard .mission-card{padding:10px}.po-story-dashboard .card-footer{margin-top:5px;padding-top:5px}body.po-story-active .reading-evaluation{min-height:58px;padding:5px}body.po-story-active .reading-controls button{min-height:34px;padding:5px 12px}}

@@ -31,7 +31,7 @@ function deferQuestion(queue, index) {
   return [...queue, queue[index]];
 }
 
-function target(n){return Math.ceil(n*200/3);}
+function target(n,listen=false){return Math.ceil(n*(listen?200/3:75));}
 function points(seconds,listen){return Math.max(10,Math.floor(100-Math.max(0,seconds)*(listen?15:12)));}
 function hints(n,level){return Array.from({length:n},(_,i)=>i).filter(i=>level===1?i%2===0:level===2?i%5===0:false).slice(0,Math.max(0,n-1));}
 const api={shuffle,makeQuestions,makeChoices,deferQuestion,target,points,hints};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PowerOnStoryGameCore=api;
