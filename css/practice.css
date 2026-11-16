@@ -308,3 +308,10 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
 .po-practice .th-listening-part.active{background:#e7f7f9;border-color:#1b98ae}
 @media(max-width:900px){.po-practice .th-analytics-hero{grid-template-columns:minmax(0,1fr) 110px;grid-template-areas:"intro ring" "summary summary"}.po-practice .th-analytics-summary{border-left:0;border-top:1px solid #597a91;padding:8px 0 0}}
 @media(max-width:680px) and (orientation:portrait){.po-practice .reading-main{grid-template-columns:1fr}.po-practice .reading-image img{max-height:27vh}.po-practice .reading-evaluation{grid-template-columns:95px minmax(0,1fr)}.po-practice .reading-evaluation>button{grid-column:1/-1}.po-practice .reading-controls button{flex-basis:45%}}
+
+/* Same QR placement as Treasure Hunt; encode PowerOn's own current public page. */
+.po-practice .th-analytics-hero{grid-template-columns:110px minmax(0,1fr) 134px minmax(150px,.65fr);grid-template-areas:"share intro ring summary"}
+.po-practice .th-share-qr-image{display:grid;place-items:center;padding:4px;background:white;box-sizing:content-box;width:90px;height:90px}
+.po-practice .th-share-qr-image img,.po-practice .th-share-qr-image canvas{max-width:100%;height:auto}
+@media(max-width:900px){.po-practice .th-analytics-hero{grid-template-columns:100px minmax(0,1fr) 100px;grid-template-areas:"share intro ring" "summary summary summary"}}
+@media(max-width:520px){.po-practice .th-analytics-hero{grid-template-columns:minmax(0,1fr) 102px;grid-template-areas:"intro share" "ring ring" "summary summary"}}

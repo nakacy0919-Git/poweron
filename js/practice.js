@@ -264,6 +264,7 @@
             store.record(scope, mode, index, modeSentences(mode).length, signature(mode),
                 {attempt:true, accuracy:score, complete:score >= 80});
             app.hearing = '認識した英語：' + recognized;
+            if(mode==='sceneReading'&&score>=80&&typeof fireConfetti==='function')try{fireConfetti();}catch(_){}
             app.feedback = '語句一致率 ' + score + '% · 約' + wpm + ' WPM' +
                 (score >= 80 ? ' ／ 80%以上でクリア！' : ' ／ 80%以上でクリア（再挑戦できます）');
             render();
@@ -316,8 +317,9 @@
     function captureLegacy(mode, score) {
         if (!['readingcheck', 'shadowing', 'vocabulary','vocabEnJa','vocabJaEn','vocabVoice'].includes(mode) ||
             !Number.isFinite(Number(score))) return false;
-        const scope = String(currentLevel) + ':' + String(currentKey);
-        const sig = core.fingerprint([dataOf('script'), mode]);
+        const key=/^vocab(?:EnJa|JaEn|Voice)$/.test(mode)?currentKey.split('_').slice(0,2).join('_')+'_full':currentKey;
+        const scope = String(currentLevel) + ':' + key;
+        const sig = core.fingerprint([dataOf('script',key), mode]);
         // Completion means "attempted", not "passed"; the existing grading stays authoritative.
         return store.record(scope, mode, 0, 1, sig, {
             attempt:true, complete:true, accuracy:Number(score)
@@ -337,7 +339,8 @@
     }
 
     function ring(value,large){const n=Math.max(0,Math.min(100,Math.round(Number(value)||0)));return '<div class="th-progress-ring'+(large?' large':'')+'" role="img" aria-label="進捗 '+n+'%" style="--value:'+n+'%"><div><strong>'+n+'</strong><span>%</span></div></div>';}
-    function legacyRow(mode){return store.get(app.scope,mode,1,core.fingerprint([dataOf('script'),mode]));}
+    function legacyRow(mode){const isDirection=/^vocab(?:EnJa|JaEn|Voice)$/.test(mode), key=isDirection?currentKey.split('_').slice(0,2).join('_')+'_full':currentKey;return store.get(String(currentLevel)+':'+key,mode,1,core.fingerprint([dataOf('script',key),mode]));}
+    function activityIcon(mode){const shapes={"readingcheck":"<rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8\"/>","reading":"<path d=\"M12 6c-3-2-6-2-10-1v14c4-1 7-1 10 1V6zM12 6c3-2 6-2 10-1v14c-4-1-7-1-10 1V6zM12 6v14\"/><path d=\"M6 9h3M15 9h3\"/>","shadowing":"<path d=\"M3 9v6h4l5 4V5L7 9H3zM16 9a5 5 0 0 1 0 6M19 5a10 10 0 0 1 0 14\"/>","listening":"<path d=\"M3 9v6h4l5 4V5L7 9H3zM16 9a5 5 0 0 1 0 6M19 5a10 10 0 0 1 0 14\"/>","vocabEnJa":"<path d=\"M12 6c-3-2-6-2-10-1v14c4-1 7-1 10 1V6zM12 6c3-2 6-2 10-1v14c-4-1-7-1-10 1V6zM12 6v14\"/><path d=\"M5 9h4M15 9h4\"/>","vocabJaEn":"<path d=\"M4 7h15l-3-3M19 7l-3 3M20 17H5l3-3M5 17l3 3\"/><path d=\"M10 11h4M12 9v4\"/>","vocabulary":"<path d=\"M12 6c-3-2-6-2-10-1v14c4-1 7-1 10 1V6zM12 6c3-2 6-2 10-1v14c-4-1-7-1-10 1V6zM12 6v14\"/><path d=\"M5 9h4M15 9h4\"/>","vocabVoice":"<rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8\"/>","sceneReading":"<path d=\"M12 6c-3-2-6-2-10-1v14c4-1 7-1 10 1V6zM12 6c3-2 6-2 10-1v14c-4-1-7-1-10 1V6zM12 6v14\"/><path d=\"M6 9h3M15 9h3\"/>","puzzle":"<path d=\"M8 3H4a1 1 0 0 0-1 1v5h2a2 2 0 0 1 0 4H3v7a1 1 0 0 0 1 1h6v-2a2 2 0 0 1 4 0v2h6a1 1 0 0 0 1-1v-6h-2a2 2 0 0 1 0-4h2V4a1 1 0 0 0-1-1h-5v2a2 2 0 0 1-4 0V3H8z\"/>","slides":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M7 9h10M7 13h10M7 17h6\"/>","deep":"<path d=\"M7 5h13M7 12h13M7 19h13M2 5h1M2 12h1M2 19h1\"/><path d=\"m16 10 2 2-2 2\"/>"};return '<svg class="th-activity-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(shapes[mode]||shapes.reading)+'</svg>';}
     function dashboardCards(){
         const row=(mode)=>state(mode), best=(mode)=>legacyRow(mode);
         const per=(mode)=>({value:percent(row(mode)),meta:completedCount(row(mode))+' / '+row(mode).total+' 完了'});
@@ -351,7 +354,7 @@
         const items=groups.flatMap(g=>g.items), total=items.length, overall=Math.round(items.reduce((n,i)=>n+Math.round(i[3].value),0)/total), complete=items.filter(i=>Math.round(i[3].value)===100).length;
         const profile=learner?'<span class="th-learner-name">● '+esc(learner.name)+' <span>'+esc(learner.class)+' · '+esc(learner.number)+'番</span><button type="button" class="th-switch-learner" onclick="PowerOnPractice.switchLearner()">変更</button></span>':'<span class="th-learner-name">匿名記録 · 学習者を登録すると個人別で保存</span>';
         const form=(!learner||editing)?'<form class="th-analytics-register" onsubmit="PowerOnPractice.register(event)" aria-label="学習者を登録"><strong>学習記録を開始</strong><input name="class" aria-label="クラス" placeholder="クラス" maxlength="40" required><input name="number" aria-label="番号" placeholder="番号" maxlength="12" required><input name="name" aria-label="氏名" placeholder="氏名" maxlength="50" required><button type="submit">記録を開始</button>'+(learner?'<button type="button" onclick="PowerOnPractice.anonymous()">匿名に戻る</button>':'')+'<small id="po-register-error" role="alert"></small></form>':'';
-        return '<div class="th-analytics"><section class="th-analytics-hero"><div class="th-analytics-intro"><span class="th-analytics-kicker">LEARNING ANALYTICS · LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+'</span><h2>Learning Progress</h2><p>学習スキルを分析。カードから練習へ進めます。</p>'+profile+'</div>'+ring(overall,true)+'<div class="th-analytics-summary"><span>COMPLETED</span><strong>'+complete+'<small> / '+total+'</small></strong><p>各項目の達成度を均等集計</p><button onclick="PowerOnPractice.openActivity(\'script\')">本文から学ぶ →</button></div></section>'+form+'<div class="th-analytics-sections">'+groups.map(g=>'<section class="th-analytics-group" data-tone="'+g.tone+'"><h3>'+g.name+'</h3><div class="th-analytics-cards">'+g.items.map(i=>'<button type="button" class="th-analytics-card" onclick="PowerOnPractice.openActivity(\''+i[0]+'\')"><span class="th-activity-icon" aria-hidden="true">'+i[2]+'</span><span class="th-analytics-card-info"><strong>'+i[1]+'</strong><small>'+esc(i[3].meta)+'</small></span>'+ring(i[3].value)+'</button>').join('')+'</div></section>').join('')+'</div><p class="th-analytics-footnote">選択中のLesson・Part・レベルの記録。段落指定時もじっくり学習・Story Slides・段落リスニングはPart全体。匿名の旧記録は匿名モードで保持し、登録者の記録には混ぜません。</p></div>';
+        return '<div class="th-analytics"><section class="th-analytics-hero"><a class="th-share-qr" id="po-share-link" aria-label="PowerOnを共有" target="_blank" rel="noopener noreferrer"><span class="th-share-qr-image" id="po-share-qr"></span><span class="th-share-qr-caption">SCAN &amp; SHARE</span></a><div class="th-analytics-intro"><span class="th-analytics-kicker">LEARNING ANALYTICS · LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+'</span><h2>Learning Progress</h2><p>学習スキルを分析。カードから練習へ進めます。</p>'+profile+'</div>'+ring(overall,true)+'<div class="th-analytics-summary"><span>COMPLETED</span><strong>'+complete+'<small> / '+total+'</small></strong><p>各項目の達成度を均等集計</p><button onclick="PowerOnPractice.openActivity(\'script\')">本文から学ぶ →</button></div></section>'+form+'<div class="th-analytics-sections">'+groups.map(g=>'<section class="th-analytics-group" data-tone="'+g.tone+'"><h3>'+g.name+'</h3><div class="th-analytics-cards">'+g.items.map(i=>'<button type="button" class="th-analytics-card" onclick="PowerOnPractice.openActivity(\''+i[0]+'\')"><span class="th-activity-icon" aria-hidden="true">'+activityIcon(i[0])+'</span><span class="th-analytics-card-info"><strong>'+i[1]+'</strong><small>'+esc(i[3].meta)+'</small></span>'+ring(i[3].value)+'</button>').join('')+'</div></section>').join('')+'</div><p class="th-analytics-footnote">選択中のLesson・Part・レベルの記録。段落指定時もじっくり学習・Story Slides・段落リスニングはPart全体。匿名の旧記録は匿名モードで保持し、登録者の記録には混ぜません。</p></div>';
     }
     function openActivity(mode){
         if(mode==='vocabulary'){if(typeof startVocabQuiz==='function')startVocabQuiz();return;}
@@ -534,6 +537,7 @@
             esc(currentKey.split('_')[1] || '') + ' / ' +
             esc(currentKey.split('_')[2] || '') + ' / ' + esc(currentLevel) + '</p></div>' +
             '</header>' + nav() + '<div class="po-content">' + body + '</div></section>';
+        if(app.mode==='progress'){const link=document.getElementById('po-share-link'),qr=document.getElementById('po-share-qr');if(link&&qr){try{const url=window.location.origin+window.location.pathname;link.href=url;if(typeof QRCode==='function')new QRCode(qr,{text:url,width:90,height:90,colorDark:'#123958',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});else qr.textContent='PowerOn';}catch(_){qr.textContent='PowerOn';}}}
         if(['slides','sceneReading'].includes(app.mode)){
             const image=document.getElementById('po-scene-image');
             const caption=document.getElementById('po-scene-caption');
