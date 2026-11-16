@@ -16,8 +16,11 @@
     function anonymous(){if(app.mode!=='progress')return;try{storage.removeItem(PROFILE_KEY);}catch(_){}stopSpeech();learner=null;store=learnerStore();editing=false;render();}
     const games=window.PowerOnStoryGameCore,readingTools=window.PowerOnReadingScore;
     const GAME_MODES=['storyPuzzle','storyRandom','storyListen'];
+    const QUESTION_MODES=['compEn','compJa','contextVocab'];
+    const isKnowledgeMode=mode=>mode==='knowledgeHub'||QUESTION_MODES.includes(mode);
+    let knowledgeRun=null;
     let game=null,gameTimer=null,answerTimer=null,dragCleanup=[],imageEpoch=0;const failedAudio=new Set();
-    const MODES = {storyHub:'Story Match',progress:'学習進捗', reading:'1文ずつ音読', sceneReading:'じっくり学習', deep:'理解チェック（自己申告）', puzzle:'Listening Puzzle', slides:'Story Slides', listening:'Listening Mission', storyPuzzle:'パズルモード', storyRandom:'ランダムモード', storyListen:'リスニング'};
+    const MODES = {knowledgeHub:'Content & Vocabulary', compEn:'英問英答', compJa:'日本語内容理解', contextVocab:'本文語彙', storyHub:'Story Match',progress:'学習進捗', reading:'1文ずつ音読', sceneReading:'じっくり学習', deep:'理解チェック（自己申告）', puzzle:'Listening Puzzle', slides:'Story Slides', listening:'Listening Mission', storyPuzzle:'パズルモード', storyRandom:'ランダムモード', storyListen:'リスニング'};
     const app = {
         mode:null, index:0, sentences:[], candidates:[], scope:'', translation:'',
         slides:[], slideScope:'', sceneAudio:null, showJapanese:false, puzzle:null, selected:[], feedback:'', hearing:'',
@@ -78,7 +81,7 @@
     }
     function stop() {
         document.body.classList.remove('po-story-active');
-        clearGameTimer();clearDrag();imageEpoch++;game=null;stopSpeech();
+        clearGameTimer();clearDrag();imageEpoch++;game=null;knowledgeRun=null;stopSpeech();
         app.mode = null;
     }
     function prepare(mode) {
@@ -108,7 +111,7 @@
         app.selected = [];
         app.feedback = '';
         app.hearing = '';
-        if (mode !== 'progress') {
+        if (mode !== 'progress' && !isKnowledgeMode(mode)) {
             const saved = state(mode);
             const count = modeSentences(mode).length;
             for (let i = 0; i < count; i++) {
@@ -123,6 +126,7 @@
         }
         if (mode === 'puzzle') resetPuzzle();
         if(GAME_MODES.includes(mode))game=null;
+        if(QUESTION_MODES.includes(mode))startKnowledgeRun(mode);
     }
     function open(mode) {
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
@@ -131,7 +135,7 @@
         prepare(mode);
         currentMode = 'practice';
         document.body.classList.add('text-active', 'po-practice-active');
-        if(mode==='storyHub'||mode==='sceneReading'||GAME_MODES.includes(mode))document.body.classList.add('po-story-active');
+        if(mode==='storyHub'||mode==='sceneReading'||GAME_MODES.includes(mode)||isKnowledgeMode(mode))document.body.classList.add('po-story-active');
         const overlay = document.getElementById('mainOverlay');
         const content = document.getElementById('targetTextDisplay');
         const speech = document.getElementById('speechResultWindow');
@@ -411,7 +415,7 @@
         const n=app.slides.length, available=gameScenes().length>0, reading=state('sceneReading'), passed=completedCount(reading), puzzle=gameRow('storyPuzzle'), random=gameRow('storyRandom'), listening=gameRow('storyListen');
         const tm=available?games.target(n,false):0,tl=available?games.target(n,true):0;
         const cards=[['sceneReading','reading','📖','じっくり学習','絵本のように','ストーリーを読む',passed+'<small> / '+n+' Scenes</small>','Accuracy 80%以上でクリア',n>0&&passed===n,n>0],['storyPuzzle','puzzle','🧩','パズルモード','空欄に画像を当てはめ','物語を完成させる',(puzzle.bestSeconds==null?'—':puzzle.bestSeconds.toFixed(1))+' 秒','ベストタイム / 30秒以内（全Level）',available&&puzzle.bestSeconds!=null&&puzzle.bestSeconds<=30,available],['storyRandom','random','⚡','ランダムモード','英文からイラストを','素早く見極める',(random.bestPoints==null?'—':random.bestPoints)+' pts','全'+n+'問 · '+tm+'点以上',available&&random.bestPoints!=null&&random.bestPoints>=tm,available],['storyListen','listening','🎧','リスニング','流れる音声を聞いて','正しい画像を選ぶ',(listening.bestPoints==null?'—':listening.bestPoints)+' pts','全'+n+'問 · '+tl+'点以上',available&&listening.bestPoints!=null&&listening.bestPoints>=tl,available]];
-        return '<section class="po-story-dashboard"><div class="dashboard-heading"><div><span class="po-story-eyebrow">LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+' · 学習進捗</span><h2>Select Game Mode</h2></div><div class="mission-count"><b>'+cards.filter(x=>x[8]).length+' / 4</b><span>MISSIONS CLEAR</span></div></div>'+(!available?'<div class="po-story-notice">画像ゲームは場面画像が揃っている Lesson 8 / Standard に対応しています。<button onclick="PowerOnPractice.storyLesson8()">Lesson 8へ →</button></div>':'')+'<div class="mission-cards">'+cards.map(x=>'<button class="mission-card '+x[1]+'" onclick="PowerOnPractice.open(\''+x[0]+'\')" '+(!x[9]?'disabled':'')+'><div class="card-top"><span class="mode-icon">'+x[2]+'</span><span class="badge '+(x[8]?'complete':'')+'">'+(x[8]?'✓ CLEAR':x[9]?'CHALLENGE':'準備中')+'</span></div><h3>'+x[3]+'</h3><p>'+x[4]+'<br>'+x[5]+'</p><div class="mode-metric"><strong>'+x[6]+'</strong><span>'+x[7]+'</span></div><div class="card-footer"><span>'+(x[0]==='sceneReading'&&passed>0&&passed<n?'続きから学習':'学習をはじめる')+'</span><b>→</b></div></button>').join('')+'</div><div class="scene-strip"><span>📖 Scene</span>'+app.slides.map((_,i)=>'<button class="'+(reading.completed[i]?'passed':'')+'" onclick="PowerOnPractice.storyScene('+i+')" title="Scene '+(i+1)+'">'+(i+1)+(reading.completed[i]?' ✓':'')+'</button>').join('')+'</div><footer class="dashboard-footer"><p>4つのミッションをクリアしたら、この画面をスクリーンショットで先生に提出しましょう。<small>記録はこの端末・このブラウザに保存されます。</small></p><button onclick="PowerOnPractice.open(\'progress\')">📊 学習の記録</button></footer></section>';
+        return '<section class="po-story-dashboard"><div class="dashboard-heading"><div><span class="po-story-eyebrow">LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+' · 学習進捗</span><h2>Select Game Mode</h2></div><div class="mission-count"><b>'+cards.filter(x=>x[8]).length+' / 4</b><span>MISSIONS CLEAR</span></div></div>'+(!available?'<div class="po-story-notice">画像ゲームは場面画像が揃っている Lesson 8 / Standard に対応しています。<button onclick="PowerOnPractice.storyLesson8()">Lesson 8へ →</button></div>':'')+'<div class="mission-cards">'+cards.map(x=>'<button class="mission-card '+x[1]+'" onclick="PowerOnPractice.open(\''+x[0]+'\')" '+(!x[9]?'disabled':'')+'><div class="card-top"><span class="mode-icon">'+x[2]+'</span><span class="badge '+(x[8]?'complete':'')+'">'+(x[8]?'✓ CLEAR':x[9]?'CHALLENGE':'準備中')+'</span></div><h3>'+x[3]+'</h3><p>'+x[4]+'<br>'+x[5]+'</p><div class="mode-metric"><strong>'+x[6]+'</strong><span>'+x[7]+'</span></div><div class="card-footer"><span>'+(x[0]==='sceneReading'&&passed>0&&passed<n?'続きから学習':'学習をはじめる')+'</span><b>→</b></div></button>').join('')+'</div><div class="scene-strip"><span>📖 Scene</span>'+app.slides.map((_,i)=>'<button class="'+(reading.completed[i]?'passed':'')+'" onclick="PowerOnPractice.storyScene('+i+')" title="Scene '+(i+1)+'">'+(i+1)+(reading.completed[i]?' ✓':'')+'</button>').join('')+'</div><footer class="dashboard-footer"><p>4つのミッションをクリアしたら、この画面をスクリーンショットで先生に提出しましょう。<small>記録はこの端末・このブラウザに保存されます。</small></p><button onclick="PowerOnPractice.open(\'knowledgeHub\')">📘 内容理解・語彙</button><button onclick="PowerOnPractice.open(\'progress\')">📊 学習の記録</button></footer></section>';
     }
     function launchStory(){document.body.classList.remove('hide-text-overlay');open('storyHub');if(!gameScenes().length)storyLesson8();}
     function storyToolbar(){return '<div class="po-story-toolbar"><button onclick="PowerOnPractice.open(\'storyHub\')">← 学習進捗へ</button><strong>Lesson '+currentLesson+' · '+esc(currentKey.split('_')[1])+' · '+esc(MODES[app.mode])+'</strong><button onclick="PowerOnPractice.close()">✕ 終了</button></div>';}
@@ -454,12 +458,78 @@
         return '<div class="po-compact-nav"><button onclick="PowerOnPractice.open(\'progress\')">▦ Progress</button><select aria-label="Part" onchange="PowerOnPractice.scopeControl(\'part\',this.value)">'+parts.map(x=>'<option value="'+x+'" '+(x===part?'selected':'')+'>Part '+x+'</option>').join('')+'</select><select aria-label="段落" onchange="PowerOnPractice.scopeControl(\'para\',this.value)">'+['full',...nums.map(n=>'p'+n)].map(x=>'<option value="'+x+'" '+(x===para?'selected':'')+'>'+(x==='full'?'Full Text':x.toUpperCase())+'</option>').join('')+'</select><select aria-label="Level" onchange="PowerOnPractice.scopeControl(\'level\',this.value)">'+['standard','pre1','grade1'].map(x=>'<option '+(x===currentLevel?'selected':'')+'>'+x+'</option>').join('')+'</select><select aria-label="活動を変更" onchange="PowerOnPractice.open(this.value)">'+Object.keys(MODES).map(x=>'<option value="'+x+'" '+(x===app.mode?'selected':'')+'>'+esc(MODES[x])+'</option>').join('')+'</select><button onclick="PowerOnPractice.close()">✕ メニュー</button></div>';
     }
 
+
+    function questionBank(mode){
+        const key=String(currentKey||'').split('_').slice(0,2).join('_');
+        if(currentLevel!=='standard')return [];
+        const part=window.PowerOnComprehension?.[key];
+        const source=mode==='contextVocab'?part?.vocabulary:part?.comprehension;
+        if(!Array.isArray(source))return [];
+        const lang=mode==='compJa'?1:0;
+        return source.map(q=>({id:q.id,paragraph:q.paragraph,prompt:mode==='contextVocab'?'本文中の「'+q.word+'」の意味は？':lang?q.ja:q.en,choices:mode==='contextVocab'?q.choices.slice():q.choices.map(pair=>pair[lang]),evidence:q.evidence,word:q.word||''}));
+    }
+    function knowledgeSig(mode){return core.fingerprint(questionBank(mode).map(q=>JSON.stringify(q)));}
+    function knowledgeRow(mode){const questions=questionBank(mode);return questions.length?store.get(app.slideScope,mode,1,knowledgeSig(mode)):{attempts:0,bestAccuracy:null,completed:{}};}
+    function knowledgeMetric(mode){const q=questionBank(mode),row=knowledgeRow(mode);return {value:row.bestAccuracy||0,meta:q.length?'Best '+(row.bestAccuracy==null?'—':row.bestAccuracy+'%')+' · '+q.length+'問':'準備中'};}
+    function shuffleChoices(){
+        if(games?.shuffle)return games.shuffle([0,1,2,3]);
+        const arr=[0,1,2,3];for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;
+    }
+    function startKnowledgeRun(mode){
+        const questions=questionBank(mode);
+        knowledgeRun=questions.length?{mode,scope:app.slideScope,sig:knowledgeSig(mode),questions,orders:questions.map(()=>shuffleChoices()),index:0,answers:[],score:0,finished:false,review:false,saved:false}:null;
+    }
+    function launchKnowledge(){open('knowledgeHub');}
+    function knowledgeLesson8(){storyLesson8();open('knowledgeHub');}
+    function knowledgeStandard(){currentLevel='standard';const el=document.getElementById('levelSelect');if(el)el.value='standard';open(app.mode||'knowledgeHub');}
+    function knowledgeAnswer(qIndex,option){
+        const run=knowledgeRun;if(!run||!QUESTION_MODES.includes(app.mode)||run.mode!==app.mode||run.scope!==app.slideScope||run.finished||run.index!==qIndex||run.answers[qIndex]!==undefined||!Number.isInteger(option)||option<0||option>3)return;
+        run.answers[qIndex]=option;if(option===0)run.score++;
+        sound(option===0?'correct':'wrong');
+        if(qIndex===run.questions.length-1&&!run.saved){
+            run.saved=true;const result=Math.round(run.score*100/run.questions.length);
+            store.record(run.scope,run.mode,0,1,run.sig,{attempt:true,accuracy:result,complete:result>=80});if(result>=80)sound('fanfare');
+        }
+        render();
+    }
+    function knowledgeNext(qIndex){
+        const run=knowledgeRun;if(!run||run.finished||run.index!==qIndex||run.answers[qIndex]===undefined)return;
+        if(run.index===run.questions.length-1)run.finished=true;else run.index++;
+        render();
+    }
+    function knowledgeRetry(){if(!QUESTION_MODES.includes(app.mode))return;startKnowledgeRun(app.mode);render();}
+    function knowledgeReview(){if(knowledgeRun?.finished){knowledgeRun.review=!knowledgeRun.review;render();}}
+    function knowledgeToolbar(){return '<div class="po-story-toolbar"><button onclick="PowerOnPractice.open(\'knowledgeHub\')">← 内容理解へ</button><strong>Lesson '+currentLesson+' · '+esc(currentKey.split('_')[1])+' · '+esc(MODES[app.mode])+'</strong><button onclick="PowerOnPractice.open(\'progress\')">学習の記録</button></div>';}
+    function knowledgeMissing(){return '<div class="po-match-intro"><h2>Content & Vocabulary</h2><p>'+(currentLevel!=='standard'?'Standard の本文に対応した問題です。':'現在、Lesson 8 の Part 1〜4 でご利用いただけます。')+'</p><button class="po-primary" onclick="PowerOnPractice.'+(currentLevel!=='standard'?'knowledgeStandard':'knowledgeLesson8')+'()">'+(currentLevel!=='standard'?'Standard に切り替える':'Lesson 8 へ')+'</button></div>';}
+    function knowledgeCards(){
+        const labels=[['compEn','📘','English Q&A','英語の質問に英語で答える'],['compJa','📖','日本語内容理解','日本語の質問で本文の内容を確認'],['contextVocab','🔤','Vocabulary in Context','本文中の語句の意味を選ぶ']];
+        return '<div class="po-knowledge-cards">'+labels.map(([mode,icon,title,desc])=>{
+            const q=questionBank(mode),row=knowledgeRow(mode),best=row.bestAccuracy==null?'—':row.bestAccuracy+'%',clear=row.bestAccuracy>=80;
+            return '<button class="po-knowledge-card '+mode+'" onclick="PowerOnPractice.open(\''+mode+'\')" '+(!q.length?'disabled':'')+'><div class="po-knowledge-card-top"><span>'+icon+'</span><small>'+(!q.length?'準備中':clear?'✓ CLEAR':'CHALLENGE')+'</small></div><h3>'+title+'</h3><p>'+desc+'</p><div class="po-knowledge-best"><b>'+best+'</b><span>BEST SCORE · '+q.length+' QUESTIONS</span></div><div class="po-knowledge-link">学習をはじめる <b>→</b></div></button>';
+        }).join('')+'</div>';
+    }
+    function knowledgeHub(){
+        const available=questionBank('compEn').length>0,cleared=QUESTION_MODES.filter(m=>knowledgeRow(m).bestAccuracy>=80).length;
+        return '<section class="po-knowledge-hub"><div class="po-knowledge-heading"><div><span class="po-story-eyebrow">POWER ON III · LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+'</span><h2>Content &amp; Vocabulary</h2><p>本文全体の内容理解と語彙を確認しよう。</p></div><div class="po-knowledge-clear"><strong>'+cleared+' / 3</strong><span>MISSIONS CLEAR</span></div></div>'+(available?knowledgeCards():knowledgeMissing())+'<footer class="po-knowledge-hub-footer"><span>各10問 · 4択 · 80%以上でクリア · Part全体（Standard）</span><button onclick="PowerOnPractice.open(\'storyHub\')">Story Matchへ</button><button onclick="PowerOnPractice.open(\'progress\')">Learning Progressへ</button></footer></section>';
+    }
+    function knowledgeBody(){
+        const run=knowledgeRun;if(!run)return knowledgeMissing();
+        const n=run.questions.length;
+        if(run.finished){
+            const result=Math.round(run.score*100/n),wrong=run.questions.map((q,i)=>({q,i})).filter(x=>run.answers[x.i]!==0);
+            return '<section class="po-knowledge-result"><span class="po-story-eyebrow">'+esc(MODES[run.mode])+' · RESULT</span><h2>'+(result>=80?'✓ MISSION CLEAR!':'もう一度挑戦しよう！')+'</h2><strong class="po-knowledge-score">'+result+'<small>%</small></strong><p>'+run.score+' / '+n+' 正解 · Best '+(knowledgeRow(run.mode).bestAccuracy??0)+'%</p><div class="po-knowledge-result-actions"><button class="po-primary" onclick="PowerOnPractice.knowledgeRetry()">もう一度</button><button onclick="PowerOnPractice.knowledgeReview()">'+(run.review?'復習を閉じる':'間違えた問題を復習（'+wrong.length+'）')+'</button><button onclick="PowerOnPractice.open(\'knowledgeHub\')">学習メニューへ</button></div>'+(run.review?'<div class="po-knowledge-review">'+(wrong.length?wrong.map(({q,i})=>'<article><strong>Q'+(i+1)+'. '+esc(q.prompt)+'</strong><p>あなたの解答：'+esc(q.choices[run.answers[i]])+'</p><p class="po-correct-text">正解：'+esc(q.choices[0])+'</p><small>Paragraph '+q.paragraph+' · '+esc(q.evidence)+'</small></article>').join(''):'<p>全問正解！</p>')+'</div>':'')+'</section>';
+        }
+        const q=run.questions[run.index],answer=run.answers[run.index],locked=answer!==undefined;
+        return '<section class="po-knowledge-question '+run.mode+'"><div class="po-knowledge-question-meta"><strong>QUESTION '+(run.index+1)+' / '+n+'</strong><span>Paragraph '+q.paragraph+'</span><b>SCORE: '+run.score+' / '+n+'</b></div><div class="po-track"><div style="width:'+((run.index+(locked?1:0))*100/n)+'%"></div></div><div class="po-knowledge-prompt"><span>'+esc(MODES[run.mode])+'</span><h2>'+esc(q.prompt)+'</h2>'+(run.mode==='contextVocab'?'<p class="po-vocab-context">'+esc(q.evidence)+'</p>':'')+'</div><div class="po-knowledge-options">'+run.orders[run.index].map((option,position)=>'<button type="button" class="po-knowledge-option '+(locked?(option===0?'right':option===answer?'wrong':'locked'):'')+'" onclick="PowerOnPractice.knowledgeAnswer('+run.index+','+option+')" '+(locked?'disabled':'')+'><span>'+String.fromCharCode(65+position)+'</span><b>'+esc(q.choices[option])+'</b></button>').join('')+'</div><div class="po-knowledge-bottom">'+(locked?'<div class="po-knowledge-feedback '+(answer===0?'right':'wrong')+'" role="status"><strong>'+(answer===0?'✓ 正解！':'✕ 正解：'+esc(q.choices[0]))+'</strong><p><small>本文の根拠 · Paragraph '+q.paragraph+'</small> '+esc(q.evidence)+'</p></div><button class="po-primary po-knowledge-next" onclick="PowerOnPractice.knowledgeNext('+run.index+')">'+(run.index+1===n?'結果を見る →':'次の問題へ →')+'</button>':'<p class="po-note">正しい選択肢を1つタップしてください。</p>')+'</div></section>';
+    }
+
     function dashboardCards(){
         const row=(mode)=>state(mode), best=(mode)=>legacyRow(mode);
         const per=(mode)=>({value:percent(row(mode)),meta:completedCount(row(mode))+' / '+row(mode).total+' 完了'});
         const mark=(mode)=>({value:best(mode).bestAccuracy||0,meta:'Best '+(best(mode).bestAccuracy||0)+'% · '+best(mode).attempts+'回'});
         const listening=row('listening'), listenTotal=listening.total, listenCount=Array.from({length:listenTotal},(_,i)=>Math.min(3,Number((listening.counts||{})[i])||0)).reduce((a,b)=>a+b,0);
         const groups=[
+            ...(questionBank('compEn').length?[{name:'CONTENT & VOCABULARY',tone:'teal',items:[['compEn','英問英答','📘',knowledgeMetric('compEn')],['compJa','日本語内容理解','📖',knowledgeMetric('compJa')],['contextVocab','本文語彙','🔤',knowledgeMetric('contextVocab')]]}]:[]),
             {name:'READING & COMPREHENSION',tone:'sky',items:[['readingcheck','本文音読 / Reading Check','🎙',mark('readingcheck')],['reading','1文ずつ音読','📖',per('reading')],['shadowing','Shadowing','🎧',mark('shadowing')]]},
             {name:'VOCABULARY & SKILLS',tone:'teal',items:[['listening','段落リスニング','🔊',{value:listenTotal?listenCount*100/(listenTotal*3):0,meta:completedCount(listening)+' / '+listenTotal+' 段落で3回達成'}],['vocabEnJa','英語 → 日本語','📘',mark('vocabEnJa')],(currentLesson===8?['vocabJaEn','日本語 → 英語','⇄',mark('vocabJaEn')]:['vocabulary','Vocabulary 総合','⇄',mark('vocabulary')]),['vocabVoice','Voice Speaking','🎤',mark('vocabVoice')]]},
             {name:'STORY MATCH',tone:'violet',items:[['sceneReading','じっくり学習','▣',per('sceneReading')],['storyPuzzle','画像パズル','🧩',gameMetric('storyPuzzle')],['storyRandom','ランダム','⚡',gameMetric('storyRandom')],['storyListen','ゲームリスニング','🔊',gameMetric('storyListen')]]},{name:'MORE PRACTICE',tone:'sky',items:[['puzzle','Listening Puzzle','🧩',per('puzzle')],['slides','Story Slides','▧',per('slides')],['deep','理解チェック','✓',per('deep')]]}
@@ -571,6 +641,8 @@
         return html+'</div><button onclick="PowerOnPractice.go(1)" '+(app.index===count-1?'disabled':'')+'>次へ →</button></div>';
     }
     function studyBody() {
+        if(app.mode==='knowledgeHub')return knowledgeHub();
+        if(QUESTION_MODES.includes(app.mode))return knowledgeBody();
         if(app.mode==='slides')return slideBody();
         if(app.mode==='sceneReading')return sceneReadingBody();
         if(app.mode==='listening')return listeningBody();
@@ -638,7 +710,7 @@
         if (!display) return;
         clearDrag();const epoch=++imageEpoch;
         let body = app.mode === 'storyHub' ? storyHub() : app.mode === 'progress' ? progressDashboard() : studyBody();
-        if (app.mode !== 'progress' && app.mode!=='storyHub' && app.mode!=='sceneReading' && !GAME_MODES.includes(app.mode)) {
+        if (app.mode !== 'progress' && app.mode!=='storyHub' && app.mode!=='sceneReading' && !GAME_MODES.includes(app.mode) && !isKnowledgeMode(app.mode)) {
             body = '<div class="po-speech-controls"><button class="po-primary" onclick="PowerOnPractice.play()" '+(app.recognizer?'disabled':'')+'>▶ '+(app.mode==='listening'?'段落を聞く':['slides','sceneReading'].includes(app.mode)?'お手本を聞く':'この1文を聞く')+'</button>' +
                 '<label>速度 <select aria-label="音声速度" onchange="PowerOnPractice.rate(this.value)">' +
                 [0.65,0.85,1].map(function (v) {
@@ -647,11 +719,11 @@
                 }).join('') + '</select></label></div>' +
                 '<p class="po-audio-status" id="po-audio-status" role="status"></p>' + body;
         }
-        display.innerHTML = '<section class="po-practice'+(['slides','sceneReading'].includes(app.mode)?' po-slides':'')+(app.mode==='progress'?' po-analytics':'')+(GAME_MODES.includes(app.mode)?' po-game':'')+' po-mode-'+app.mode+'"><header class="po-heading"><div><span>POWER ON Ⅲ · STUDY LAB</span><h2>' +
+        display.innerHTML = '<section class="po-practice'+(['slides','sceneReading'].includes(app.mode)?' po-slides':'')+(app.mode==='progress'?' po-analytics':'')+(GAME_MODES.includes(app.mode)?' po-game':'')+(isKnowledgeMode(app.mode)?' po-knowledge':'')+' po-mode-'+app.mode+'"><header class="po-heading"><div><span>POWER ON Ⅲ · STUDY LAB</span><h2>' +
             esc(MODES[app.mode]) + '</h2><p>Lesson ' + currentLesson + ' / ' +
             esc(currentKey.split('_')[1] || '') + ' / ' +
             esc(currentKey.split('_')[2] || '') + ' / ' + esc(currentLevel) + '</p></div>' +
-            '</header>' + (app.mode==='storyHub'?compactNav():app.mode==='sceneReading'||GAME_MODES.includes(app.mode)?storyToolbar():compactNav()) + '<div class="po-content">' + body + '</div></section>';
+            '</header>' + (app.mode==='storyHub'||app.mode==='knowledgeHub'?compactNav():QUESTION_MODES.includes(app.mode)?knowledgeToolbar():app.mode==='sceneReading'||GAME_MODES.includes(app.mode)?storyToolbar():compactNav()) + '<div class="po-content">' + body + '</div></section>';
         attachPuzzleDrag(display);
         if(GAME_MODES.includes(app.mode)&&display.querySelectorAll){display.querySelectorAll('.po-match-board img').forEach(img=>{const fail=()=>{if(epoch!==imageEpoch||!game||game.done)return;clearGameTimer();clearDrag();stopSpeech();game=null;const board=display.querySelector('.po-match-board');if(board)board.innerHTML='<div class="po-match-intro"><h2>画像を読み込めません</h2><p>通信環境を確認して、もう一度お試しください。</p><button onclick="PowerOnPractice.open(\''+app.mode+'\')">戻る</button></div>';};img.addEventListener('error',fail,{once:true});if(img.complete&&!img.naturalWidth)fail();});}
         if(app.mode==='progress'){const link=document.getElementById('po-share-link'),qr=document.getElementById('po-share-qr');if(link&&qr){try{const url=window.location.origin+window.location.pathname;link.href=url;if(typeof QRCode==='function')new QRCode(qr,{text:url,width:90,height:90,colorDark:'#123958',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});else qr.textContent='PowerOn';}catch(_){qr.textContent='PowerOn';}}}
@@ -665,7 +737,7 @@
         const rows = [['Level','Scope','Mode','Completed','Total','Percent','Attempts','BestWordMatchPercent','LastStudied','BestPoints','BestSeconds','BestByCount','BestByLevel']];
         const all = store.snapshot().scopes;
         Object.keys(all).sort().forEach(function (key) {
-            ['reading','deep','puzzle','readingcheck','shadowing','vocabulary','slides','sceneReading','listening','vocabEnJa','vocabJaEn','vocabVoice','storyPuzzle','storyRandom','storyListen'].forEach(function (mode) {
+            ['reading','deep','puzzle','readingcheck','shadowing','vocabulary','slides','sceneReading','listening','vocabEnJa','vocabJaEn','vocabVoice','storyPuzzle','storyRandom','storyListen','compEn','compJa','contextVocab'].forEach(function (mode) {
                 const row = all[key]?.[mode];
                 if (!row || !row.total) return;
                 const count = Object.keys(row.completed || {}).filter(function (index) {
@@ -693,6 +765,6 @@
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
-        gameHint:gameHint,closeHint:closeHint,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect, getProgress:function () {return store.snapshot();}
+        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect, getProgress:function () {return store.snapshot();}
     };
 })();
