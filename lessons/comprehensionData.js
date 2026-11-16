@@ -1,4 +1,4 @@
-/* PowerOn III: original source-anchored Lesson 8 comprehension and vocabulary questions. Correct answer is source option 0. */
+/* PowerOn III source-anchored Lesson 8 questions. Correct option index 0. */
 (function(root){const bank={
   "L08_P1": {
     "comprehension": [
@@ -25,7 +25,9 @@
             "エリー湖の湖岸沿い。"
           ]
         ],
-        "evidence": "along the shore of Lake Ontario"
+        "evidence": "along the shore of Lake Ontario",
+        "explanation": "along the shore of ～ は「～の岸に沿って」。第1文ではセントキャサリンズの位置をオンタリオ湖の湖岸と説明しています。オハイオ川やエリー湖ではありません。",
+        "tip": "along the shore of Lake Ontario = オンタリオ湖の湖岸に沿って"
       },
       {
         "id": "L08_P1-c2",
@@ -50,7 +52,9 @@
             "カナダとイギリス。"
           ]
         ],
-        "evidence": "the border between the U.S. and Canada"
+        "evidence": "the border between the U.S. and Canada",
+        "explanation": "between A and B は「AとBの間に」。ナイアガラの滝が伸びている国境は、本文では the U.S. と Canada の間と明示されています。",
+        "tip": "the border between A and B = AとBの国境"
       },
       {
         "id": "L08_P1-c3",
@@ -75,7 +79,9 @@
             "秘密の停車駅をすべて閉鎖した。"
           ]
         ],
-        "evidence": "In 1999, the Canadian government formally chose a small chapel in St. Catharines as a National Historic Site of Canada."
+        "evidence": "In 1999, the Canadian government formally chose a small chapel in St. Catharines as a National Historic Site of Canada.",
+        "explanation": "chose A as B は「AをBとして選んだ」。1999年に選ばれたのは小さな礼拝堂で、指定されたのは国定史跡です。鉄道建設について述べた文ではありません。",
+        "tip": "choose A as B = AをBとして選ぶ"
       },
       {
         "id": "L08_P1-c4",
@@ -100,7 +106,9 @@
             "逃亡者のための監獄だった。"
           ]
         ],
-        "evidence": "The chapel was the \"terminal station\""
+        "evidence": "The chapel was the \"terminal station\"",
+        "explanation": "terminal は「終端の」という意味です。礼拝堂は地下鉄道の最終到達地点だったので、出発駅ではなく終着駅が正解です。",
+        "tip": "terminal station = 終着駅"
       },
       {
         "id": "L08_P1-c5",
@@ -125,7 +133,9 @@
             "南北戦争の間だけ。"
           ]
         ],
-        "evidence": "Long before the American Civil War started"
+        "evidence": "Long before the American Civil War started",
+        "explanation": "long before は「～よりずっと前に」。本文は南北戦争が始まるよりも前から脱出の試みがあったと説明しており、戦争中や戦後に限定していません。",
+        "tip": "long before ～ = ～よりずっと前に"
       },
       {
         "id": "L08_P1-c6",
@@ -150,7 +160,9 @@
             "戦争を始めたかったから。"
           ]
         ],
-        "evidence": "they did not support slavery due to their religious beliefs"
+        "evidence": "they did not support slavery due to their religious beliefs",
+        "explanation": "because 以下に理由があり、due to their religious beliefs はその背景を説明しています。北部の協力者は宗教的信条から奴隷制を支持していなかったのです。",
+        "tip": "due to ～ = ～が原因で"
       },
       {
         "id": "L08_P1-c7",
@@ -175,7 +187,9 @@
             "秘密の富の価値。"
           ]
         ],
-        "evidence": "they strongly believed in human equality"
+        "evidence": "they strongly believed in human equality",
+        "explanation": "believe in は「～を信じる」。クエーカー教徒が信じていたのは human equality（人間の平等）で、それが人々を助けた理由でした。",
+        "tip": "human equality = 人間の平等"
       },
       {
         "id": "L08_P1-c8",
@@ -200,7 +214,9 @@
             "罰。"
           ]
         ],
-        "evidence": "Philadelphia was the symbol of freedom for slaves"
+        "evidence": "Philadelphia was the symbol of freedom for slaves",
+        "explanation": "the symbol of freedom は「自由の象徴」。フィラデルフィアは逃亡者たちが自由を求めて目指した場所で、富や戦争の象徴ではありません。",
+        "tip": "symbol of ～ = ～の象徴"
       },
       {
         "id": "L08_P1-c9",
@@ -225,7 +241,9 @@
             "南部へ向かう1本の道路。"
           ]
         ],
-        "evidence": "The routes to freedom became known as the \"Underground Railroad.\""
+        "evidence": "The routes to freedom became known as the \"Underground Railroad.\"",
+        "explanation": "routes to freedom は自由へ至る経路を意味します。Underground Railroad はこの経路の呼び名で、実際の地下を走る鉄道という意味ではありません。",
+        "tip": "route to ～ = ～へ至る経路"
       },
       {
         "id": "L08_P1-c10",
@@ -250,7 +268,9 @@
             "大きな鐘で到着を知らせた。"
           ]
         ],
-        "evidence": "The \"stations\" put a lamp in the window so that escaping slaves could find them. There, escaping slaves were hidden, warmed, and fed"
+        "evidence": "The \"stations\" put a lamp in the window so that escaping slaves could find them. There, escaping slaves were hidden, warmed, and fed",
+        "explanation": "so that escaping slaves could find them は、逃亡者が停車駅を見つけられるようにという目的を示します。目印のランプに加え、隠れ場所・暖かさ・食事を提供していました。",
+        "tip": "so that S can/could ～ = Sが～できるように"
       }
     ],
     "vocabulary": [
@@ -264,7 +284,9 @@
           "礼拝堂",
           "山頂"
         ],
-        "evidence": "shore of Lake Ontario"
+        "evidence": "shore of Lake Ontario",
+        "explanation": "shore は湖や海などの水に接する岸を表す名詞です。Lake Ontario と組み合わされ、町が湖岸にあることを示しています。border（国境）とは区別しましょう。",
+        "tip": "the shore of a/the lake = 湖の岸"
       },
       {
         "id": "L08_P1-v2",
@@ -276,7 +298,9 @@
           "～を取り壊す",
           "～から遠ざかる"
         ],
-        "evidence": "stretches along the border"
+        "evidence": "stretches along the border",
+        "explanation": "stretch は「伸びる」、along は「～に沿って」。本文ではナイアガラの滝が国境に沿って伸びている様子を表します。",
+        "tip": "stretch along a border = 国境に沿って伸びる"
       },
       {
         "id": "L08_P1-v3",
@@ -288,7 +312,9 @@
           "秘密裏に",
           "突然"
         ],
-        "evidence": "formally chose"
+        "evidence": "formally chose",
+        "explanation": "formally は formal の副詞で「正式に」。政府による指定が公式なものだったことを説明します。偶然に、という意味ではありません。",
+        "tip": "formally choose/designate = 正式に選ぶ／指定する"
       },
       {
         "id": "L08_P1-v4",
@@ -300,7 +326,9 @@
           "中間駅",
           "貨物列車"
         ],
-        "evidence": "terminal station"
+        "evidence": "terminal station",
+        "explanation": "terminal は終端を表します。terminal station は路線や経路の最終地点で、本文では地下鉄道の終着地点を比喩的に表します。",
+        "tip": "terminal = 終端の"
       },
       {
         "id": "L08_P1-v5",
@@ -312,7 +340,9 @@
           "雇う",
           "追跡する"
         ],
-        "evidence": "tried to escape"
+        "evidence": "tried to escape",
+        "explanation": "escape は危険や拘束から逃れること。try to escape は奴隷制から逃げようとする行為を示します。",
+        "tip": "escape from ～ = ～から逃れる"
       },
       {
         "id": "L08_P1-v6",
@@ -324,7 +354,9 @@
           "～の代わりに",
           "～を除いて"
         ],
-        "evidence": "due to their religious beliefs"
+        "evidence": "due to their religious beliefs",
+        "explanation": "due to の後ろには名詞句が続き、理由・原因を表します。この文では宗教的信条が奴隷制に反対した理由です。",
+        "tip": "due to + 名詞句"
       },
       {
         "id": "L08_P1-v7",
@@ -336,7 +368,9 @@
           "信仰",
           "義務"
         ],
-        "evidence": "human equality"
+        "evidence": "human equality",
+        "explanation": "equality は equal（等しい）からできた名詞で「平等」。human equality はすべての人間の平等という考えを表します。",
+        "tip": "equal（形容詞）／equality（名詞）"
       },
       {
         "id": "L08_P1-v8",
@@ -348,7 +382,9 @@
           "経路",
           "証拠"
         ],
-        "evidence": "symbol of freedom"
+        "evidence": "symbol of freedom",
+        "explanation": "symbol は何かを代表・象徴するものです。フィラデルフィアが自由を象徴する町だったという文脈に合います。",
+        "tip": "a symbol of freedom = 自由の象徴"
       },
       {
         "id": "L08_P1-v9",
@@ -360,7 +396,9 @@
           "～を引き返す",
           "～に住む"
         ],
-        "evidence": "headed for Philadelphia"
+        "evidence": "headed for Philadelphia",
+        "explanation": "head for は目的地へ向かうという句動詞です。headed は過去形で、フィラデルフィアが目的地だったと分かります。",
+        "tip": "head for + 目的地"
       },
       {
         "id": "L08_P1-v10",
@@ -372,7 +410,9 @@
           "隠す",
           "修理する"
         ],
-        "evidence": "were set up"
+        "evidence": "were set up",
+        "explanation": "set up は設置・設立すること。were set up は受動態で、秘密の停車駅が設けられたという意味になります。",
+        "tip": "be set up = 設置される"
       }
     ]
   },
@@ -401,7 +441,9 @@
             "北極星について何も知らなかったから。"
           ]
         ],
-        "evidence": "Most slaves were not allowed to learn how to read or write."
+        "evidence": "Most slaves were not allowed to learn how to read or write.",
+        "explanation": "were not allowed to learn は「学ぶことを許されなかった」。読み書きの機会が制限されていたため、文字による情報を得ることが難しかったと考えられます。",
+        "tip": "be not allowed to ～ = ～することを許されない"
       },
       {
         "id": "L08_P2-c2",
@@ -426,7 +468,9 @@
             "奴隷所有者に経路を公開した。"
           ]
         ],
-        "evidence": "songs known as Negro spirituals contained secret messages"
+        "evidence": "songs known as Negro spirituals contained secret messages",
+        "explanation": "contained secret messages が重要です。霊歌には普通の意味とは別の秘密の合図が含まれ、その合図を通して逃亡経路を知りました。",
+        "tip": "contain secret messages = 秘密のメッセージを含む"
       },
       {
         "id": "L08_P2-c3",
@@ -451,7 +495,9 @@
             "ナイアガラの滝。"
           ]
         ],
-        "evidence": "\"Jordan\" meant \"the Ohio River.\""
+        "evidence": "\"Jordan\" meant \"the Ohio River.\"",
+        "explanation": "本文は angels が conductors、Jordan が the Ohio River を表したと具体例を挙げています。Jordan を文字どおりの場所として読むのではなく、暗号の意味を確認します。",
+        "tip": "mean ～ = ～を意味する"
       },
       {
         "id": "L08_P2-c4",
@@ -476,7 +522,9 @@
             "公共の鉄道のホームで。"
           ]
         ],
-        "evidence": "within their families, but not in the presence of white people"
+        "evidence": "within their families, but not in the presence of white people",
+        "explanation": "within their families は家族内、not in the presence of white people は白人がいるところではない、という対比です。秘密を守るための歌い方が示されています。",
+        "tip": "within ～ = ～の内で"
       },
       {
         "id": "L08_P2-c5",
@@ -501,7 +549,9 @@
             "ちょうど100人。"
           ]
         ],
-        "evidence": "saved more than 300 slaves"
+        "evidence": "saved more than 300 slaves",
+        "explanation": "more than 300 は「300を超える」。本文に記述されている救出人数を問う問題なので、史実に関する他の資料の数字ではなく本文の表現から判断します。",
+        "tip": "more than ～ = ～を超える"
       },
       {
         "id": "L08_P2-c6",
@@ -526,7 +576,9 @@
             "1897年頃、メリーランド州。"
           ]
         ],
-        "evidence": "on a plantation in Maryland around 1820"
+        "evidence": "on a plantation in Maryland around 1820",
+        "explanation": "on a plantation in Maryland が出生地、around 1820 が時期を表します。around はおよそなので、正確な誕生年を断定していません。",
+        "tip": "around + 年 = ～年頃"
       },
       {
         "id": "L08_P2-c7",
@@ -551,7 +603,9 @@
             "カナダへの地図を見つけたこと。"
           ]
         ],
-        "evidence": "She heard that she and two of her brothers would be sold."
+        "evidence": "She heard that she and two of her brothers would be sold.",
+        "explanation": "would be sold は「売られることになる」という表現です。自分たちが売られると聞いたことが、3人で脱出を決意した直接のきっかけでした。",
+        "tip": "would be + 過去分詞 = ～されることになる"
       },
       {
         "id": "L08_P2-c8",
@@ -576,7 +630,9 @@
             "家族へ伝言を送るため。"
           ]
         ],
-        "evidence": "crossed a river so that the dogs could not follow them"
+        "evidence": "crossed a river so that the dogs could not follow them",
+        "explanation": "so that the dogs could not follow them は川を渡った目的を示しています。犬が追跡できないようにしたのであって、犬の餌を探すためではありません。",
+        "tip": "so that S could not ～ = Sが～できないように"
       },
       {
         "id": "L08_P2-c9",
@@ -601,7 +657,9 @@
             "安全な鉄道駅を見つけた。"
           ]
         ],
-        "evidence": "her brothers became so frightened that they went back"
+        "evidence": "her brothers became so frightened that they went back",
+        "explanation": "so frightened that ～ は「とても怖かったので～した」。兄弟は夜明け前に引き返しましたが、ハリエットは希望を捨てずに進みました。",
+        "tip": "so + 形容詞 + that S V = とても～なので…"
       },
       {
         "id": "L08_P2-c10",
@@ -626,7 +684,9 @@
             "夫が案内するのを待った。"
           ]
         ],
-        "evidence": "She went on alone through the woods by night. She hid by day. She had no map, but she trusted God. She used the North Star to guide her."
+        "evidence": "She went on alone through the woods by night. She hid by day. She had no map, but she trusted God. She used the North Star to guide her.",
+        "explanation": "by night は夜に、by day は昼にという意味。彼女は夜に一人で森を進み、昼は隠れ、地図の代わりに北極星を道しるべとしました。",
+        "tip": "by night / by day = 夜に／昼に"
       }
     ],
     "vocabulary": [
@@ -640,7 +700,9 @@
           "～するのを忘れる",
           "～することを拒む"
         ],
-        "evidence": "were not allowed to learn"
+        "evidence": "were not allowed to learn",
+        "explanation": "allow A to do はAに～することを許すという構文。受動態 be allowed to do は許可される、否定の were not allowed to は許可されなかったという意味です。",
+        "tip": "allow A to do → A is allowed to do"
       },
       {
         "id": "L08_P2-v2",
@@ -652,7 +714,9 @@
           "～するつもりはない",
           "～するふりをする"
         ],
-        "evidence": "manage to find"
+        "evidence": "manage to find",
+        "explanation": "manage to は困難があっても何とか実行することを表します。ここでは逃亡経路をどうやって見つけられたのか、という疑問に使われています。",
+        "tip": "manage to + 動詞の原形"
       },
       {
         "id": "L08_P2-v3",
@@ -664,7 +728,9 @@
           "伝える",
           "取り出す"
         ],
-        "evidence": "contained secret messages"
+        "evidence": "contained secret messages",
+        "explanation": "contain は中に何かを含むという動詞です。contained secret messages は歌の中に秘密のメッセージが含まれていたことを表します。",
+        "tip": "contain + 内容物"
       },
       {
         "id": "L08_P2-v4",
@@ -676,7 +742,9 @@
           "～の助けなしで",
           "～より前に"
         ],
-        "evidence": "in the presence of white people"
+        "evidence": "in the presence of white people",
+        "explanation": "presence は存在・いること。in the presence of は誰かがいる場において、という意味です。本文では not が付いて白人の前では歌わなかったことを示します。",
+        "tip": "in the presence of + 人"
       },
       {
         "id": "L08_P2-v5",
@@ -688,7 +756,9 @@
           "森林",
           "工場"
         ],
-        "evidence": "on a plantation"
+        "evidence": "on a plantation",
+        "explanation": "plantation は大規模に作物を栽培する農園です。本文ではメリーランド州でハリエットが生まれた場所を指します。",
+        "tip": "on a plantation = 大農園で"
       },
       {
         "id": "L08_P2-v6",
@@ -700,7 +770,9 @@
           "不注意な",
           "勇敢な"
         ],
-        "evidence": "a cheerful man"
+        "evidence": "a cheerful man",
+        "explanation": "cheerful は明るく陽気な性格や様子を表す形容詞です。a cheerful man では man の性格を説明しています。",
+        "tip": "cheerful（形容詞）= 明るい"
       },
       {
         "id": "L08_P2-v7",
@@ -712,7 +784,9 @@
           "働く",
           "戻る"
         ],
-        "evidence": "they fled from the plantation"
+        "evidence": "they fled from the plantation",
+        "explanation": "flee は危険から急いで逃げるという動詞で、fled は過去形です。from the plantation は逃げ出した場所を示します。",
+        "tip": "flee – fled – fled"
       },
       {
         "id": "L08_P2-v8",
@@ -724,7 +798,9 @@
           "正午",
           "真夜中"
         ],
-        "evidence": "Before dawn"
+        "evidence": "Before dawn",
+        "explanation": "dawn は夜が明ける時間を指します。before dawn は夜明け前で、夕暮れ（dusk）とは反対の時間帯です。",
+        "tip": "before dawn = 夜明け前"
       },
       {
         "id": "L08_P2-v9",
@@ -736,7 +812,9 @@
           "引き受ける",
           "立ち上がる"
         ],
-        "evidence": "never gave up her hope"
+        "evidence": "never gave up her hope",
+        "explanation": "give up は努力や希望などを諦めること。never gave up her hope は、ハリエットが希望を一度も捨てなかったという意味です。",
+        "tip": "give up hope = 希望を捨てる"
       },
       {
         "id": "L08_P2-v10",
@@ -748,7 +826,9 @@
           "～に守られて",
           "～を頼りにして"
         ],
-        "evidence": "at the risk of her life"
+        "evidence": "at the risk of her life",
+        "explanation": "at the risk of は何かを失う危険を冒して行動すること。her life が続くので、命を危険にさらしながら旅を続けたことを表します。",
+        "tip": "at the risk of one's life = 命の危険を冒して"
       }
     ]
   },
@@ -777,7 +857,9 @@
             "家族のことを忘れていたから。"
           ]
         ],
-        "evidence": "All her family members were still slaves."
+        "evidence": "All her family members were still slaves.",
+        "explanation": "no longer a slave と still slaves の対比が鍵です。彼女自身は奴隷ではなくなりましたが、家族は自由になっていなかったため喜べませんでした。",
+        "tip": "no longer ～ / still ～ = もはや～ない／まだ～"
       },
       {
         "id": "L08_P3-c2",
@@ -802,7 +884,9 @@
             "二度と南部へ戻らないことにした。"
           ]
         ],
-        "evidence": "she went back to Maryland and met her family again"
+        "evidence": "she went back to Maryland and met her family again",
+        "explanation": "went back to Maryland はメリーランド州に戻ったこと、met her family again は再会したことを表します。自由になった後も家族を忘れなかったことが分かります。",
+        "tip": "go back to ～ = ～へ戻る"
       },
       {
         "id": "L08_P3-c3",
@@ -827,7 +911,9 @@
             "一人でイギリスへ行くこと。"
           ]
         ],
-        "evidence": "She hoped that her husband would come north with her."
+        "evidence": "She hoped that her husband would come north with her.",
+        "explanation": "hoped that ～ は望んだ内容を述べます。come north with her は彼女と一緒に北へ来ることです。夫が実際に同行したかどうかとは別の問題です。",
+        "tip": "hope that S V = SがVすることを望む"
       },
       {
         "id": "L08_P3-c4",
@@ -852,7 +938,9 @@
             "一人でカナダへ行くよう頼んだ。"
           ]
         ],
-        "evidence": "he said he did not wish to go"
+        "evidence": "he said he did not wish to go",
+        "explanation": "However が前文からの転換を示します。夫は did not wish to go と答えたため、ハリエットの希望とは反対に同行を拒みました。",
+        "tip": "wish to do = ～したいと思う"
       },
       {
         "id": "L08_P3-c5",
@@ -877,7 +965,9 @@
             "奴隷主とその家族。"
           ]
         ],
-        "evidence": "she led two brothers, a sister, her children, and a dozen more slaves to the North"
+        "evidence": "she led two brothers, a sister, her children, and a dozen more slaves to the North",
+        "explanation": "本文では2人の兄弟、1人の妹、その子どもたちに加え、さらに12人の奴隷を導いたと列挙しています。夫だけを連れて行ったわけではありません。",
+        "tip": "a dozen more ～ = さらに12の～"
       },
       {
         "id": "L08_P3-c6",
@@ -902,7 +992,9 @@
             "勇敢な人々に賞を与えること。"
           ]
         ],
-        "evidence": "prohibited anyone from helping escaping slaves"
+        "evidence": "prohibited anyone from helping escaping slaves",
+        "explanation": "prohibit A from doing はAが～することを禁止する構文です。逃亡者を助ける行為が禁止され、アメリカ国内で安全に立ち止まるのが難しくなりました。",
+        "tip": "prohibit A from -ing = Aが～するのを禁止する"
       },
       {
         "id": "L08_P3-c7",
@@ -927,7 +1019,9 @@
             "奴隷捕獲者を助けたかったから。"
           ]
         ],
-        "evidence": "where they would be safe and free"
+        "evidence": "where they would be safe and free",
+        "explanation": "where は先行する Canada を説明し、そこで safe and free（安全で自由）になれると述べています。法による危険を避けるための目的地でした。",
+        "tip": "where = そこで（場所を補足する関係副詞）"
       },
       {
         "id": "L08_P3-c8",
@@ -952,7 +1046,9 @@
             "鉄道技師。"
           ]
         ],
-        "evidence": "Harriet's reputation as a fearless leader spread fast."
+        "evidence": "Harriet's reputation as a fearless leader spread fast.",
+        "explanation": "as a fearless leader は「恐れ知らずの指導者として」。reputation が広まった理由は彼女の指導者としての勇気で、歌手や技師としてではありません。",
+        "tip": "reputation as ～ = ～としての評判"
       },
       {
         "id": "L08_P3-c9",
@@ -977,7 +1073,9 @@
             "カナダに安全な停車駅を建てるため。"
           ]
         ],
-        "evidence": "Large rewards were offered by slaveholders for catching her."
+        "evidence": "Large rewards were offered by slaveholders for catching her.",
+        "explanation": "for catching her は賞金の目的を示します。賞金を出したのは奴隷所有者で、勇気を称えるためではなく彼女を捕らえるためでした。",
+        "tip": "for + 動名詞 = ～するための"
       },
       {
         "id": "L08_P3-c10",
@@ -1002,7 +1100,9 @@
             "ハリエットは乗客を見捨てた。"
           ]
         ],
-        "evidence": "she never lost any of her \"passengers\" to them either"
+        "evidence": "she never lost any of her \"passengers\" to them either",
+        "explanation": "never captured と never lost any の両方を確認しましょう。本人も捕まらず、彼女が逃亡を助けた人々も一人として捕獲者に奪われなかったと述べています。",
+        "tip": "never ... either = ～も決して…ない"
       }
     ],
     "vocabulary": [
@@ -1016,7 +1116,9 @@
           "長い間",
           "すぐに"
         ],
-        "evidence": "no longer a slave"
+        "evidence": "no longer a slave",
+        "explanation": "no longer は以前の状態が今は続いていないことを表します。no longer a slave はもはや奴隷ではないという意味です。",
+        "tip": "no longer = not ... any longer"
       },
       {
         "id": "L08_P3-v2",
@@ -1028,7 +1130,9 @@
           "～し始める",
           "～する必要がある"
         ],
-        "evidence": "kept thinking"
+        "evidence": "kept thinking",
+        "explanation": "keep の後ろに動名詞を続けると、同じ行為を続ける意味になります。kept thinking は家族のことを考え続けたという表現です。",
+        "tip": "keep + 動名詞"
       },
       {
         "id": "L08_P3-v3",
@@ -1040,7 +1144,9 @@
           "20の",
           "100の"
         ],
-        "evidence": "a dozen more slaves"
+        "evidence": "a dozen more slaves",
+        "explanation": "dozen は12を表す単位です。a dozen more slaves はさらに12人を表します。dozens of（何十もの）とは区別しましょう。",
+        "tip": "a dozen = 12"
       },
       {
         "id": "L08_P3-v4",
@@ -1052,7 +1158,9 @@
           "推薦する",
           "保護する"
         ],
-        "evidence": "prohibited anyone"
+        "evidence": "prohibited anyone",
+        "explanation": "prohibit は禁止するという動詞です。本文の prohibited anyone from helping は、誰かが逃亡者を助けることを禁じたという意味です。",
+        "tip": "prohibit A from -ing"
       },
       {
         "id": "L08_P3-v5",
@@ -1064,7 +1172,9 @@
           "奴隷所有者",
           "審判員"
         ],
-        "evidence": "runaways to stop"
+        "evidence": "runaways to stop",
+        "explanation": "runaway は逃げ出した人を指す名詞として使われています。本文の runaways は奴隷制から逃亡している人々です。",
+        "tip": "run away（動詞句）／runaway（名詞）"
       },
       {
         "id": "L08_P3-v6",
@@ -1076,7 +1186,9 @@
           "反対者",
           "商人"
         ],
-        "evidence": "her followers"
+        "evidence": "her followers",
+        "explanation": "follower は follow（ついていく）からできた名詞です。ここではハリエットに従って自由を目指す人々で、彼女を捕まえる追跡者ではありません。",
+        "tip": "follow（動詞）→ follower（名詞）"
       },
       {
         "id": "L08_P3-v7",
@@ -1088,7 +1200,9 @@
           "規則",
           "責任"
         ],
-        "evidence": "Harriet's reputation"
+        "evidence": "Harriet's reputation",
+        "explanation": "reputation は周囲の人々からの評価や評判を表します。本文では恐れ知らずの指導者としての評価が広まったことを示します。",
+        "tip": "gain a reputation as ～ = ～として評判になる"
       },
       {
         "id": "L08_P3-v8",
@@ -1100,7 +1214,9 @@
           "注意深い",
           "無関心な"
         ],
-        "evidence": "a fearless leader"
+        "evidence": "a fearless leader",
+        "explanation": "fear に「～がない」を表す -less が付いた形容詞です。fearless leader は恐れずに行動する指導者という意味です。",
+        "tip": "fear + -less = fearless"
       },
       {
         "id": "L08_P3-v9",
@@ -1112,7 +1228,9 @@
           "税金",
           "借金"
         ],
-        "evidence": "Large rewards"
+        "evidence": "Large rewards",
+        "explanation": "reward は行為に対して与えられる報酬です。本文ではハリエットを捕らえることに対して提示された賞金を意味します。",
+        "tip": "a reward for ～ = ～に対する報酬"
       },
       {
         "id": "L08_P3-v10",
@@ -1124,7 +1242,9 @@
           "送り届ける",
           "隠す"
         ],
-        "evidence": "was never captured"
+        "evidence": "was never captured",
+        "explanation": "capture は捕らえるという動詞です。was never captured は受動態で、一度も捕らえられなかったことを示します。",
+        "tip": "be captured = 捕らえられる"
       }
     ]
   },
@@ -1153,7 +1273,9 @@
             "ハリエットの夫。"
           ]
         ],
-        "evidence": "Abraham Lincoln signed the Emancipation Proclamation"
+        "evidence": "Abraham Lincoln signed the Emancipation Proclamation",
+        "explanation": "Abraham Lincoln が主語、signed が動詞です。署名した人物を問う Who の答えはリンカーンで、ビクトリア女王は後の授賞に登場します。",
+        "tip": "sign a proclamation = 宣言に署名する"
       },
       {
         "id": "L08_P4-c2",
@@ -1178,7 +1300,9 @@
             "1913年。"
           ]
         ],
-        "evidence": "in 1863"
+        "evidence": "in 1863",
+        "explanation": "in 1863 が署名の年を表しています。1897年は授賞、1913年は死去、2011年は銘板の除幕の年なので区別しましょう。",
+        "tip": "in + 年 = ～年に"
       },
       {
         "id": "L08_P4-c3",
@@ -1203,7 +1327,9 @@
             "10歳未満。"
           ]
         ],
-        "evidence": "Harriet was over forty years old"
+        "evidence": "Harriet was over forty years old",
+        "explanation": "over forty years old は40歳を超えているという意味です。20代前半は結婚時、90代前半は死去時の年齢です。",
+        "tip": "over ～ = ～を超えて"
       },
       {
         "id": "L08_P4-c4",
@@ -1228,7 +1354,9 @@
             "ハリエットに奴隷へ戻ることを求めた。"
           ]
         ],
-        "evidence": "It turned the freedom she had desperately worked for into a law."
+        "evidence": "It turned the freedom she had desperately worked for into a law.",
+        "explanation": "turn A into B はAをBに変えるという意味です。本文はハリエットが求めてきた自由が法律として認められたことを説明しています。",
+        "tip": "turn A into B = AをBに変える"
       },
       {
         "id": "L08_P4-c5",
@@ -1253,7 +1381,9 @@
             "奴隷所有者としての仕事のため。"
           ]
         ],
-        "evidence": "Harriet was honored by many people for her humanitarian work."
+        "evidence": "Harriet was honored by many people for her humanitarian work.",
+        "explanation": "for her humanitarian work が称賛の理由を示します。humanitarian は人道的という意味で、人々のために力を尽くした活動が評価されたのです。",
+        "tip": "be honored for ～ = ～のために称えられる"
       },
       {
         "id": "L08_P4-c6",
@@ -1278,7 +1408,9 @@
             "フィラデルフィアへの切符。"
           ]
         ],
-        "evidence": "a silver medal for bravery by Queen Victoria"
+        "evidence": "a silver medal for bravery by Queen Victoria",
+        "explanation": "silver medal は銀のメダル、for bravery は勇敢さに対して、という意味です。女王が授与したものとその理由の両方を押さえましょう。",
+        "tip": "award A a medal = Aにメダルを授与する"
       },
       {
         "id": "L08_P4-c7",
@@ -1303,7 +1435,9 @@
             "2011年。"
           ]
         ],
-        "evidence": "by Queen Victoria in 1897"
+        "evidence": "by Queen Victoria in 1897",
+        "explanation": "by Queen Victoria が授与した人物、in 1897 が授与の年です。受動態に続く by と in がそれぞれ別の情報を表しています。",
+        "tip": "by + 人（行為者）／in + 年"
       },
       {
         "id": "L08_P4-c8",
@@ -1328,7 +1462,9 @@
             "1863年5月27日。"
           ]
         ],
-        "evidence": "She died on March 10, 1913"
+        "evidence": "She died on March 10, 1913",
+        "explanation": "on March 10, 1913 が死去の日付で、early nineties は90代前半を意味します。2011年の5月27日は死後の銘板の除幕日です。",
+        "tip": "on + 具体的な日付"
       },
       {
         "id": "L08_P4-c9",
@@ -1353,7 +1489,9 @@
             "地下鉄道の新しい停車駅が開いた。"
           ]
         ],
-        "evidence": "On May 27, 2011, a plaque was unveiled in the chapel of St. Catharines"
+        "evidence": "On May 27, 2011, a plaque was unveiled in the chapel of St. Catharines",
+        "explanation": "a plaque was unveiled は銘板が除幕された、という受動態です。2011年の出来事は彼女の生前の受賞ではなく、功績を記念する式典でした。",
+        "tip": "unveil a plaque = 銘板を除幕する"
       },
       {
         "id": "L08_P4-c10",
@@ -1378,7 +1516,9 @@
             "有名な芸術家。"
           ]
         ],
-        "evidence": "to honor Harriet Tubman as a National Historic Person"
+        "evidence": "to honor Harriet Tubman as a National Historic Person",
+        "explanation": "honor A as B はAをBとして称えるという表現です。National Historic Person がBに当たり、Part 1の National Historic Site（史跡）とは区別します。",
+        "tip": "honor A as B = AをBとして称える"
       }
     ],
     "vocabulary": [
@@ -1392,7 +1532,9 @@
           "翻訳する",
           "反対する"
         ],
-        "evidence": "Lincoln signed"
+        "evidence": "Lincoln signed",
+        "explanation": "sign はここでは動詞で署名することを意味します。signed the Emancipation Proclamation は宣言に署名したという意味で、名詞の sign（標識）ではありません。",
+        "tip": "sign a document = 文書に署名する"
       },
       {
         "id": "L08_P4-v2",
@@ -1404,7 +1546,9 @@
           "捕獲",
           "結婚"
         ],
-        "evidence": "Emancipation Proclamation"
+        "evidence": "Emancipation Proclamation",
+        "explanation": "emancipation は拘束や支配から解放されることを表す名詞です。Emancipation Proclamation は本文では奴隷解放宣言を指します。",
+        "tip": "emancipation = 解放"
       },
       {
         "id": "L08_P4-v3",
@@ -1416,7 +1560,9 @@
           "銘板",
           "評判"
         ],
-        "evidence": "Emancipation Proclamation"
+        "evidence": "Emancipation Proclamation",
+        "explanation": "proclamation は公式に公表される宣言を表します。Emancipation と組み合わさり、奴隷解放宣言という名称になっています。",
+        "tip": "proclaim（動詞）／proclamation（名詞）"
       },
       {
         "id": "L08_P4-v4",
@@ -1428,7 +1574,9 @@
           "偶然に",
           "正式に"
         ],
-        "evidence": "desperately worked"
+        "evidence": "desperately worked",
+        "explanation": "desperately は必死に、切実にという副詞で worked を修飾します。彼女が自由を得るために力を尽くしたことを強調します。",
+        "tip": "work desperately for ～ = ～のために必死に努力する"
       },
       {
         "id": "L08_P4-v5",
@@ -1440,7 +1588,9 @@
           "非難する",
           "捕らえる"
         ],
-        "evidence": "Harriet was honored"
+        "evidence": "Harriet was honored",
+        "explanation": "honor は敬意を表して称えるという動詞です。was honored は受動態で、彼女が多くの人々に称賛されたことを意味します。",
+        "tip": "be honored by ～ = ～から称えられる"
       },
       {
         "id": "L08_P4-v6",
@@ -1452,7 +1602,9 @@
           "宗教的な",
           "経済的な"
         ],
-        "evidence": "her humanitarian work"
+        "evidence": "her humanitarian work",
+        "explanation": "humanitarian は人々の苦しみを軽減し、幸福を支えることに関わる形容詞です。humanitarian work は人道的活動を意味します。",
+        "tip": "humanitarian work = 人道的活動"
       },
       {
         "id": "L08_P4-v7",
@@ -1464,7 +1616,9 @@
           "紛失する",
           "借りる"
         ],
-        "evidence": "was awarded"
+        "evidence": "was awarded",
+        "explanation": "award は賞などを授与するという動詞です。was awarded a silver medal は銀のメダルを授与されたという意味になります。",
+        "tip": "be awarded + 賞など"
       },
       {
         "id": "L08_P4-v8",
@@ -1476,7 +1630,9 @@
           "裕福さ",
           "平等"
         ],
-        "evidence": "medal for bravery"
+        "evidence": "medal for bravery",
+        "explanation": "bravery は brave（勇敢な）の名詞形です。for bravery は勇敢さに対してという理由を表し、銀のメダルの授与につながります。",
+        "tip": "brave（形容詞）／bravery（名詞）"
       },
       {
         "id": "L08_P4-v9",
@@ -1488,7 +1644,9 @@
           "地図",
           "法律"
         ],
-        "evidence": "a plaque was unveiled"
+        "evidence": "a plaque was unveiled",
+        "explanation": "plaque は功績や出来事を記念して設置する銘板です。本文では礼拝堂で除幕された記念物で、メダルとは異なります。",
+        "tip": "a commemorative plaque = 記念銘板"
       },
       {
         "id": "L08_P4-v10",
@@ -1500,7 +1658,9 @@
           "破壊する",
           "署名する"
         ],
-        "evidence": "was unveiled"
+        "evidence": "was unveiled",
+        "explanation": "unveil は veil（覆い）を取り除くこと。記念物について用いると除幕するという意味になります。was unveiled はその受動態です。",
+        "tip": "be unveiled = 除幕される"
       }
     ]
   }
