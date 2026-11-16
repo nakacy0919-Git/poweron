@@ -862,3 +862,5 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 @keyframes po-burst-pop{from{transform:scale(.76);opacity:0}to{transform:scale(1);opacity:1}}@keyframes po-burst-fade{0%,72%{opacity:1}100%{opacity:0}}@keyframes po-burst-spark{from{transform:translate(0,0) scale(.5);opacity:0}25%{opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(60deg);opacity:0}}
 @media(max-width:600px){.po-story-part-nav{gap:4px;padding:3px 0}.po-story-part-buttons{gap:3px}.po-practice .po-story-part-buttons button,.po-practice .po-story-exit{font-size:11px;padding:5px 4px}.po-story-part-nav>strong{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.po-answer-burst,.po-burst-card,.po-burst-card i{animation:none!important}.po-burst-card i{display:none}}
+
+.po-mic-tools{display:flex;flex-direction:column;gap:4px}.po-practice .po-mic-tools button{font-size:11px;padding:5px 8px;min-height:29px;white-space:nowrap}

@@ -20,7 +20,11 @@
     const isKnowledgeMode=mode=>mode==='knowledgeHub'||QUESTION_MODES.includes(mode);
     let knowledgeRun=null;
     let game=null,gameTimer=null,answerTimer=null,dragCleanup=[],imageEpoch=0;
-    let sceneMic=null,sceneMicKey='',sceneMicRun=null,feedbackNode=null,feedbackTimer=null;const failedAudio=new Set();
+    let sceneMic=null,sceneMicKey='',sceneMicRun=null,sceneMicStyle='',feedbackNode=null,feedbackTimer=null;
+    const MIC_MODE_KEY='poweron_scene_mic_compat_v1';let micOverride=null;
+    function appleTouch(){const n=window.navigator||{};return /iPad|iPhone|iPod/.test(n.userAgent||'')||(/Mac/.test(n.platform||n.userAgent||'')&&(n.maxTouchPoints||0)>1);}
+    function naturalMic(){if(micOverride!==null)return micOverride;try{const v=storage?.getItem(MIC_MODE_KEY);if(v==='natural')return true;if(v==='normal')return false;}catch(_){}return appleTouch();}
+    function toggleMicStyle(){if(app.mode!=='sceneReading'||app.recognizer)return;const next=!naturalMic();stopSpeech();sceneMic=null;sceneMicKey='';sceneMicStyle='';micOverride=next;try{storage?.setItem(MIC_MODE_KEY,next?'natural':'normal');}catch(_){}app.feedback='音声認識方式を変更しました。音読スタートを押してください。';render();}const failedAudio=new Set();
     const MODES = {knowledgeHub:'Content & Vocabulary', compEn:'英問英答', compJa:'日本語内容理解', contextVocab:'本文語彙', storyHub:'Story Match',progress:'学習進捗', reading:'1文ずつ音読', sceneReading:'じっくり学習', deep:'理解チェック（自己申告）', puzzle:'Listening Puzzle', slides:'Story Slides', listening:'Listening Mission', storyPuzzle:'パズルモード', storyRandom:'ランダムモード', storyListen:'リスニング'};
     const app = {
         mode:null, index:0, sentences:[], candidates:[], scope:'', translation:'',
@@ -81,7 +85,7 @@
             prev.onresult = null; prev.onend = null; prev.onerror = null;
             try { prev.abort(); } catch (_) {}
         }
-        try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+        try { if(window.speechSynthesis?.speaking||window.speechSynthesis?.pending)window.speechSynthesis.cancel(); } catch (_) {}
     }
     function stop() {
         document.body.classList.remove('po-story-active','po-knowledge-active');
@@ -169,7 +173,7 @@
     function go(delta) {
         if (!app.mode || app.mode === 'progress') return;
         const count = modeSentences(app.mode).length;
-        clearAnswerFeedback();stopSpeech();
+        clearAnswerFeedback();stopSpeech();readingTools?.releaseFeedbackAudio?.();
         if (!count) return;
         app.index = Math.max(0, Math.min(count - 1, app.index + delta));
         app.result=null;
@@ -221,9 +225,12 @@
         if(sceneMicRun&&app.recognizer){sceneMicRun.handle.stop();return;}
         const sentence=currentText(),index=app.index,scope=app.slideScope,key=scope+':'+index;
         if(!sentence)return;
-        clearAnswerFeedback();stopSpeech();
+        clearAnswerFeedback();stopSpeech();readingTools?.releaseFeedbackAudio?.();
+        const style=naturalMic()&&readingTools.createNaturalReadingController?'natural':'normal';
+        if(sceneMicStyle!==style){sceneMic=null;sceneMicKey='';sceneMicStyle=style;}
         if(!sceneMic){
-            sceneMic=readingTools.createReadingSpeechController({host:window,calculate:readingTools.score,getThreshold:()=>80,onChange:view=>{
+            const create=style==='natural'?readingTools.createNaturalReadingController:readingTools.createReadingSpeechController;
+            sceneMic=create({host:window,calculate:readingTools.score,getThreshold:()=>80,onChange:view=>{
                 const run=sceneMicRun;
                 if(!run||run.token!==app.micToken||app.mode!=='sceneReading'||run.index!==app.index||run.scope!==app.slideScope)return;
                 // begin() resets internally through idle. Do not drop the active handle mid-start.
@@ -240,7 +247,7 @@
                 app.result=score;app.hearing=spoken;app.recognizer=null;app.recording=false;
                 store.record(run.scope,'sceneReading',run.index,modeSentences('sceneReading').length,signature('sceneReading'),{attempt:true,accuracy:score,complete:score>=80});
                 app.feedback='語句一致率 '+score+'% · 約'+Math.round(core.normalizeWords(spoken).length/Math.max(1,(Date.now()-run.started)/1000)*60)+' WPM'+(score>=80?' ／ 80%以上でクリア！':' ／ 再挑戦できます');
-                sceneMicRun=null;render();answerFeedback(score>=80);
+                sceneMicRun=null;render();if(style==='natural')showAnswerFeedback(score>=80);else answerFeedback(score>=80);
             }});
         }
         // Reset transcript and callbacks for each item, before beginning on the same user tap.
@@ -643,12 +650,12 @@
     function cancelPracticeAudio(){stopSpeech();render();status('停止しました。途中停止は加算されません。');}
     function listeningBody(){const r=state('listening');return '<h2>Listening Mission</h2><p class="po-note">各段落を最後まで3回聞いてクリア。途中停止・再生のやり直しは加算されません。</p><div class="th-listening-mission-grid">'+app.paragraphs.map((x,i)=>{const n=Number((r.counts||{})[i])||0;return '<button class="th-listening-part '+(i===app.index?'active':'')+'" onclick="PowerOnPractice.go('+(i-app.index)+')"><span>Paragraph '+x.number+'</span>'+ring(Math.min(100,n*100/3))+'<strong>'+n+' / 3 回</strong><small>'+(n>=3?'✓ CLEAR':'この段落を選ぶ')+'</small></button>';}).join('')+'</div><div class="po-action-row"><button onclick="PowerOnPractice.cancelPracticeAudio()">■ 停止</button></div>';}
     function sceneNext(skip){if(app.mode!=='sceneReading'||app.recognizer)return;clearAnswerFeedback();const passed=!!state('sceneReading').completed[app.index];if(!passed&&!skip)return;if(app.index>=app.slides.length-1)open('storyHub');else go(1);}
-    function reconnect(){stopSpeech();app.result=null;app.feedback='マイクを再接続します。';render();if(app.mode==='sceneReading'&&readingTools?.createReadingSpeechController)sceneMicrophone();}
+    function reconnect(){stopSpeech();sceneMic=null;sceneMicKey='';sceneMicStyle='';app.result=null;app.feedback='マイクを再接続します。';render();if(app.mode==='sceneReading'&&readingTools?.createReadingSpeechController)sceneMicrophone();}
     function sceneReadingBody(){
        const s=app.slides[app.index],total=app.slides.length;if(!s)return '<p class="po-note">このPartのシーンはありません。</p>';
        const r=state('sceneReading'),passed=!!r.completed[app.index],best=(r.scores||{})[app.index]||0,media=currentLevel==='standard'?sceneMedia(s):{},cover='img/L'+Number(currentLesson)+'.webp';
        const jp=String(s.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'');
-       return '<section class="reading-studio"><div class="reading-top"><span>Scene '+(app.index+1)+' / '+total+'</span><span class="badge '+(passed?'complete':'')+'">'+(passed?'✓ CLEAR':'Accuracy 80%以上で合格')+'</span></div><div class="po-track"><div style="width:'+percent(r)+'%"></div></div><div class="reading-main"><figure class="reading-image"><img id="po-scene-image" src="'+esc(media.image||cover)+'" alt="Scene '+(app.index+1)+'"><figcaption id="po-scene-caption">'+(media.image?'Scene '+(app.index+1):'Lessonカバー · 場面画像は未登録')+'</figcaption></figure><div class="reading-text"><div class="po-reading-model"><button onclick="PowerOnPractice.play()" '+(app.recognizer?'disabled':'')+'>🔊 お手本を聞く</button><label>再生速度 <select aria-label="再生速度" onchange="PowerOnPractice.rate(this.value)">'+[0.65,0.85,1].map(v=>'<option value="'+v+'" '+(app.rate===v?'selected':'')+'>'+v+'×</option>').join('')+'</select></label></div><p class="po-audio-status" id="po-audio-status" role="status"></p><p class="reading-english">'+esc(s.english)+'</p><p class="reading-japanese"><small>Paragraph '+s.paragraph+' の和訳（段落全体）</small><br>'+esc(jp)+'</p></div></div><div class="reading-evaluation"><div class="accuracy '+(passed?'pass':'')+'"><span>Accuracy</span><strong>'+(app.result===null?'—':app.result)+'<small>%</small></strong><span>Best '+best+'%</span></div><div class="transcript"><span>認識した英文</span><p id="po-live-transcript">'+esc(app.hearing||'音読すると、ここに英文が表示されます。')+'</p><small id="po-mic-status" role="status">'+esc(app.feedback||'音読スタートを押してください。')+'</small></div><button onclick="PowerOnPractice.reconnect()">マイクを再接続</button></div><div class="reading-controls"><button onclick="PowerOnPractice.go(-1)" '+(app.index===0||app.recognizer?'disabled':'')+'>◀ 前へ</button><button class="po-primary" onclick="PowerOnPractice.microphone()">'+(app.recognizer?'■ 終了・判定':'🎙 音読スタート')+'</button><button onclick="PowerOnPractice.sceneNext(true)" '+(passed||app.recognizer?'disabled':'')+'>スキップ（未クリア）</button><button class="po-primary po-reading-next" onclick="PowerOnPractice.sceneNext(false)" '+(!passed||app.recognizer?'disabled':'')+'>'+(app.index===total-1?'✓ 学習進捗へ':'次のシーンへ ▶')+'</button></div><p class="po-note">シーン単位音読は語句一致率の目安です。未クリアは再挑戦できます。</p></section>';
+       return '<section class="reading-studio"><div class="reading-top"><span>Scene '+(app.index+1)+' / '+total+'</span><span class="badge '+(passed?'complete':'')+'">'+(passed?'✓ CLEAR':'Accuracy 80%以上で合格')+'</span></div><div class="po-track"><div style="width:'+percent(r)+'%"></div></div><div class="reading-main"><figure class="reading-image"><img id="po-scene-image" src="'+esc(media.image||cover)+'" alt="Scene '+(app.index+1)+'"><figcaption id="po-scene-caption">'+(media.image?'Scene '+(app.index+1):'Lessonカバー · 場面画像は未登録')+'</figcaption></figure><div class="reading-text"><div class="po-reading-model"><button onclick="PowerOnPractice.play()" '+(app.recognizer?'disabled':'')+'>🔊 お手本を聞く</button><label>再生速度 <select aria-label="再生速度" onchange="PowerOnPractice.rate(this.value)">'+[0.65,0.85,1].map(v=>'<option value="'+v+'" '+(app.rate===v?'selected':'')+'>'+v+'×</option>').join('')+'</select></label></div><p class="po-audio-status" id="po-audio-status" role="status"></p><p class="reading-english">'+esc(s.english)+'</p><p class="reading-japanese"><small>Paragraph '+s.paragraph+' の和訳（段落全体）</small><br>'+esc(jp)+'</p></div></div><div class="reading-evaluation"><div class="accuracy '+(passed?'pass':'')+'"><span>Accuracy</span><strong>'+(app.result===null?'—':app.result)+'<small>%</small></strong><span>Best '+best+'%</span></div><div class="transcript"><span>認識した英文</span><p id="po-live-transcript">'+esc(app.hearing||'音読すると、ここに英文が表示されます。')+'</p><small id="po-mic-status" role="status">'+esc(app.feedback||'音読スタートを押してください。')+'</small></div><div class="po-mic-tools"><button onclick="PowerOnPractice.reconnect()">マイクを再接続</button><button onclick="PowerOnPractice.toggleMicStyle()" '+(app.recognizer?'disabled':'')+'>'+(naturalMic()?'自動判定モード':'通常モード')+' ⇄</button></div></div><div class="reading-controls"><button onclick="PowerOnPractice.go(-1)" '+(app.index===0||app.recognizer?'disabled':'')+'>◀ 前へ</button><button class="po-primary" onclick="PowerOnPractice.microphone()">'+(app.recognizer?(naturalMic()?'音読中・自動判定':'■ 終了・判定'):'🎙 音読スタート')+'</button><button onclick="PowerOnPractice.sceneNext(true)" '+(passed||app.recognizer?'disabled':'')+'>スキップ（未クリア）</button><button class="po-primary po-reading-next" onclick="PowerOnPractice.sceneNext(false)" '+(!passed||app.recognizer?'disabled':'')+'>'+(app.index===total-1?'✓ 学習進捗へ':'次のシーンへ ▶')+'</button></div><p class="po-note">'+(naturalMic()?'音声ガイドの後に音読。読み終えたら少し静かにすると自動判定します。':'シーン単位音読は語句一致率の目安です。未クリアは再挑戦できます。')+'</p></section>';
     }
 
     function progressDashboard() {
@@ -846,6 +853,6 @@
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
-        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect, getProgress:function () {return store.snapshot();}
+        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect,toggleMicStyle:toggleMicStyle, getProgress:function () {return store.snapshot();}
     };
 })();
