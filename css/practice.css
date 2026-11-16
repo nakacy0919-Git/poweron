@@ -631,3 +631,48 @@ body.po-story-active .po-content{flex:1;min-height:0;display:flex;flex-direction
 .po-story-toolbar button{font-size:12px;min-height:34px;padding:4px 10px}
 @media(min-width:769px){body.po-story-active .nav-btn{padding:3px!important;font-size:12px!important}body.po-story-active .nav-btn .num{font-size:20px!important}}
 @media(max-width:768px){.po-story-dashboard .mission-cards{grid-template-columns:repeat(2,minmax(0,1fr));min-height:350px}.po-story-dashboard .mission-card h3{font-size:15px}.po-story-dashboard .mission-card p{font-size:11px}.po-story-dashboard .mode-icon{font-size:26px}.po-story-dashboard .dashboard-footer p{font-size:10px}.po-story-dashboard .mission-count b{font-size:24px}}
+
+/* Full-scene board and quiz surfaces adapted from Treasure Hunt mission-active layout. */
+body.po-story-active .po-game .po-content{overflow:auto}
+.po-story-settings,.po-story-result{flex:1}
+.po-story-settings .mode-icon{font-size:42px}
+.po-settings-options{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.po-practice .po-settings-options button{background:#fff;border:1px solid #ccd7e7;border-radius:18px;padding:20px 28px;font-size:20px;color:#385779;min-width:120px}
+.po-settings-options small{display:block;font-size:12px;margin-top:8px}
+.po-full-puzzle{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:5px;min-height:0;flex:1}
+.po-puzzle-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#253d55}
+.po-puzzle-meta strong{color:#db6145;font-size:19px;white-space:nowrap}
+.po-puzzle-instruction{font-size:11px;color:#53718b;text-align:right}
+.po-full-puzzle .po-match-columns{display:grid;grid-template-columns:minmax(0,3.5fr) minmax(0,1.35fr);min-height:0;gap:7px}
+.po-full-puzzle .po-match-slots{display:grid;grid-template-columns:repeat(var(--slot-cols),minmax(0,1fr));grid-template-rows:repeat(var(--slot-rows),minmax(0,1fr));gap:5px;min-height:0}
+.po-full-puzzle .po-match-deck{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(var(--deck-rows),minmax(0,1fr));gap:5px;min-height:0;background:#e0e9f4;padding:4px;border-radius:12px}
+.po-puzzle-cell{display:grid;grid-template-rows:auto 18px minmax(0,1fr);min-height:0;min-width:0;padding:5px;gap:2px;background:white;border:1px solid #d4dfef;border-radius:10px;overflow:hidden}
+.po-puzzle-cell p{font-size:clamp(10px,1.05vw,15px);line-height:1.23;margin:0;color:#173650;overflow-wrap:anywhere;max-height:8.6em;overflow:auto;touch-action:pan-y}
+.po-practice .po-hint-button{justify-self:start;padding:1px 5px;min-height:0;font-size:9px;color:#997026;background:#fff4d9;border:0;border-radius:5px}
+.po-practice .po-drop-target{min-height:0;width:100%;height:100%;background:linear-gradient(140deg,#f5f9ff,#e9f0fa);border:1px dashed #a9bfdf;border-radius:8px;display:grid;place-items:center;padding:2px;color:#718da9;font-size:11px}
+.po-practice .matched .po-drop-target{opacity:1;background:#e3f7eb;border-color:#74bd9b}
+.po-drop-target img{width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
+.po-full-puzzle .po-match-picture{touch-action:none;user-select:none;border:0;border-radius:8px;padding:3px}
+.po-full-puzzle .po-match-picture.is-selected{outline:3px solid #1eaaab;outline-offset:-3px}
+.po-drag-ghost{position:fixed;z-index:100000;width:130px;transform:translate(-50%,-50%);pointer-events:none;opacity:.85;border-radius:8px;box-shadow:0 6px 20px #0005}
+.po-hint-overlay{position:fixed;inset:0;background:#1b335a88;display:grid;place-items:center;z-index:9999;padding:16px}
+.po-hint-overlay>div{max-width:670px;max-height:85dvh;overflow:auto;background:white;border-radius:16px;padding:24px}
+.po-quiz-full{display:grid;grid-template-rows:32px minmax(0,1fr) minmax(0,1fr) 20px;max-width:1200px;width:100%;margin:auto;flex:1;min-height:0;gap:9px}
+.po-quiz-full .po-game-hud{background:transparent;color:#203e5c;padding:0 10%;font-size:clamp(15px,2vw,22px)}
+.po-random-full .po-game-hud strong:last-child{color:#f78b00}
+.po-listening-full .po-game-hud strong:last-child{color:#9829a8}
+.po-quiz-full .po-game-prompt{height:100%;min-height:0;background:#fff;border:2px solid #e5e8ec;border-radius:18px;justify-content:flex-start;text-align:left;padding:clamp(12px,2vw,26px);font-size:clamp(19px,2.4vw,33px);overflow:auto;touch-action:pan-y}
+.po-listening-full .po-game-prompt{background:#f4e6f5;border:2px solid #d29cde;justify-content:center;text-align:center;color:#8c249e}
+.po-quiz-full .po-game-choices{height:100%;min-height:0;max-height:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.po-practice .po-quiz-full .po-game-choices button{min-height:0;height:100%;border:0;background:white;padding:5px;border-radius:15px;}
+.po-quiz-full .po-game-choices img{height:100%;width:100%;object-fit:contain;aspect-ratio:auto}
+.po-quiz-full .po-game-footer{min-height:0;font-size:11px;justify-content:center}
+.po-listening-inner{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.po-listening-inner h2{font-size:clamp(17px,2.1vw,26px);margin:0}
+.po-listening-inner p{font-size:12px;margin:0;color:#81549c}
+.po-sound-wave{display:flex;gap:5px;align-items:center;height:35px}
+.po-sound-wave i{width:7px;height:25px;border-radius:6px;background:#b457c4}.po-sound-wave i:nth-child(2),.po-sound-wave i:nth-child(4){height:32px}.po-sound-wave i:nth-child(3){height:35px}
+.po-listen-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.po-practice .po-listen-actions button{border:1px solid #c794d5;color:#9a36aa;background:#fff;border-radius:22px;min-height:34px;padding:6px 12px;font-size:12px}
+.po-listen-actions label{font-size:12px}.po-listen-actions select{font-size:12px;padding:4px;border-radius:7px}
+@media(max-width:768px){.po-full-puzzle .po-match-columns{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(220px,3fr) minmax(110px,1fr)}.po-full-puzzle .po-match-deck{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(38px,1fr)}.po-puzzle-cell p{font-size:10px}.po-quiz-full{min-height:355px}.po-quiz-full .po-game-prompt{font-size:16px}.po-listening-inner{gap:4px}}
