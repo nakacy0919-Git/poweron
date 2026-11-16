@@ -1,13 +1,13 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const core=require('../js/practiceCore.js'),games=require('../js/storyGameCore.js'),reading=require('../js/storyReading.js');
 const sentences=['We learn English today.','She walks to school.','They play baseball.','He likes oranges.'];
-function harness(withAudio=false){
+function harness(withAudio=false,apple=false){
  let now=100000,timers=new Map(),seq=0,mic,speech;
  const nodes=Object.fromEntries(['targetTextDisplay','mainOverlay','speechResultWindow','overlayTitle','po-audio-status'].map(k=>[k,{style:{},innerHTML:'',textContent:''}]));
  const storage=new Map(),timer=(fn,ms)=>{const id=++seq;timers.set(id,{fn,ms});return id;},cancel=id=>timers.delete(id);
- class Mic{constructor(){mic=this}start(){}stop(){this.onend?.()}abort(){this.aborted=true}}
+ class Mic{constructor(){mic=this;this.stopCalls=0;this.abortCalls=0}start(){this.onstart?.()}stop(){this.stopCalls++;this.onend?.()}abort(){this.abortCalls++;this.aborted=true}}
  class Audio{constructor(url){this.url=url}play(){this.onerror?.();return Promise.resolve()}pause(){}}
- const window={PowerOnPracticeCore:core,PowerOnStoryGameCore:games,PowerOnReadingScore:reading,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},SpeechRecognition:Mic,SpeechSynthesisUtterance:class{constructor(t){this.text=t}},speechSynthesis:{cancel(){},speak(u){speech=u}},setTimeout:timer,clearTimeout:cancel,PowerOnSceneMedia:Object.fromEntries(sentences.map((s,i)=>['L08_P1_p'+(i+1)+'_s01',{image:'s'+i+'.webp',...(withAudio?{audio:'broken.mp3'}:{})}]))};
+ const window={navigator:apple?{userAgent:'iPad',platform:'MacIntel',maxTouchPoints:5}:{userAgent:'Chrome',platform:'Win32',maxTouchPoints:0},PowerOnPracticeCore:core,PowerOnStoryGameCore:games,PowerOnReadingScore:reading,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},SpeechRecognition:Mic,SpeechSynthesisUtterance:class{constructor(t){this.text=t}},speechSynthesis:{cancel(){},speak(u){speech=u}},setTimeout:timer,clearTimeout:cancel,PowerOnSceneMedia:Object.fromEntries(sentences.map((s,i)=>['L08_P1_p'+(i+1)+'_s01',{image:'s'+i+'.webp',...(withAudio?{audio:'broken.mp3'}:{})}]))};
  const document={body:{classList:{add(){},remove(){}}},getElementById:k=>nodes[k]||null};
  const ctx={window,document,Audio,Date:class extends Date{static now(){return now;}},setTimeout:timer,clearTimeout:cancel,setInterval:()=>999,clearInterval(){},currentLesson:8,currentKey:'L08_P1_full',currentLevel:'standard',currentMode:'',lessonStructure:{8:{1:[1,2,3,4]}},lessonScripts:Object.fromEntries([...sentences.map((s,i)=>['L08_P1_p'+(i+1),s]),['L08_P1_full',sentences.join(' ')]]),lessonTranslations:{}};
  ctx.resetAppMode=()=>{window.PowerOnPractice?.stop();ctx.currentMode='';};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/practice.js'),'utf8'),ctx);
@@ -42,4 +42,30 @@ test('central feedback shows correct / retry and removes previous effect',()=>{
  p.answerFeedback(true);assert.equal(children.length,1);assert.match(children[0].innerHTML,/Correct!/);
  p.answerFeedback(false);assert.equal(children.length,1);assert.match(children[0].innerHTML,/Try Again/);
  p.stop();assert.equal(children.length,0);
+});
+
+test('iPad natural recognizer completes four successive scenes without stop or abort',()=>{
+ const {p,html,mic,speech}=harness(false,true);p.open('sceneReading');assert.match(html(),/自動判定モード/);
+ for(let i=0;i<4;i++){
+  assert.match(html(),new RegExp('Scene '+(i+1)+' / 4'));p.microphone();
+  const cue=speech();assert.equal(cue.text,'Read aloud.');cue.onend();
+  const rec=mic();assert.equal(rec.continuous,false);
+  rec.onaudiostart();rec.onspeechstart();const oldResult=rec.onresult;
+  rec.onresult({results:[Object.assign([{transcript:sentences[i]}],{isFinal:true})]});
+  assert.match(html(),/音読中・自動判定/);p.microphone();assert.equal(rec.stopCalls,0);
+  rec.onend();assert.equal(p.getProgress().scopes['standard:L08_P1_full'].sceneReading.scores[i],100);
+  p.sceneNext(false);assert.equal(rec.abortCalls,0);oldResult({results:[Object.assign([{transcript:'old transcript'}],{isFinal:true})]});
+  assert.ok(!html().includes('old transcript'));
+ }
+ assert.equal(p.mode(),'storyHub');
+});
+test('iPad natural mode warns on missing results and supports reconnect and normal switch',()=>{
+ const {p,html,mic,speech,run}=harness(false,true);p.open('sceneReading');p.microphone();speech().onend();const first=mic();run(12000);
+ // A real DOM updates the status element directly; check no silent score or forced end.
+ assert.equal(first.stopCalls,0);assert.equal(first.abortCalls,0);first.onend();assert.match(html(),/文字起こしがありません/);
+ p.toggleMicStyle();assert.match(html(),/通常モード/);p.microphone();assert.equal(mic().continuous,true);
+ mic().onresult({results:[Object.assign([{transcript:sentences[0]}],{isFinal:true})]});p.microphone();assert.equal(p.getProgress().scopes['standard:L08_P1_full'].sceneReading.scores[0],100);
+});
+test('cancelled speech cue cannot start an old scene recognizer',()=>{
+ const {p,speech,mic}=harness(false,true);p.open('sceneReading');p.microphone();const late=speech().onend;p.open('storyHub');late();assert.equal(mic(),undefined);assert.equal(p.mode(),'storyHub');
 });

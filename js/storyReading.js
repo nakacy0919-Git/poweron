@@ -710,7 +710,7 @@ function createReadingSpeechController({
       });
       return;
     }
-    try { host.speechSynthesis?.cancel(); } catch (_) {}
+    try { if(host.speechSynthesis?.speaking||host.speechSynthesis?.pending)host.speechSynthesis.cancel(); } catch (_) {}
     cancel();
     state.recording = true;
     state.stopRequested = false;
@@ -903,9 +903,53 @@ function createReadingSpeechController({
   return { begin, stop, cancel, setItem, reconnect };
 }
 
+
+/* Apple WebKit compatibility: spoken cue then a one-shot native recognition
+   session allowed to finish naturally. See WebKit bug 321436. */
+function createNaturalReadingController({host,onChange,onScore,calculate,getThreshold=()=>80}){
+ let item=null,rec=null,cue=null,token=0,phase="idle",spoken="",timer=null,signals={audio:false,voice:false,text:false};
+ const clear=()=>{if(timer!==null){host.clearTimeout(timer);timer=null;}};
+ const paint=status=>onChange({phase,transcript:spoken,status,signals:{...signals}});
+ const detach=r=>{if(r)r.onstart=r.onaudiostart=r.onspeechstart=r.onresult=r.onerror=r.onend=null;};
+ function cancel(){token++;clear();const r=rec,u=cue;rec=null;cue=null;phase="idle";detach(r);if(r)try{r.abort();}catch(_){}if(u){u.onend=u.onerror=null;try{host.speechSynthesis?.cancel();}catch(_){}}}
+ function setItem(next){cancel();item=next;spoken="";signals={audio:false,voice:false,text:false};paint("音読スタートを押してください。");}
+ function begin(){
+  if(!item||phase!=="idle")return;
+  const C=host.webkitSpeechRecognition||host.SpeechRecognition;if(!C){paint("音声認識に対応したブラウザでお試しください。");return;}
+  const id=++token,target=item;spoken="";signals={audio:false,voice:false,text:false};phase="starting";
+  const valid=()=>id===token&&item?.id===target.id;
+  const fail=message=>{if(!valid())return;clear();phase="idle";paint(message);};
+  const listen=()=>{
+   if(!valid()||phase!=="starting")return;clear();cue=null;
+   let r;try{r=new C();r.lang="en-US";r.continuous=false;r.interimResults=true;r.maxAlternatives=1;}catch(_){fail("マイクを準備できません。再接続してください。");return;}
+   rec=r;phase="listening";const current=()=>valid()&&rec===r;let error="";
+   r.onstart=()=>{if(current())paint("マイク接続済み · 英文を読み、読み終えたら少し静かにしてください。");};
+   r.onaudiostart=()=>{if(current()){signals.audio=true;paint("マイク入力あり · 音読してください。");}};
+   r.onspeechstart=()=>{if(current()){signals.voice=true;paint("音声を検出しました。");}};
+   r.onresult=event=>{if(!current())return;const words=Array.from(event.results||[]).map(x=>String(x?.[0]?.transcript||"").trim()).filter(Boolean);if(!words.length)return;spoken=words.join(" ");signals={audio:true,voice:true,text:true};paint("文字起こし中 · 英文を最後まで読みましょう。");};
+   r.onerror=event=>{if(!current())return;error=String(event.error||"unknown");paint("音声認識: "+error+" · 終了を待っています。");};
+   r.onend=()=>{if(!current())return;clear();detach(r);rec=null;phase="idle";
+    if(!spoken||["not-allowed","service-not-allowed","audio-capture","language-not-supported"].includes(error)){paint(error?"認識終了: "+error+"。再接続して試してください。":"文字起こしがありません。再試行してください。");return;}
+    const result=calculate(target.sentence,spoken).percent;paint(result>=getThreshold()?"✓ 合格！次のシーンへ進めます。":"80%以上で合格です。再挑戦しましょう。");onScore(result,spoken,target.id);
+   };
+   timer=host.setTimeout(()=>{if(current())paint(signals.text?"自然終了を待っています。読み終えたら少し静かにしてください。":"文字起こしが届いていません。マイクを再接続するか、Safariを完全終了して再度お試しください。");},12000);
+   paint("🔴 音読してください。読み終えたら自動で判定します。");try{r.start();}catch(error){detach(r);rec=null;fail("マイク開始エラー: "+(error.message||"再接続してください。"));}
+  };
+  paint("音声ガイドの後に音読してください。");const synth=host.speechSynthesis,U=host.SpeechSynthesisUtterance;
+  if(!synth||!U){listen();return;}
+  try{const u=new U("Read aloud.");cue=u;u.lang="en-US";u.rate=1;u.volume=.65;u.onend=()=>{if(valid()&&cue===u)listen();};u.onerror=()=>{if(valid()&&cue===u)listen();};
+   timer=host.setTimeout(()=>{if(!valid()||cue!==u)return;cue=null;u.onend=u.onerror=null;try{synth.cancel();}catch(_){}fail("音声ガイドが応答しません。マイクを再接続してください。");},5000);synth.speak(u);
+  }catch(_){cue=null;listen();}
+ }
+ function stop(){if(phase==="listening")paint("読み終えたら静かにしてください。自動で判定します。");}
+ return {begin,stop,cancel,setItem,reconnect(){cancel();begin();}};
+}
+
 // A single context avoids Safari/iPad's limit on simultaneous AudioContexts.
 // Chimes are synthesized on-device: no downloads, external audio, or latency.
 let audioContext;
+let audioReleaseTimer=null;
+function releaseFeedbackAudio(){if(audioReleaseTimer!==null){clearTimeout(audioReleaseTimer);audioReleaseTimer=null;}const context=audioContext;audioContext=null;if(context&&context.state!=="closed")try{Promise.resolve(context.close()).catch(()=>{});}catch(_){} }
 const notesByType = {
   // Gentle, rising major chord: pleasant success with a soft high-note tail.
   correct: [[523.25,0,.28,.065],[659.25,.075,.30,.058],[783.99,.15,.33,.06],[1046.5,.24,.53,.055]],
@@ -921,6 +965,7 @@ function playSound(type, enabled=true) {
     if(!Context) return;
     if(!audioContext || audioContext.state==="closed") audioContext=new Context();
     if(audioContext.state==="suspended") Promise.resolve(audioContext.resume()).catch(()=>{});
+    if(audioReleaseTimer!==null)clearTimeout(audioReleaseTimer);
     const startAt=audioContext.currentTime+.012;
     notesByType[type].forEach(([frequency,offset,duration,peak])=>{
       const start=startAt+offset,end=start+duration;
@@ -935,10 +980,11 @@ function playSound(type, enabled=true) {
       gain.connect(audioContext.destination);
       oscillator.start(start);oscillator.stop(end+.01);
     });
+    audioReleaseTimer=setTimeout(releaseFeedbackAudio,Math.ceil(Math.max(...notesByType[type].map(n=>n[1]+n[2]))*1000)+80);
   } catch (_) {
     // Silence is preferable to interrupting an activity if sound is blocked.
   }
 }
 
-const api={score:(expected,heard)=>score(String(expected||'').slice(0,4000),String(heard||'').slice(0,4000)),words,createReadingSpeechController,playSound,createFeedback};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PowerOnReadingScore=api;
+const api={score:(expected,heard)=>score(String(expected||'').slice(0,4000),String(heard||'').slice(0,4000)),words,createReadingSpeechController,createNaturalReadingController,playSound,releaseFeedbackAudio,createFeedback};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PowerOnReadingScore=api;
 })(typeof globalThis==='object'?globalThis:this);
