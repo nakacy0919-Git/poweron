@@ -63,3 +63,9 @@ test('storage corruption or private mode degrades to usable session memory', () 
     assert.equal(s.get('standard:L01_P1_p1','deep',1,'abc').completed[0],true);
     assert.equal(s.isPersistent(),false);
 });
+
+test('saved scores of 75–79 are promoted for reading only without changing attempts',()=>{
+ const scope='standard:L08_P1_full',sig='x',initial={version:1,scopes:{[scope]:{sceneReading:{total:3,fingerprint:sig,completed:{},scores:{0:74,1:75,2:79},attempts:3,bestAccuracy:79},compEn:{total:1,fingerprint:sig,completed:{},scores:{0:75},attempts:1,bestAccuracy:75}}}};
+ const mem=new Map([['poweron_study_progress_v1',JSON.stringify(initial)]]);const s=core.createProgressStore({getItem:k=>mem.get(k),setItem:(k,v)=>mem.set(k,v)});
+ assert.equal(s.get(scope,'sceneReading',3,sig).completed[0],undefined);assert.equal(s.get(scope,'sceneReading',3,sig).completed[1],true);assert.equal(s.get(scope,'sceneReading',3,sig).completed[2],true);assert.equal(s.get(scope,'sceneReading',3,sig).attempts,3);assert.equal(s.get(scope,'compEn',1,sig).completed[0],undefined);
+});

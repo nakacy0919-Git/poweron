@@ -864,3 +864,5 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 @media(prefers-reduced-motion:reduce){.po-answer-burst,.po-burst-card,.po-burst-card i{animation:none!important}.po-burst-card i{display:none}}
 
 .po-mic-tools{display:flex;flex-direction:column;gap:4px}.po-practice .po-mic-tools button{font-size:11px;padding:5px 8px;min-height:29px;white-space:nowrap}
+
+.po-mic-ready{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 12px;font-size:clamp(11px,1.6vw,16px);font-weight:850;color:#946119;background:#fff1cf;white-space:normal;text-align:center}.po-mic-ready.is-ready{color:#fff;background:#188653;box-shadow:0 0 0 3px #d6f3e4}.po-practice .reading-top{gap:6px;flex-wrap:wrap}.po-practice .reading-controls .po-primary:disabled{opacity:.65;cursor:wait}

@@ -396,7 +396,7 @@ function fireConfetti() {
 }
 
 function checkCelebration() {
-    if (currentScore >= 80) {
+    if (currentScore >= 75) {
         if (typeof successSound !== 'undefined' && successSound) successSound.play().catch(e => console.log(e));
         fireConfetti();
     }

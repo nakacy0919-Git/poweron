@@ -389,7 +389,7 @@ function processSpeechMatch(spokenText) {
         if (wpm) wpm.textContent='---';
         return;
     }
-    if (acc) { acc.textContent = currentScore+'%';acc.style.color=currentScore>=80?'#ffd700':'#fff'; }
+    if (acc) { acc.textContent = currentScore+'%';acc.style.color=currentScore>=75?'#ffd700':'#fff'; }
     const end = recordEndTime || Date.now();
     const minutes = recordStartTime ? Math.max((end-recordStartTime)/60000,1/60) : 0;
     const speed = minutes ? Math.round(spokenOriginalWords.length/minutes) : 0;
