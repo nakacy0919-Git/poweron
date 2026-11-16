@@ -2,6 +2,7 @@
 // main.js: レッスン切替、初期化、イベント登録
 // ==========================================
 function selectLesson(num, btnElement) {
+    const previousMode=currentMode==='practice'&&window.PowerOnPractice?PowerOnPractice.mode():null;
     currentLesson = num;
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
@@ -30,6 +31,7 @@ function selectLesson(num, btnElement) {
     updateParaSelect();
     resetAppMode();
     onScopeChange();
+    if(previousMode&&window.PowerOnPractice)PowerOnPractice.open(previousMode);
 }
 
 function updateParaSelect() {

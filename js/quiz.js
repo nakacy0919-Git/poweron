@@ -583,6 +583,6 @@ function renderQuizResult() {
         </div>
     `;
     if (typeof PowerOnPractice !== 'undefined' && Number.isFinite(percent))
-        PowerOnPractice.captureLegacy('vocabulary', percent);
+        {PowerOnPractice.captureLegacy('vocabulary', percent);PowerOnPractice.captureLegacy(quizMode===1?'vocabEnJa':quizMode===3?'vocabJaEn':'vocabVoice',percent);}
     if ((isLesson8PointRound ? cleared : percent >= 80) && typeof fireConfetti === 'function') fireConfetti();
 }

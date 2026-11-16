@@ -6,7 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'poweron_study_progress_v1';
-    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides'];
+    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides', 'sceneReading', 'listening', 'vocabEnJa', 'vocabJaEn', 'vocabVoice', 'storyPuzzle', 'storyRandom', 'storyListen'];
 
     function splitSentences(value) {
         const source = String(value || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')
@@ -128,11 +128,12 @@
             puzzle.ordered.every((card, i) => card.id === selectedIds[i]);
     }
 
-    function createProgressStore(storage) {
+    function createProgressStore(storage, storageKey) {
+        const keyName = storageKey || KEY;
         let state = {version:1, scopes:{}};
         let persisted = false;
         try {
-            const raw = storage && storage.getItem(KEY);
+            const raw = storage && storage.getItem(keyName);
             if (raw) {
                 const parsed = JSON.parse(raw);
                 if (parsed && parsed.version === 1 && parsed.scopes && typeof parsed.scopes === 'object' &&
@@ -149,7 +150,9 @@
                 completed:previous.completed && typeof previous.completed === 'object' ? previous.completed : {},
                 attempts:Number(previous.attempts) || 0,
                 bestAccuracy:Number.isFinite(previous.bestAccuracy) ? previous.bestAccuracy : null,
-                lastAt:previous.lastAt || null
+                lastAt:previous.lastAt || null,
+                bestPoints:Number.isFinite(previous.bestPoints)?previous.bestPoints:null,bestSeconds:Number.isFinite(previous.bestSeconds)?previous.bestSeconds:null,bestByLevel:Object.assign({},previous.bestByLevel||{}),
+                scores:Object.assign({}, previous.scores || {}), counts:Object.assign({}, previous.counts || {})
             };
         }
         function record(scope, mode, index, count, sig, options) {
@@ -159,6 +162,11 @@
             options = options || {};
             if (options.complete) entry.completed[index] = true;
             if (options.attempt) entry.attempts += 1;
+            if(Number.isFinite(options.points))entry.bestPoints=Math.max(entry.bestPoints||0,options.points);
+            if(Number.isFinite(options.seconds)&&options.seconds>=0){if([1,2,3].includes(options.gameLevel)){entry.bestByLevel=entry.bestByLevel||{};entry.bestByLevel[options.gameLevel]=Math.min(entry.bestByLevel[options.gameLevel]??Infinity,options.seconds);}if(!options.gameLevel||options.gameLevel===3)entry.bestSeconds=Math.min(entry.bestSeconds==null?Infinity:entry.bestSeconds,options.seconds);}
+            entry.scores = entry.scores || {}; entry.counts = entry.counts || {};
+            if (Number.isFinite(options.accuracy)) entry.scores[index] = Math.max(entry.scores[index] || 0, Math.min(100, Math.max(0, Math.round(options.accuracy))));
+            if (options.listen) {entry.counts[index] = (Number(entry.counts[index]) || 0) + 1; if (entry.counts[index] >= 3) entry.completed[index] = true;}
             if (Number.isFinite(options.accuracy))
                 entry.bestAccuracy = Math.max(entry.bestAccuracy === null ? 0 : entry.bestAccuracy,
                     Math.min(100, Math.max(0, Math.round(options.accuracy))));
@@ -168,7 +176,7 @@
             state.scopes[scope][mode] = entry;
             try {
                 if (storage) {
-                    storage.setItem(KEY, JSON.stringify(state));
+                    storage.setItem(keyName, JSON.stringify(state));
                     persisted = true;
                 } else persisted = false;
             } catch (_) { persisted = false; }
@@ -176,7 +184,7 @@
         }
         return {
             get:read, record:record, snapshot:function(){return JSON.parse(JSON.stringify(state));},
-            isPersistent:function(){return persisted;}, key:KEY
+            isPersistent:function(){return persisted;}, key:keyName
         };
     }
     return {splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
