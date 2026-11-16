@@ -105,7 +105,7 @@
       {
         "id": "L08_P1-c5",
         "paragraph": 2,
-        "en": "When did many enslaved people begin trying to escape with help from the North?",
+        "en": "When did many enslaved people in the South try to escape with help from the North?",
         "ja": "南部の多くの奴隷が北部の人々の助けを借りて脱出しようとしたのはいつ？",
         "choices": [
           [
@@ -250,7 +250,7 @@
             "大きな鐘で到着を知らせた。"
           ]
         ],
-        "evidence": "escaping slaves were hidden, warmed, and fed"
+        "evidence": "The \"stations\" put a lamp in the window so that escaping slaves could find them. There, escaping slaves were hidden, warmed, and fed"
       }
     ],
     "vocabulary": [
@@ -626,7 +626,7 @@
             "夫が案内するのを待った。"
           ]
         ],
-        "evidence": "She used the North Star to guide her."
+        "evidence": "She went on alone through the woods by night. She hid by day. She had no map, but she trusted God. She used the North Star to guide her."
       }
     ],
     "vocabulary": [

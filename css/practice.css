@@ -699,3 +699,42 @@ body.po-story-active .po-mode-sceneReading .po-note{font-size:10px;margin:0}
 
 body.po-story-active #mobileGuideMessage,body.po-story-active #mobileAudioControls{display:none!important}body.po-story-active #mobileTopMenu{display:none!important}
 @media(max-width:768px){body.po-story-active .po-mode-storyHub .po-compact-nav{gap:4px;flex-wrap:wrap}body.po-story-active .po-mode-storyHub .po-compact-nav select{max-width:45%;flex:1 1 auto}}
+
+/* Part-wide reading & vocabulary quiz, following Treasure Hunt's one-card flow. */
+.po-knowledge{--k-accent:#216991}
+.po-knowledge .po-content{min-height:0;overflow:auto}
+.po-knowledge-hub{display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;padding:clamp(5px,1.3vw,18px);color:#1e3c56}
+.po-knowledge-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.po-knowledge-heading h2{margin:2px 0;font-size:clamp(22px,3vw,36px)}.po-knowledge-heading p{margin:4px 0;color:#648099;font-size:13px}
+.po-knowledge-clear{display:flex;flex-direction:column;text-align:right;white-space:nowrap}.po-knowledge-clear strong{font-size:28px}.po-knowledge-clear span{font-size:9px;letter-spacing:1px}
+.po-knowledge-cards{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:230px;max-height:430px}
+.po-practice .po-knowledge-card{display:flex;flex-direction:column;align-items:stretch;text-align:left;min-width:0;border:1px solid #dce7ee;border-top:4px solid var(--k-accent);background:linear-gradient(155deg,#fff 45%,#ecf5fc);padding:clamp(12px,2vw,24px);border-radius:18px;color:#223e5b;box-shadow:0 5px 18px #253b5610}
+.po-knowledge-card.compJa{--k-accent:#168970;background:linear-gradient(155deg,#fff 45%,#eaf8f2)}
+.po-knowledge-card.contextVocab{--k-accent:#8b58ad;background:linear-gradient(155deg,#fff 45%,#f3edfc)}
+.po-knowledge-card-top{display:flex;justify-content:space-between;align-items:center;gap:4px}.po-knowledge-card-top>span{font-size:clamp(28px,3.3vw,44px)}.po-knowledge-card-top small{color:var(--k-accent);font-size:9px;background:#eaf0f8;padding:5px 8px;border-radius:99px}
+.po-knowledge-card h3{color:var(--k-accent);font-size:clamp(17px,2vw,24px);margin:8px 0}.po-knowledge-card p{font-size:13px;line-height:1.4;color:#627c93;margin:0}
+.po-knowledge-best{flex:1;display:flex;flex-direction:column;justify-content:end;gap:4px;padding:12px 0}.po-knowledge-best b{font-size:clamp(28px,4vw,46px)}.po-knowledge-best span{color:#70879e;font-size:10px}
+.po-knowledge-link{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #d5e1ee;padding-top:12px;font-size:12px;color:var(--k-accent);font-weight:800}
+.po-knowledge-hub-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#58758c}.po-knowledge-hub-footer>span{flex:1}
+.po-knowledge-question{display:flex;flex-direction:column;gap:10px;width:100%;max-width:1150px;margin:0 auto;flex:1;min-height:0;color:#1e3b58}
+.po-knowledge-question.compJa{--k-accent:#168970}.po-knowledge-question.contextVocab{--k-accent:#8b58ad}
+.po-knowledge-question-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--k-accent)}.po-knowledge-question-meta>span{font-size:11px;color:#69849a}
+.po-knowledge-question .po-track{flex-shrink:0;height:7px;margin:0}
+.po-knowledge-prompt{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:clamp(9px,2vw,25px);background:#fff;border:1px solid #dce5ee;border-radius:18px;flex:1 1 90px;min-height:75px}
+.po-knowledge-prompt>span{font-size:10px;font-weight:800;color:var(--k-accent)}.po-knowledge-prompt h2{font-size:clamp(20px,2.7vw,34px);line-height:1.35;margin:0;color:#193b5b;overflow-wrap:anywhere}
+.po-vocab-context{font-size:clamp(13px,1.65vw,19px);color:#617b90;margin:3px 0 0}
+.po-knowledge-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(62px,1fr);gap:8px;flex:1 1 140px;min-height:140px}
+.po-practice .po-knowledge-option{display:flex;align-items:center;gap:10px;text-align:left;min-width:0;min-height:0;padding:clamp(9px,1.5vw,18px);background:#fff;border:2px solid #d9e5ef;border-radius:13px;color:#214561;font-size:clamp(16px,1.8vw,24px);line-height:1.27;overflow-wrap:anywhere;touch-action:manipulation}
+.po-knowledge-option>span{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;font-size:15px;color:var(--k-accent);background:#eaf2f8;border-radius:50%}
+.po-knowledge-option b{font-weight:650}
+.po-practice .po-knowledge-option.right{background:#e3f8ec;border-color:#25965d;color:#1c6847;opacity:1}.po-practice .po-knowledge-option.wrong{background:#ffedec;border-color:#d95853;color:#9e3b38;opacity:1}.po-practice .po-knowledge-option.locked{opacity:.7}
+.po-knowledge-bottom{display:flex;align-items:center;gap:10px;min-height:64px;flex-shrink:0}
+.po-knowledge-feedback{flex:1;min-width:0;padding:9px 12px;background:#eef6f0;border-radius:10px;color:#205940;font-size:clamp(12px,1.3vw,16px);overflow-wrap:anywhere}.po-knowledge-feedback.wrong{background:#fff0ef;color:#963c37}.po-knowledge-feedback p{margin:4px 0 0;font-size:12px;line-height:1.4;color:#314e67}.po-knowledge-feedback small{font-size:10px;color:#6c8091;margin-right:4px}
+.po-practice .po-knowledge-next{flex:0 0 auto;min-height:44px;padding:12px 18px;background:var(--k-accent);white-space:nowrap}
+.po-knowledge-result{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;flex:1;min-height:0;padding:12px;color:#204664}
+.po-knowledge-result h2,.po-knowledge-result p{margin:0}.po-knowledge-score{font-size:clamp(54px,8vw,100px);line-height:1;color:#168a73}.po-knowledge-score small{font-size:.48em}
+.po-knowledge-result-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+.po-knowledge-review{width:100%;max-width:900px;max-height:36dvh;overflow:auto;min-height:0;border:1px solid #dfebf5;background:#fff;border-radius:12px;padding:8px 14px}
+.po-knowledge-review article{padding:8px 0;border-bottom:1px solid #e4edf2}.po-knowledge-review p{font-size:13px;margin:3px 0}.po-correct-text{color:#18764f}.po-knowledge-review small{font-size:11px;color:#536e84}
+@media(max-height:650px) and (min-width:769px){.po-knowledge-question{gap:5px}.po-knowledge-prompt{min-height:60px;padding:9px}.po-knowledge-prompt h2{font-size:clamp(18px,2.3vw,29px)}.po-knowledge-options{grid-auto-rows:minmax(47px,1fr);min-height:100px;gap:5px}.po-practice .po-knowledge-option{padding:7px 10px;font-size:clamp(14px,1.55vw,21px)}.po-knowledge-bottom{min-height:42px}.po-knowledge-feedback{padding:5px 9px}.po-knowledge-feedback p{font-size:11px}.po-knowledge-cards{min-height:190px}}
+@media(max-width:700px){.po-knowledge-cards{grid-template-columns:1fr;min-height:0;max-height:none;gap:7px}.po-practice .po-knowledge-card{padding:10px}.po-knowledge-card-top>span{font-size:25px}.po-knowledge-card h3{margin:3px 0}.po-knowledge-best{padding:4px 0}.po-knowledge-best b{font-size:24px}.po-knowledge-link{padding-top:5px}.po-knowledge-options{grid-template-columns:1fr;grid-auto-rows:minmax(48px,auto);min-height:0;flex:0 0 auto}.po-knowledge-prompt{flex:0 0 auto}.po-knowledge-bottom{flex-wrap:wrap}.po-knowledge-feedback{flex-basis:100%}.po-knowledge-next{margin-left:auto}.po-knowledge-question-meta{font-size:11px}}

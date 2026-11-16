@@ -6,7 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'poweron_study_progress_v1';
-    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides', 'sceneReading', 'listening', 'vocabEnJa', 'vocabJaEn', 'vocabVoice', 'storyPuzzle', 'storyRandom', 'storyListen'];
+    const MODES = ['reading', 'deep', 'puzzle', 'readingcheck', 'shadowing', 'vocabulary', 'slides', 'sceneReading', 'listening', 'vocabEnJa', 'vocabJaEn', 'vocabVoice', 'storyPuzzle', 'storyRandom', 'storyListen', 'compEn', 'compJa', 'contextVocab'];
 
     function splitSentences(value) {
         const source = String(value || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')
