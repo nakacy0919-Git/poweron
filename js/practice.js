@@ -331,7 +331,7 @@
         store.record(app.scope, 'puzzle', app.index, app.candidates.length, signature('puzzle'),
             {attempt:true, complete:correct});
         app.feedback = correct ? '正解！英文の並びを完成できました。' : 'まだ違います。もう一度聞いて並べ直しましょう。';
-        render();
+        render();answerFeedback(correct);
     }
     function retryPuzzle() {
         if (app.mode !== 'puzzle') return;
@@ -842,7 +842,7 @@
     if(typeof document.addEventListener==='function')document.addEventListener('visibilitychange',()=>{if(!document.hidden||!app.mode)return;const wasMic=!!app.recognizer;stopSpeech();clearDrag();if(wasMic){app.feedback='画面を離れたため音読を停止しました。再試行してください。';render();}else if(game&&game.mode==='storyListen'&&!game.done&&!game.answering){game.ready=false;game.message='画面に戻り、もう一度音声を聞いてください。';render();}});
     if(typeof window.addEventListener==='function'){window.addEventListener('resize',fitKnowledgeExplanation);window.visualViewport?.addEventListener?.('resize',fitKnowledgeExplanation);}
     window.PowerOnPractice = {
-        open:open, close:close, stop:stop, mode:function(){return app.mode;},
+        open:open, close:close, stop:stop, answerFeedback:answerFeedback, mode:function(){return app.mode;},
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
