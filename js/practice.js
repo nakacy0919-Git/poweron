@@ -80,7 +80,7 @@
         try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
     }
     function stop() {
-        document.body.classList.remove('po-story-active');
+        document.body.classList.remove('po-story-active','po-knowledge-active');
         clearGameTimer();clearDrag();imageEpoch++;game=null;knowledgeRun=null;stopSpeech();
         app.mode = null;
     }
@@ -136,6 +136,7 @@
         currentMode = 'practice';
         document.body.classList.add('text-active', 'po-practice-active');
         if(mode==='storyHub'||mode==='sceneReading'||GAME_MODES.includes(mode)||isKnowledgeMode(mode))document.body.classList.add('po-story-active');
+        if(isKnowledgeMode(mode))document.body.classList.add('po-knowledge-active');
         const overlay = document.getElementById('mainOverlay');
         const content = document.getElementById('targetTextDisplay');
         const speech = document.getElementById('speechResultWindow');
@@ -477,14 +478,14 @@
     }
     function startKnowledgeRun(mode){
         const questions=questionBank(mode);
-        knowledgeRun=questions.length?{mode,scope:app.slideScope,sig:knowledgeSig(mode),questions,orders:questions.map(()=>shuffleChoices()),index:0,answers:[],score:0,finished:false,review:false,saved:false}:null;
+        knowledgeRun=questions.length?{mode,scope:app.slideScope,sig:knowledgeSig(mode),questions,orders:questions.map(()=>shuffleChoices()),index:0,answers:[],score:0,finished:false,review:false,reviewIndex:0,expPaged:false,expPage:0,saved:false}:null;
     }
     function launchKnowledge(){open('knowledgeHub');}
     function knowledgeLesson8(){storyLesson8();open('knowledgeHub');}
     function knowledgeStandard(){currentLevel='standard';const el=document.getElementById('levelSelect');if(el)el.value='standard';open(app.mode||'knowledgeHub');}
     function knowledgeAnswer(qIndex,option){
         const run=knowledgeRun;if(!run||!QUESTION_MODES.includes(app.mode)||run.mode!==app.mode||run.scope!==app.slideScope||run.finished||run.index!==qIndex||run.answers[qIndex]!==undefined||!Number.isInteger(option)||option<0||option>3)return;
-        run.answers[qIndex]=option;if(option===0)run.score++;
+        run.answers[qIndex]=option;run.expPage=0;run.expPaged=false;if(option===0)run.score++;
         sound(option===0?'correct':'wrong');
         if(qIndex===run.questions.length-1&&!run.saved){
             run.saved=true;const result=Math.round(run.score*100/run.questions.length);
@@ -493,12 +494,17 @@
         render();
     }
     function knowledgeNext(qIndex){
-        const run=knowledgeRun;if(!run||run.finished||run.index!==qIndex||run.answers[qIndex]===undefined)return;
+        const run=knowledgeRun;if(!run||run.finished||run.index!==qIndex||run.answers[qIndex]===undefined||(run.expPaged&&run.expPage!==1))return;
+        run.expPaged=false;run.expPage=0;
         if(run.index===run.questions.length-1)run.finished=true;else run.index++;
         render();
     }
     function knowledgeRetry(){if(!QUESTION_MODES.includes(app.mode))return;startKnowledgeRun(app.mode);render();}
-    function knowledgeReview(){if(knowledgeRun?.finished){knowledgeRun.review=!knowledgeRun.review;render();}}
+    function knowledgeReview(){if(knowledgeRun?.finished){knowledgeRun.review=!knowledgeRun.review;knowledgeRun.reviewIndex=0;render();}}
+    function knowledgeReviewPage(delta){const run=knowledgeRun;if(!run?.finished||!run.review||![-1,1].includes(delta))return;const n=run.answers.filter(x=>x!==0).length;run.reviewIndex=Math.max(0,Math.min(n-1,run.reviewIndex+delta));render();}
+    function knowledgeExplanationPage(delta){const run=knowledgeRun;if(!run||run.finished||run.answers[run.index]===undefined||!run.expPaged||![-1,1].includes(delta))return;run.expPage=Math.max(0,Math.min(1,run.expPage+delta));render();}
+    function knowledgeLesson(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>10||typeof selectLesson!=='function')return;selectLesson(n,document.querySelectorAll('.nav-btn')[n-1]);}
+    function knowledgeHubNav(){const parts=Object.keys(lessonStructure[currentLesson]||{}),part=currentKey.split('_')[1]?.slice(1);return '<div class="po-compact-nav po-knowledge-nav"><select aria-label="Lesson" onchange="PowerOnPractice.knowledgeLesson(this.value)">'+Array.from({length:10},(_,i)=>'<option value="'+(i+1)+'" '+(currentLesson===i+1?'selected':'')+'>Lesson '+(i+1)+'</option>').join('')+'</select><select aria-label="Part" onchange="PowerOnPractice.scopeControl(\'part\',this.value)">'+parts.map(x=>'<option value="'+x+'" '+(x===part?'selected':'')+'>Part '+x+'</option>').join('')+'</select><select aria-label="Level" onchange="PowerOnPractice.scopeControl(\'level\',this.value)">'+['standard','pre1','grade1'].map(x=>'<option '+(x===currentLevel?'selected':'')+'>'+x+'</option>').join('')+'</select><button onclick="PowerOnPractice.open(\'progress\')">▦ Progress</button><button onclick="PowerOnPractice.close()">✕ メニュー</button></div>';}
     function knowledgeToolbar(){return '<div class="po-story-toolbar"><button onclick="PowerOnPractice.open(\'knowledgeHub\')">← 内容理解へ</button><strong>Lesson '+currentLesson+' · '+esc(currentKey.split('_')[1])+' · '+esc(MODES[app.mode])+'</strong><button onclick="PowerOnPractice.open(\'progress\')">学習の記録</button></div>';}
     function knowledgeMissing(){return '<div class="po-match-intro"><h2>Content & Vocabulary</h2><p>'+(currentLevel!=='standard'?'Standard の本文に対応した問題です。':'現在、Lesson 8 の Part 1〜4 でご利用いただけます。')+'</p><button class="po-primary" onclick="PowerOnPractice.'+(currentLevel!=='standard'?'knowledgeStandard':'knowledgeLesson8')+'()">'+(currentLevel!=='standard'?'Standard に切り替える':'Lesson 8 へ')+'</button></div>';}
     function knowledgeCards(){
@@ -513,23 +519,37 @@
         return '<section class="po-knowledge-hub"><div class="po-knowledge-heading"><div><span class="po-story-eyebrow">POWER ON III · LESSON '+currentLesson+' · '+esc(currentKey.split('_')[1])+'</span><h2>Content &amp; Vocabulary</h2><p>本文全体の内容理解と語彙を確認しよう。</p></div><div class="po-knowledge-clear"><strong>'+cleared+' / 3</strong><span>MISSIONS CLEAR</span></div></div>'+(available?knowledgeCards():knowledgeMissing())+'<footer class="po-knowledge-hub-footer"><span>各10問 · 4択 · 80%以上でクリア · Part全体（Standard）</span><button onclick="PowerOnPractice.open(\'storyHub\')">Story Matchへ</button><button onclick="PowerOnPractice.open(\'progress\')">Learning Progressへ</button></footer></section>';
     }
     function knowledgeExplanation(run){
-        const i=run.index,q=run.questions[i],answer=run.answers[i],correct=answer===0,letter=String.fromCharCode(65+run.orders[i].indexOf(0)),chosen=String.fromCharCode(65+run.orders[i].indexOf(answer));
-        return '<dialog open id="po-knowledge-explanation" class="po-explanation '+(correct?'is-correct':'is-wrong')+'" aria-modal="true" aria-labelledby="po-explanation-title" aria-describedby="po-explanation-reason"><div class="po-explanation-panel"><header class="po-explanation-header"><span>QUESTION '+(i+1)+' / '+run.questions.length+' · ANSWER REVIEW</span><h2 id="po-explanation-title">'+(correct?'✓ 正解！ Correct!':'✕ 不正解 · 解説を確認しよう')+'</h2></header><div class="po-explanation-content"><div class="po-exp-answer">'+(!correct?'<div class="po-exp-your"><small>あなたの解答 · '+chosen+'</small><strong>'+esc(q.choices[answer])+'</strong></div>':'')+'<div class="po-exp-correct"><small>正解 · '+letter+'</small><strong>'+esc(q.choices[0])+'</strong>'+(run.mode==='compEn'?'<span>'+esc(q.answerJa)+'</span>':'')+'</div></div>'+(run.mode==='compEn'?'<p class="po-exp-question-ja"><small>質問の意味：</small>'+esc(q.promptJa)+'</p>':'')+'<section class="po-exp-reason"><h3>なぜこの答えになるの？</h3><p id="po-explanation-reason">'+esc(q.explanation||'本文の根拠と正解を照らし合わせましょう。')+'</p></section><section class="po-exp-evidence"><h3>本文の根拠 <small>Paragraph '+q.paragraph+'</small></h3><p lang="en">'+esc(q.evidence)+'</p></section>'+(q.tip?'<section class="po-exp-tip"><h3>覚えておきたいポイント</h3><p>'+esc(q.tip)+'</p></section>':'')+'</div><footer class="po-explanation-footer"><span>解説を読んでから次に進もう。</span><button type="button" id="po-explanation-next" class="po-primary" onclick="PowerOnPractice.knowledgeNext('+i+')">'+(i+1===run.questions.length?'解説を確認した・結果を見る →':'解説を確認した・次の問題へ →')+'</button></footer></div></dialog>';
+        const i=run.index,q=run.questions[i],answer=run.answers[i],correct=answer===0,letter=String.fromCharCode(65+run.orders[i].indexOf(0)),chosen=String.fromCharCode(65+run.orders[i].indexOf(answer)),paged=run.expPaged,page=run.expPage;
+        return '<dialog open id="po-knowledge-explanation" class="po-explanation '+(correct?'is-correct':'is-wrong')+(paged?' is-paged':'')+'" aria-modal="true" aria-labelledby="po-explanation-title"><div class="po-explanation-panel"><header class="po-explanation-header"><span>QUESTION '+(i+1)+' / '+run.questions.length+' · ANSWER REVIEW'+(paged?' · '+(page+1)+' / 2':'')+'</span><h2 id="po-explanation-title">'+(correct?'✓ 正解！ Correct!':'✕ 不正解 · 解説を確認しよう')+'</h2></header><div class="po-explanation-content"><div class="po-exp-group po-exp-first" '+(paged&&page!==0?'hidden':'')+'><div class="po-exp-answer">'+(!correct?'<div class="po-exp-your"><small>あなたの解答 · '+chosen+'</small><strong>'+esc(q.choices[answer])+'</strong></div>':'')+'<div class="po-exp-correct"><small>正解 · '+letter+'</small><strong>'+esc(q.choices[0])+'</strong>'+(run.mode==='compEn'?'<span>'+esc(q.answerJa)+'</span>':'')+'</div></div>'+(run.mode==='compEn'?'<p class="po-exp-question-ja"><small>質問の意味：</small>'+esc(q.promptJa)+'</p>':'')+'<section class="po-exp-reason"><h3>なぜこの答えになるの？</h3><p id="po-explanation-reason">'+esc(q.explanation||'本文の根拠と正解を照らし合わせましょう。')+'</p></section></div><div class="po-exp-group po-exp-second" '+(paged&&page!==1?'hidden':'')+'><section class="po-exp-evidence"><h3>本文の根拠 <small>Paragraph '+q.paragraph+'</small></h3><p lang="en">'+esc(q.evidence)+'</p></section>'+(q.tip?'<section class="po-exp-tip"><h3>覚えておきたいポイント</h3><p>'+esc(q.tip)+'</p></section>':'')+'</div></div><footer class="po-explanation-footer">'+(paged&&page===1?'<button type="button" class="po-exp-back" onclick="PowerOnPractice.knowledgeExplanationPage(-1)">← 正解・理由</button>':'<span>'+(paged?'1 / 2 · 解説を読もう':'解説を読んでから次に進もう。')+'</span>')+'<button type="button" id="po-explanation-next" class="po-primary" onclick="PowerOnPractice.'+(paged&&page===0?'knowledgeExplanationPage(1)':'knowledgeNext('+i+')')+'">'+(paged&&page===0?'本文の根拠・ポイントへ →':i+1===run.questions.length?'解説を確認した・結果を見る →':'解説を確認した・次の問題へ →')+'</button></footer></div></dialog>';
+    }
+    function fitKnowledgeExplanation(){
+        const run=knowledgeRun,modal=document.getElementById('po-knowledge-explanation');
+        if(!run||run.finished||!modal||run.expPaged)return;
+        const body=modal.querySelector?.('.po-explanation-content');
+        if(body&&body.clientHeight>0&&body.scrollHeight>body.clientHeight+2){run.expPaged=true;run.expPage=0;render();}
     }
     function activateKnowledgeExplanation(display){
         const modal=document.getElementById('po-knowledge-explanation');if(!modal)return;
         modal.addEventListener?.('cancel',ev=>ev.preventDefault());
         if(typeof modal.showModal==='function'){try{modal.removeAttribute('open');modal.showModal();}catch(_){modal.setAttribute('open','');}}
         const next=document.getElementById('po-explanation-next');
-        modal.addEventListener?.('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();return;}if(ev.key==='Tab'&&next){ev.preventDefault();next.focus();}});
+        modal.addEventListener?.('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();return;}if(ev.key==='Tab'&&next){const controls=Array.from(modal.querySelectorAll?.('button:not(:disabled)')||[next]);if(controls.length){ev.preventDefault();const index=controls.indexOf(document.activeElement);controls[(index+(ev.shiftKey?-1:1)+controls.length)%controls.length]?.focus();}}});
         try{next?.focus({preventScroll:true});}catch(_){}
+        fitKnowledgeExplanation();
+        if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(()=>{if(document.getElementById('po-knowledge-explanation')===modal)fitKnowledgeExplanation();});
+    }
+    function knowledgeReviewCard(run,wrong){
+        if(!wrong.length)return '<div class="po-knowledge-review-page"><h3>全問正解！</h3></div>';
+        const {q,i}=wrong[Math.max(0,Math.min(wrong.length-1,run.reviewIndex))];
+        return '<div class="po-knowledge-review-page"><div class="po-review-heading"><strong>復習 '+(run.reviewIndex+1)+' / '+wrong.length+' · Q'+(i+1)+'</strong><button onclick="PowerOnPractice.knowledgeReview()">結果へ戻る</button></div><div class="po-review-question">'+esc(q.prompt)+'</div><div class="po-review-columns"><div class="po-review-group"><p>あなたの解答：'+esc(q.choices[run.answers[i]])+'</p><p class="po-correct-text">正解：'+esc(q.choices[0])+'</p><p>'+esc(q.explanation)+'</p></div><div class="po-review-group"><small>本文の根拠 · Paragraph '+q.paragraph+'</small><p>'+esc(q.evidence)+'</p><p class="po-exp-review-tip">'+esc(q.tip)+'</p></div></div><div class="po-review-nav"><button onclick="PowerOnPractice.knowledgeReviewPage(-1)" '+(run.reviewIndex===0?'disabled':'')+'>← 前へ</button><span>'+(run.reviewIndex+1)+' / '+wrong.length+'</span><button onclick="PowerOnPractice.knowledgeReviewPage(1)" '+(run.reviewIndex===wrong.length-1?'disabled':'')+'>次へ →</button></div></div>';
     }
     function knowledgeBody(){
         const run=knowledgeRun;if(!run)return knowledgeMissing();
         const n=run.questions.length;
         if(run.finished){
             const result=Math.round(run.score*100/n),wrong=run.questions.map((q,i)=>({q,i})).filter(x=>run.answers[x.i]!==0);
-            return '<section class="po-knowledge-result"><span class="po-story-eyebrow">'+esc(MODES[run.mode])+' · RESULT</span><h2>'+(result>=80?'✓ MISSION CLEAR!':'もう一度挑戦しよう！')+'</h2><strong class="po-knowledge-score">'+result+'<small>%</small></strong><p>'+run.score+' / '+n+' 正解 · Best '+(knowledgeRow(run.mode).bestAccuracy??0)+'%</p><div class="po-knowledge-result-actions"><button class="po-primary" onclick="PowerOnPractice.knowledgeRetry()">もう一度</button><button onclick="PowerOnPractice.knowledgeReview()">'+(run.review?'復習を閉じる':'間違えた問題を復習（'+wrong.length+'）')+'</button><button onclick="PowerOnPractice.open(\'knowledgeHub\')">学習メニューへ</button></div>'+(run.review?'<div class="po-knowledge-review">'+(wrong.length?wrong.map(({q,i})=>'<article><strong>Q'+(i+1)+'. '+esc(q.prompt)+'</strong><p>あなたの解答：'+esc(q.choices[run.answers[i]])+'</p><p class="po-correct-text">正解：'+esc(q.choices[0])+'</p><p>'+esc(q.explanation)+'</p><small>Paragraph '+q.paragraph+' · '+esc(q.evidence)+'</small><p class="po-exp-review-tip">'+esc(q.tip)+'</p></article>').join(''):'<p>全問正解！</p>')+'</div>':'')+'</section>';
+            if(run.review)return knowledgeReviewCard(run,wrong);
+            return '<section class="po-knowledge-result"><span class="po-story-eyebrow">'+esc(MODES[run.mode])+' · RESULT</span><h2>'+(result>=80?'✓ MISSION CLEAR!':'もう一度挑戦しよう！')+'</h2><strong class="po-knowledge-score">'+result+'<small>%</small></strong><p>'+run.score+' / '+n+' 正解 · Best '+(knowledgeRow(run.mode).bestAccuracy??0)+'%</p><div class="po-knowledge-result-actions"><button class="po-primary" onclick="PowerOnPractice.knowledgeRetry()">もう一度</button><button onclick="PowerOnPractice.knowledgeReview()">'+(run.review?'復習を閉じる':'間違えた問題を復習（'+wrong.length+'）')+'</button><button onclick="PowerOnPractice.open(\'knowledgeHub\')">学習メニューへ</button></div>'+'</section>';
         }
         const q=run.questions[run.index],answer=run.answers[run.index],locked=answer!==undefined;
         return '<section class="po-knowledge-question '+run.mode+'"><div class="po-knowledge-question-meta"><strong>QUESTION '+(run.index+1)+' / '+n+'</strong><span>Paragraph '+q.paragraph+'</span><b>SCORE: '+run.score+' / '+n+'</b></div><div class="po-track"><div style="width:'+((run.index+(locked?1:0))*100/n)+'%"></div></div><div class="po-knowledge-prompt"><span>'+esc(MODES[run.mode])+'</span><h2>'+esc(q.prompt)+'</h2>'+(run.mode==='contextVocab'?'<p class="po-vocab-context">'+esc(q.evidence)+'</p>':'')+'</div><div class="po-knowledge-options">'+run.orders[run.index].map((option,position)=>'<button type="button" class="po-knowledge-option '+(locked?(option===0?'right':option===answer?'wrong':'locked'):'')+'" onclick="PowerOnPractice.knowledgeAnswer('+run.index+','+option+')" '+(locked?'disabled':'')+'><span>'+String.fromCharCode(65+position)+'</span><b>'+esc(q.choices[option])+'</b></button>').join('')+'</div><div class="po-knowledge-bottom">'+(locked?'<p class="po-note">解説を確認してから次へ進みましょう。</p>':'<p class="po-note">正しい選択肢を1つタップしてください。</p>')+'</div></section>'+(locked?knowledgeExplanation(run):'');
@@ -735,7 +755,7 @@
             esc(MODES[app.mode]) + '</h2><p>Lesson ' + currentLesson + ' / ' +
             esc(currentKey.split('_')[1] || '') + ' / ' +
             esc(currentKey.split('_')[2] || '') + ' / ' + esc(currentLevel) + '</p></div>' +
-            '</header>' + (app.mode==='storyHub'||app.mode==='knowledgeHub'?compactNav():QUESTION_MODES.includes(app.mode)?knowledgeToolbar():app.mode==='sceneReading'||GAME_MODES.includes(app.mode)?storyToolbar():compactNav()) + '<div class="po-content">' + body + '</div></section>';
+            '</header>' + (app.mode==='knowledgeHub'?knowledgeHubNav():app.mode==='storyHub'?compactNav():QUESTION_MODES.includes(app.mode)?knowledgeToolbar():app.mode==='sceneReading'||GAME_MODES.includes(app.mode)?storyToolbar():compactNav()) + '<div class="po-content">' + body + '</div></section>';
         if(QUESTION_MODES.includes(app.mode))activateKnowledgeExplanation(display);
         attachPuzzleDrag(display);
         if(GAME_MODES.includes(app.mode)&&display.querySelectorAll){display.querySelectorAll('.po-match-board img').forEach(img=>{const fail=()=>{if(epoch!==imageEpoch||!game||game.done)return;clearGameTimer();clearDrag();stopSpeech();game=null;const board=display.querySelector('.po-match-board');if(board)board.innerHTML='<div class="po-match-intro"><h2>画像を読み込めません</h2><p>通信環境を確認して、もう一度お試しください。</p><button onclick="PowerOnPractice.open(\''+app.mode+'\')">戻る</button></div>';};img.addEventListener('error',fail,{once:true});if(img.complete&&!img.naturalWidth)fail();});}
@@ -773,11 +793,12 @@
     }
     if(typeof window.addEventListener==='function'){window.addEventListener('DOMContentLoaded',()=>{if(window.location&&window.location.hash==='#story-match')launchStory();});window.addEventListener('pagehide',()=>{stopSpeech();clearGameTimer();clearDrag();});window.addEventListener('pageshow',event=>{if(event.persisted&&app.mode)open(GAME_MODES.includes(app.mode)?'storyHub':app.mode);});}
     if(typeof document.addEventListener==='function')document.addEventListener('visibilitychange',()=>{if(!document.hidden||!app.mode)return;const wasMic=!!app.recognizer;stopSpeech();clearDrag();if(wasMic){app.feedback='画面を離れたため音読を停止しました。再試行してください。';render();}else if(game&&game.mode==='storyListen'&&!game.done&&!game.answering){game.ready=false;game.message='画面に戻り、もう一度音声を聞いてください。';render();}});
+    if(typeof window.addEventListener==='function'){window.addEventListener('resize',fitKnowledgeExplanation);window.visualViewport?.addEventListener?.('resize',fitKnowledgeExplanation);}
     window.PowerOnPractice = {
         open:open, close:close, stop:stop, mode:function(){return app.mode;},
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV,
-        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect, getProgress:function () {return store.snapshot();}
+        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect, getProgress:function () {return store.snapshot();}
     };
 })();
