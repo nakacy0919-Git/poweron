@@ -21,5 +21,17 @@ window.PowerOnSceneMedia = {
     "L08_P2_p5_s06": {image:"lessons/lesson8/part2/images/L08_P2_09.webp"},
     "L08_P2_p5_s08": {image:"lessons/lesson8/part2/images/L08_P2_10.webp"},
     "L08_P2_p5_s10": {image:"lessons/lesson8/part2/images/L08_P2_11.webp"},
-    "L08_P2_p5_s12": {image:"lessons/lesson8/part2/images/L08_P2_12.webp"}
+    "L08_P2_p5_s12": {image:"lessons/lesson8/part2/images/L08_P2_12.webp"},
+    "L08_P3_p6_s01": {image:"lessons/lesson8/part3/images/L08_P3_01.webp"},
+    "L08_P3_p6_s03": {image:"lessons/lesson8/part3/images/L08_P3_02.webp"},
+    "L08_P3_p6_s05": {image:"lessons/lesson8/part3/images/L08_P3_03.webp"},
+    "L08_P3_p6_s07": {image:"lessons/lesson8/part3/images/L08_P3_04.webp"},
+    "L08_P3_p7_s01": {image:"lessons/lesson8/part3/images/L08_P3_05.webp"},
+    "L08_P3_p7_s02": {image:"lessons/lesson8/part3/images/L08_P3_06.webp"},
+    "L08_P3_p8_s01": {image:"lessons/lesson8/part3/images/L08_P3_07.webp"},
+    "L08_P3_p8_s03": {image:"lessons/lesson8/part3/images/L08_P3_08.webp"},
+    "L08_P4_p9_s01": {image:"lessons/lesson8/part4/images/L08_P4_01.webp"},
+    "L08_P4_p10_s01": {image:"lessons/lesson8/part4/images/L08_P4_02.webp"},
+    "L08_P4_p10_s03": {image:"lessons/lesson8/part4/images/L08_P4_03.webp"},
+    "L08_P4_p10_s04": {image:"lessons/lesson8/part4/images/L08_P4_04.webp"}
 };

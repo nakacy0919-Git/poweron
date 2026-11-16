@@ -17,7 +17,8 @@
         for (let i = 0; i < source.length; i++) {
             if (!/[.!?]/.test(source[i])) continue;
             const prev = source.slice(start, i + 1).trim();
-            if (/\b(?:Mr|Mrs|Ms|Dr|Prof|St|Jr|Sr|vs|U\.S|U\.K)\.$/i.test(prev)) continue;
+            // In Lesson 8 paragraph 7, U.S. ends a sentence rather than merely abbreviating a country.
+            if (/\b(?:Mr|Mrs|Ms|Dr|Prof|St|Jr|Sr|vs|U\.S|U\.K)\.$/i.test(prev) && !(/\bU\.S\.$/i.test(prev) && /^\s+So Harriet led her followers to Canada\b/.test(source.slice(i + 1)))) continue;
             if (source[i] === '.' && /^\d{1,2}\.$/.test(prev)) continue; // numbered questions
             if (source[i] === '.' && /\d/.test(source[i-1] || '') && /\d/.test(source[i+1] || '')) continue;
             let end = i + 1;
@@ -36,7 +37,12 @@
         L08_P1_p2: Object.freeze([1, 2, 2, 1, 2, 1]),
         L08_P2_p3: Object.freeze([2, 2, 2]),
         L08_P2_p4: Object.freeze([1, 2]),
-        L08_P2_p5: Object.freeze([1, 3, 1, 2, 2, 2, 1])
+        L08_P2_p5: Object.freeze([1, 3, 1, 2, 2, 2, 1]),
+        L08_P3_p6: Object.freeze([2, 2, 2, 1]),
+        L08_P3_p7: Object.freeze([1, 1]),
+        L08_P3_p8: Object.freeze([2, 1]),
+        L08_P4_p9: Object.freeze([2]),
+        L08_P4_p10: Object.freeze([2, 1, 1])
     });
 
     function buildScenes(paragraphs, split, sceneSizes) {

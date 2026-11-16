@@ -45,3 +45,21 @@ test('Lesson 8 Part 2 uses twelve curated scenes and all twenty-one sentences',(
  assert.deepEqual(plan.map(s=>[s.id,s.firstSentence,s.lastSentence]),scenes.map(s=>[s.id,s.firstSentence,s.lastSentence]));
  scenes.forEach((s,i)=>{const image='lessons/lesson8/part2/images/L08_P2_'+String(i+1).padStart(2,'0')+'.webp';assert.equal(mediaContext.window.PowerOnSceneMedia[s.id].image,image);const b=fs.readFileSync(path.join(dir,'..',image));assert.equal(b.subarray(0,4).toString(),'RIFF');assert.equal(b.subarray(8,12).toString(),'WEBP');});
 });
+
+
+test('Lesson 8 Parts 3 and 4 preserve all sentences and curated media mappings',()=>{
+ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+ const dir=path.join(__dirname,'..','lessons');const ctx=vm.createContext({});
+ vm.runInContext(fs.readFileSync(path.join(dir,'lessonData.js'),'utf8')+'\n;this.__lessonScripts=lessonScripts;',ctx);
+ const mediaCtx=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(dir,'sceneMedia.js'),'utf8'),mediaCtx);
+ const all=JSON.parse(fs.readFileSync(path.join(dir,'scene-plan.json'),'utf8')).scenes;
+ for(const [part,nums,expected,total] of [[3,[6,7,8],[[6,1,2],[6,3,4],[6,5,6],[6,7,7],[7,1,1],[7,2,2],[8,1,2],[8,3,3]],12],[4,[9,10],[[9,1,2],[10,1,2],[10,3,3],[10,4,4]],6]]){
+  const prefix='L08_P'+part;const paras=nums.map(number=>({number,key:prefix+'_p'+number,english:ctx.__lessonScripts[prefix+'_p'+number]}));
+  const scenes=core.buildScenes(paras,core.splitSentences,core.LESSON8_SCENE_SIZES);
+  assert.deepEqual(scenes.map(s=>[s.paragraph,s.firstSentence,s.lastSentence]),expected);
+  assert.equal(scenes.flatMap(s=>s.sentences).length,total);
+  assert.deepEqual(scenes.flatMap(s=>s.sentences),paras.flatMap(p=>core.splitSentences(p.english)));
+  const plan=all.filter(s=>s.part===prefix);assert.deepEqual(plan.map(s=>[s.id,s.firstSentence,s.lastSentence]),scenes.map(s=>[s.id,s.firstSentence,s.lastSentence]));
+  scenes.forEach((s,i)=>{const image='lessons/lesson8/part'+part+'/images/'+prefix+'_'+String(i+1).padStart(2,'0')+'.webp';assert.equal(mediaCtx.window.PowerOnSceneMedia[s.id].image,image);assert.equal(plan[i].image,image);});
+ }
+});
