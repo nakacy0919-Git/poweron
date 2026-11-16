@@ -602,7 +602,7 @@ body.po-practice-active #floatingSubmitBtn { display: none !important; }
   margin-top: 5px;
 }
 
-.nav-container{grid-template-columns:repeat(10,minmax(0,1fr)) minmax(115px,1.3fr)!important}
+.nav-container{grid-template-columns:repeat(10,minmax(0,1fr))!important}
 .po-story-launch,.po-mobile-story{background:#254f78!important;color:white!important;font-weight:900;border:0;border-radius:10px;cursor:pointer}
 body.po-story-active .sidebar,body.po-story-active #drag-handle{display:none!important}
 body.po-story-active .main-screen{padding:0!important;overflow:hidden!important}
@@ -842,3 +842,23 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 @media(max-height:320px){body.po-knowledge-active .po-knowledge>.po-content{overflow:auto!important}.po-knowledge .po-knowledge-question{min-height:270px}.po-knowledge .po-knowledge-hub{min-height:270px}}
 
 .po-knowledge .po-review-heading button,.po-knowledge .po-review-nav button{min-height:44px;padding:8px 14px}.po-review-heading h3{margin:0}.po-knowledge .po-review-group{overscroll-behavior:contain;touch-action:pan-y}.po-knowledge .po-knowledge-option:focus-visible{outline-offset:-4px}
+
+/* Story Match: simple, direct, whole-Part selection. */
+.po-story-part-nav{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-shrink:0;padding:4px 8px;margin-bottom:5px;color:#244563}
+.po-story-part-nav>strong{font-size:clamp(13px,1.7vw,20px);white-space:nowrap}
+.po-story-part-buttons{display:flex;flex:1;justify-content:center;gap:6px;min-width:0}
+.po-practice .po-story-part-buttons button{flex:1;max-width:160px;min-height:44px;font-size:clamp(12px,1.7vw,17px);border:1px solid #c5d6e7;background:white;color:#33597a;padding:6px 9px}
+.po-practice .po-story-part-buttons button.active{background:#245f9a;border-color:#245f9a;color:#fff;box-shadow:0 3px 8px #245f9a30}
+.po-practice .po-story-exit{min-height:44px;font-size:12px;white-space:nowrap;padding:6px 9px}
+.po-answer-burst{position:fixed;inset:0;z-index:2147482000;display:grid;place-items:center;pointer-events:none;isolation:isolate;font-family:system-ui,sans-serif;animation:po-burst-fade .9s both}
+.po-burst-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:min(270px,70vw);padding:18px 25px 22px;border-radius:26px;color:#16784c;background:#f2fff6f5;box-shadow:0 12px 54px #134d3d36;border:2px solid #a3e5bc;animation:po-burst-pop .42s cubic-bezier(.19,1.35,.4,1) both}
+.po-answer-burst.is-wrong .po-burst-card{color:#a84b46;background:#fff4f0f5;border-color:#f3c5bd;box-shadow:0 12px 54px #713b3130;animation:po-burst-pop .36s ease-out both}
+.po-burst-mark{font-size:clamp(36px,7vw,64px);line-height:1;font-weight:900}
+.po-burst-card strong{font-size:clamp(26px,5vw,46px);line-height:1.1;letter-spacing:.1px}
+.po-burst-card span{font-size:15px;font-weight:700}
+.po-burst-card i{position:absolute;width:9px;height:9px;border-radius:3px;background:#56c98f;animation:po-burst-spark .75s ease-out both}
+.po-burst-card i:nth-of-type(1){left:7%;top:16%;--dx:-40px;--dy:-38px}.po-burst-card i:nth-of-type(2){right:8%;top:15%;--dx:38px;--dy:-40px}.po-burst-card i:nth-of-type(3){left:8%;bottom:12%;--dx:-40px;--dy:24px}.po-burst-card i:nth-of-type(4){right:8%;bottom:13%;--dx:42px;--dy:25px}
+.po-answer-burst.is-wrong i{display:none}
+@keyframes po-burst-pop{from{transform:scale(.76);opacity:0}to{transform:scale(1);opacity:1}}@keyframes po-burst-fade{0%,72%{opacity:1}100%{opacity:0}}@keyframes po-burst-spark{from{transform:translate(0,0) scale(.5);opacity:0}25%{opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(60deg);opacity:0}}
+@media(max-width:600px){.po-story-part-nav{gap:4px;padding:3px 0}.po-story-part-buttons{gap:3px}.po-practice .po-story-part-buttons button,.po-practice .po-story-exit{font-size:11px;padding:5px 4px}.po-story-part-nav>strong{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.po-answer-burst,.po-burst-card,.po-burst-card i{animation:none!important}.po-burst-card i{display:none}}
