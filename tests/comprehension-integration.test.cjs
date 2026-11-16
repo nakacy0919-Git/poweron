@@ -17,7 +17,7 @@ test('all Lesson 8 banks have ten distinct questions, four distinct choices and 
   for(const rows of Object.values(sets)){
    assert.equal(rows.length,10);assert.equal(new Set(rows.map(q=>q.id)).size,10);
    for(const q of rows){
-    assert.ok(data.lessonScripts[part+'_p'+q.paragraph].includes(q.evidence),q.id);
+    assert.ok(data.lessonScripts[part+'_p'+q.paragraph].includes(q.evidence),q.id);assert.ok(q.explanation.length>30&&q.tip.length>5,q.id);
     for(const choices of Array.isArray(q.choices[0])?[q.choices.map(c=>c[0]),q.choices.map(c=>c[1])]:[q.choices])assert.equal(new Set(choices).size,4);
    }
   }
@@ -34,7 +34,7 @@ test('all 12 quizzes gate progression, score one answer per question, allow revi
     const ids=[...html().matchAll(/knowledgeAnswer\((\d+),(\d+)\)/g)].map(m=>Number(m[2]));
     assert.equal(ids.length,4);assert.equal(new Set(ids).size,4);
     p.knowledgeNext(i);assert.match(html(),new RegExp('QUESTION '+(i+1)+' / 10'));
-    p.knowledgeAnswer(i,i===0?1:0);p.knowledgeAnswer(i,0);assert.match(html(),/本文の根拠/);p.knowledgeNext(i);
+    p.knowledgeAnswer(i,i===0?1:0);p.knowledgeAnswer(i,0);assert.match(html(),/id="po-knowledge-explanation"/);assert.match(html(),/なぜこの答えになるの/);assert.match(html(),/本文の根拠/);assert.match(html(),/覚えておきたいポイント/);assert.match(html(),i===0?/あなたの解答/:/正解！ Correct!/);p.knowledgeNext(i);assert.ok(!html().includes('id="po-knowledge-explanation"'));
    }
    assert.match(html(),/9 \/ 10 正解/);assert.match(html(),/MISSION CLEAR/);
    const row=p.getProgress().scopes['standard:L08_P'+part+'_full'][mode];assert.equal(row.bestAccuracy,90);assert.equal(row.attempts,1);
