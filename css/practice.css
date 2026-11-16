@@ -840,3 +840,5 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 }
 /* Accessibility escape hatch for exceptionally small/zoomed viewports: keep content reachable. */
 @media(max-height:320px){body.po-knowledge-active .po-knowledge>.po-content{overflow:auto!important}.po-knowledge .po-knowledge-question{min-height:270px}.po-knowledge .po-knowledge-hub{min-height:270px}}
+
+.po-knowledge .po-review-heading button,.po-knowledge .po-review-nav button{min-height:44px;padding:8px 14px}.po-review-heading h3{margin:0}.po-knowledge .po-review-group{overscroll-behavior:contain;touch-action:pan-y}.po-knowledge .po-knowledge-option:focus-visible{outline-offset:-4px}

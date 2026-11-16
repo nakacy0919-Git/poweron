@@ -539,7 +539,7 @@
         if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(()=>{if(document.getElementById('po-knowledge-explanation')===modal)fitKnowledgeExplanation();});
     }
     function knowledgeReviewCard(run,wrong){
-        if(!wrong.length)return '<div class="po-knowledge-review-page"><h3>全問正解！</h3></div>';
+        if(!wrong.length)return '<div class="po-knowledge-review-page"><div class="po-review-heading"><h3>全問正解！</h3><button onclick="PowerOnPractice.knowledgeReview()">結果へ戻る</button></div></div>';
         const {q,i}=wrong[Math.max(0,Math.min(wrong.length-1,run.reviewIndex))];
         return '<div class="po-knowledge-review-page"><div class="po-review-heading"><strong>復習 '+(run.reviewIndex+1)+' / '+wrong.length+' · Q'+(i+1)+'</strong><button onclick="PowerOnPractice.knowledgeReview()">結果へ戻る</button></div><div class="po-review-question">'+esc(q.prompt)+'</div><div class="po-review-columns"><div class="po-review-group"><p>あなたの解答：'+esc(q.choices[run.answers[i]])+'</p><p class="po-correct-text">正解：'+esc(q.choices[0])+'</p><p>'+esc(q.explanation)+'</p></div><div class="po-review-group"><small>本文の根拠 · Paragraph '+q.paragraph+'</small><p>'+esc(q.evidence)+'</p><p class="po-exp-review-tip">'+esc(q.tip)+'</p></div></div><div class="po-review-nav"><button onclick="PowerOnPractice.knowledgeReviewPage(-1)" '+(run.reviewIndex===0?'disabled':'')+'>← 前へ</button><span>'+(run.reviewIndex+1)+' / '+wrong.length+'</span><button onclick="PowerOnPractice.knowledgeReviewPage(1)" '+(run.reviewIndex===wrong.length-1?'disabled':'')+'>次へ →</button></div></div>';
     }

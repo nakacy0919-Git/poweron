@@ -38,7 +38,7 @@ test('all 12 quizzes gate progression, score one answer per question, allow revi
    }
    assert.match(html(),/9 \/ 10 正解/);assert.match(html(),/MISSION CLEAR/);
    const row=p.getProgress().scopes['standard:L08_P'+part+'_full'][mode];assert.equal(row.bestAccuracy,90);assert.equal(row.attempts,1);
-   p.knowledgeReview();assert.match(html(),/あなたの解答/);
+   p.knowledgeReview();assert.match(html(),/あなたの解答/);assert.match(html(),/復習 1 \/ 1/);assert.match(html(),/結果へ戻る/);
   }
  }
  ctx.currentKey='L08_P2_p3';p.open('compEn');for(let i=0;i<10;i++){p.knowledgeAnswer(i,0);p.knowledgeNext(i);}
@@ -47,4 +47,23 @@ test('all 12 quizzes gate progression, score one answer per question, allow revi
  p.open('progress');assert.match(html(),/CONTENT & VOCABULARY/);
  ctx.currentLevel='pre1';p.open('compEn');assert.match(html(),/Standard に切り替える/);
  ctx.currentLevel='standard';ctx.currentLesson=1;ctx.currentKey='L01_P1_full';p.open('compJa');assert.match(html(),/Lesson 8 へ/);
+});
+
+test('answer explanation paginates on short viewport and cannot skip page two',()=>{
+ const {p,ctx,html}=harness();
+ let modalShown=0;
+ const modal={addEventListener(){},removeAttribute(){},setAttribute(){},showModal(){modalShown++},querySelector(){return {clientHeight:220,scrollHeight:550}}};
+ const oldGet=ctx.document.getElementById;
+ ctx.document.getElementById=k=>k==='po-knowledge-explanation'&&html().includes('id="po-knowledge-explanation"')?modal:k==='po-explanation-next'?{focus(){}}:oldGet(k);
+ p.open('compEn');p.knowledgeAnswer(0,1);
+ assert.match(html(),/is-paged/);assert.match(html(),/knowledgeExplanationPage\(1\)/);assert.match(html(),/po-exp-second" hidden/);
+ p.knowledgeNext(0);assert.match(html(),/QUESTION 1 \/ 10/);
+ p.knowledgeExplanationPage(1);assert.match(html(),/po-exp-first" hidden/);assert.match(html(),/knowledgeNext\(0\)/);
+ p.knowledgeExplanationPage(-1);assert.match(html(),/po-exp-second" hidden/);p.knowledgeExplanationPage(1);p.knowledgeNext(0);
+ assert.match(html(),/QUESTION 2 \/ 10/);assert.ok(!html().includes('id="po-knowledge-explanation"'));assert.ok(modalShown>=3);
+});
+test('review is one question per page, supports back and all-correct return',()=>{
+ const {p,html}=harness();p.open('compJa');for(let i=0;i<10;i++){p.knowledgeAnswer(i,i<3?1:0);p.knowledgeNext(i);}
+ p.knowledgeReview();assert.match(html(),/復習 1 \/ 3/);p.knowledgeReviewPage(1);assert.match(html(),/復習 2 \/ 3/);p.knowledgeReviewPage(1);assert.match(html(),/復習 3 \/ 3/);p.knowledgeReviewPage(1);assert.match(html(),/復習 3 \/ 3/);p.knowledgeReviewPage(-1);assert.match(html(),/復習 2 \/ 3/);
+ p.knowledgeReview();assert.match(html(),/7 \/ 10 正解/);p.knowledgeRetry();for(let i=0;i<10;i++){p.knowledgeAnswer(i,0);p.knowledgeNext(i);}p.knowledgeReview();assert.match(html(),/全問正解/);assert.match(html(),/結果へ戻る/);
 });
