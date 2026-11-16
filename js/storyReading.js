@@ -251,47 +251,125 @@ function units(text) {
 }
 
 
-// Reviewed people, places, institutions and named works in the 15 story units.
-// Keep ordinary sentence-initial words (and ordinary uses of "mark") scored.
+// Reviewed people, regions, institutions and named historical terms in PowerOn Lessons 1–10.
+// Use explicit source spellings, including multiword names; do not exempt ordinary capitalization.
 const readingNames = [
-  "Internet",
-  "Colin",
-  "Ann",
-  "Takashi",
+  "Musashino Place",
+  "Tokyo",
+  "Sapporo Municipal Library and Information Center",
+  "New York Public Library",
+  "New York City",
+  "New York",
+  "American",
   "America",
-  "Japan",
-  "James Lind",
-  "Dr. Lind",
-  "Lind",
-  "British",
-  "Mark",
-  "Tom",
-  "Terry Fox",
-  "Terry",
-  "Canada",
-  "The Terry Fox Run",
-  "Marathon of Hope",
-  "April",
-  "England",
-  "China",
-  "Europe",
+  "United States",
   "U.S.",
   "U. S.",
-  "Western",
+  "US",
+  "Shohei Otani",
+  "Shohei Ohtani",
+  "Shohei",
+  "Sho-time",
   "Major League Baseball",
-  "Take Me Out to the Ball Game",
-  "Bible",
+  "Babe Ruth",
+  "Ruth",
+  "Japanese",
+  "Japan",
+  "Dr. de Sanz",
+  "Dr. Sanz",
+  "de Sanz",
+  "Sanz",
+  "Dr. Brown",
+  "Brown",
+  "San Francisco",
+  "Artie",
+  "Sandy",
+  "Matsumoto Norio",
+  "Matsumoto",
+  "North America",
+  "Hoshino Michio",
+  "Hoshino",
+  "Russia",
+  "Mt. Denali",
+  "Denali",
+  "Alaska",
+  "Southeast Alaska",
+  "Arctic",
+  "University of Alaska Southeast",
+  "Celsius",
+  "Ig Nobel Prizes",
+  "Ig Nobel Prize",
+  "Ig Nobel",
+  "Marc Abrahams",
+  "Nutrition Prize",
+  "Medicine Prize",
+  "Italian",
+  "British",
+  "Mozart",
+  "Harvard University",
+  "Nobel Prize",
+  "Halloween",
+  "Valentine's Day",
+  "Christmas",
+  "Celtic",
+  "Celts",
+  "Irish",
+  "Australia",
+  "Germany",
+  "U.K.",
+  "U. K.",
+  "UK",
+  "Mexico",
+  "St. Catharines",
+  "St Catharines",
+  "Catharines",
+  "Lake Ontario",
+  "Ontario",
+  "Niagara Falls",
+  "Niagara",
+  "Canada",
+  "Canadian",
+  "National Historic Site of Canada",
+  "National Historic Site",
+  "Underground Railroad",
+  "American Civil War",
+  "Civil War",
+  "South",
+  "North",
+  "Quakers",
+  "Philadelphia",
+  "Jordan",
+  "Ohio River",
+  "Ohio",
+  "Harriet Tubman",
+  "Harriet",
+  "Tubman",
+  "Maryland",
   "God",
-  "Seven Seas",
-  "Seven Continents",
-  "Chinese",
-  "Ethiopia",
-  "Angola",
-  "Celina",
-  "UNICEF",
-  "New Year’s",
-  "New Year's",
-  "Harriet Tubman", "Harriet", "Tubman", "Philadelphia", "Maryland", "St. Catharines", "Underground Railroad", "Queen Victoria", "Victoria", "Auburn", "New York", "United States", "Civil War",
+  "North Star",
+  "Fugitive Slave Law",
+  "Abraham Lincoln",
+  "Lincoln",
+  "Emancipation Proclamation",
+  "Queen Victoria",
+  "Victoria",
+  "National Historic Person",
+  "Oxford English Dictionary",
+  "German",
+  "French-speaking",
+  "French",
+  "Normans",
+  "England",
+  "Renaissance",
+  "Latin",
+  "Greek",
+  "Internet",
+  "Auburn",
+  "February",
+  "March",
+  "April",
+  "May",
+  "October"
 ];
 /* Story Match word accuracy: Copeak numeric normalization and reviewed name exclusions. */
 
@@ -385,56 +463,11 @@ function protectedSpans(sentence) {
   const tokens = [...source.matchAll(
     /[\p{L}\p{M}]+(?:['’-][\p{L}\p{M}]+)*/gu,
   )];
-  const isTitle = (word) => /^[A-Z][a-z]+$/.test(word);
-  const sentenceStart = (start) => {
-    const preceding = source.slice(0, start)
-      .replace(/[\s"'“”‘’()[\]{}]+$/gu, "");
-    return !preceding || /[.!?:]$/.test(preceding);
-  };
-  const ordinaryCapitalizedWords = new Set(["English"]);
-  const starterWords = new Set([
-    "a", "an", "the", "i", "we", "you", "he", "she", "it",
-    "they", "in", "on", "at", "to", "from", "for", "of",
-    "with", "as", "by", "and", "but", "or", "so", "if",
-    "when", "while", "after", "before", "because", "however",
-    "today", "yesterday", "tomorrow", "then", "now", "once",
-    "this", "that", "these", "those", "there", "here",
-  ]);
-
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i], word = token[0], start = token.index;
-    const end = start + word.length;
-    const letters = word.replace(/['’-]/g, "");
-    // All non-ASCII words/characters are not English-only score targets.
-    // This includes Han characters and accented foreign-language words.
-    if (hasNonAsciiLetter(letters)) {
-      addIgnoredSpan(spans, start, end);
-      continue;
-    }
-    if (word === "I" || ordinaryCapitalizedWords.has(word)) continue;
-    const titled = isTitle(word);
-    const acronym = /^[A-Z]{2,}$/.test(word);
-    const internalCaps = /^[a-z]+[A-Z][A-Za-z]*$/.test(word);
-    const atStart = sentenceStart(start);
-
-    // Unknown single capitalized words in the middle of a sentence are
-    // usually names; sentence-initial regular English remains assessable.
-    if ((titled && !atStart) || acronym || internalCaps)
-      addIgnoredSpan(spans, start, end);
-
-    // Unknown two-word names at the beginning, e.g. "Ada Lovelace".
-    if (
-      titled && atStart && !starterWords.has(word.toLowerCase()) &&
-      isTitle(tokens[i + 1]?.[0] || "") &&
-      /^\s+$/.test(source.slice(end, tokens[i + 1].index))
-    ) {
-      addIgnoredSpan(spans, start, end);
-      addIgnoredSpan(
-        spans,
-        tokens[i + 1].index,
-        tokens[i + 1].index + tokens[i + 1][0].length,
-      );
-    }
+  // Do not infer a name from capitalization alone: sentence starters and
+  // ordinary capitalized teaching words must still be assessed.
+  for (const token of tokens) {
+    const word=token[0],start=token.index,end=start+word.length;
+    if (hasNonAsciiLetter(word.replace(/['’-]/g,""))) addIgnoredSpan(spans,start,end);
   }
   return spans.sort((x, y) => x.start - y.start);
 }
@@ -986,5 +1019,5 @@ function playSound(type, enabled=true) {
   }
 }
 
-const api={score:(expected,heard)=>score(String(expected||'').slice(0,4000),String(heard||'').slice(0,4000)),words,createReadingSpeechController,createNaturalReadingController,playSound,releaseFeedbackAudio,createFeedback};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PowerOnReadingScore=api;
+const api={score:(expected,heard)=>score(String(expected||'').slice(0,4000),String(heard||'').slice(0,4000)),words,excludedTerms:(text)=>protectedSpans(text).map(({start,end})=>String(text).slice(start,end)),createReadingSpeechController,createNaturalReadingController,playSound,releaseFeedbackAudio,createFeedback};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PowerOnReadingScore=api;
 })(typeof globalThis==='object'?globalThis:this);
