@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/style.css?v=23">
     <link rel="stylesheet" href="css/mobile.css?v=23">
     <link rel="stylesheet" href="css/lesson8Practice.css?v=3">
-    <link rel="stylesheet" href="css/practice.css?v=2">
+    <link rel="stylesheet" href="css/practice.css?v=3">
 </head>
 <body>
 
@@ -59,7 +59,8 @@
                 <div class="po-mobile-actions" aria-label="学習モード">
                     <button onclick="PowerOnPractice.open('progress')">📊 進捗</button>
                     <button onclick="PowerOnPractice.open('reading')">🎙 1文音読</button>
-                    <button onclick="PowerOnPractice.open('deep')">📖 じっくり</button>
+                    <button onclick="PowerOnPractice.open('sceneReading')">📖 じっくり</button>
+                    <button onclick="PowerOnPractice.open('listening')">🔊 3回聴く</button>
                     <button onclick="PowerOnPractice.open('slides')">🖼 Story Slides</button>
                     <button onclick="PowerOnPractice.open('puzzle')">🧩 聞いて並べる</button>
                 </div>
@@ -155,9 +156,10 @@
                 <button class="btn btn-compre stylish-btn" onclick="openSpeechOverlay('reading')"><span class="main-txt">Reading Check</span><span class="sub-txt">音読練習</span></button>
                 <button class="btn btn-shadowing stylish-btn" onclick="openSpeechOverlay('shadowing')"><span class="main-txt">Shadowing</span><span class="sub-txt">シャドーイング</span></button>
                 <hr style="margin: 5px 0;">
+                <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('listening')"><span class="main-txt">Listening Mission</span><span class="sub-txt">各段落を3回聞く</span></button>
                 <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('progress')"><span class="main-txt">Learning Progress</span><span class="sub-txt">学習の進捗を見る</span></button>
                 <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('reading')"><span class="main-txt">Sentence Reading</span><span class="sub-txt">1文ずつ聞いて・音読</span></button>
-                <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('deep')"><span class="main-txt">Deep Study</span><span class="sub-txt">じっくり理解する</span></button>
+                <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('sceneReading')"><span class="main-txt">Deep Study</span><span class="sub-txt">シーン音読80%でクリア</span></button>
                 <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('slides')"><span class="main-txt">Story Slides</span><span class="sub-txt">1〜2文ずつ画像で学習</span></button>
                 <button class="btn stylish-btn po-sidebar-btn" onclick="PowerOnPractice.open('puzzle')"><span class="main-txt">Listening Puzzle</span><span class="sub-txt">聞いて英文を組み立てる</span></button>
                 <button class="btn btn-clear stylish-btn" onclick="resetAppMode()"><span class="main-txt" style="margin-top:6px;">ALL CLEAR</span></button>
@@ -203,14 +205,14 @@
     <script src="js/state.js"></script>
     <script src="js/audio.js?v=21"></script>
     <script src="js/lesson8QuizProgress.js?v=1"></script>
-    <script src="js/quiz.js?v=23"></script>
+    <script src="js/quiz.js?v=24"></script>
     <script src="js/lesson8Practice.js?v=3"></script>
     <script src="js/ui.js?v=22"></script>
     <script src="js/main.js?v=21"></script>
     <script src="js/speech.js?v=21"></script>
     <script src="js/mobile.js?v=21"></script>
     <script src="lessons/sceneMedia.js?v=2"></script>
-    <script src="js/practiceCore.js?v=3"></script>
-    <script src="js/practice.js?v=2"></script>
+    <script src="js/practiceCore.js?v=4"></script>
+    <script src="js/practice.js?v=3"></script>
 </body>
 </html>
