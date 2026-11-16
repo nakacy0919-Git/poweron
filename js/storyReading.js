@@ -710,7 +710,7 @@ function createReadingSpeechController({
       });
       return;
     }
-    host.speechSynthesis?.cancel();
+    try { host.speechSynthesis?.cancel(); } catch (_) {}
     cancel();
     state.recording = true;
     state.stopRequested = false;
@@ -755,7 +755,7 @@ function createReadingSpeechController({
       let sessionHasText = false;
       state.healthTimer = host.setTimeout(() => {
         state.healthTimer = null;
-        if (!current() || state.stopRequested || state.signals.text) return;
+        if (!current() || state.stopRequested || sessionHasText) return;
         if (state.recoveries >= 1) {
           cancel();
           paint({
@@ -802,7 +802,7 @@ function createReadingSpeechController({
         for (let i = 0; i < event.results.length; i++) {
           const result = event.results[i],
             text = String(result?.[0]?.transcript || "").trim();
-          if (text) (result.isFinal ? finals : interims).push(text);
+          if (text) (result.isFinal !== false ? finals : interims).push(text);
         }
         if (!finals.length && !interims.length) return;
         sessionHasText = true;
@@ -908,10 +908,10 @@ function createReadingSpeechController({
 let audioContext;
 const notesByType = {
   // Gentle, rising major chord: pleasant success with a soft high-note tail.
-  correct: [[523.25,0,.24,.042],[659.25,.085,.26,.042],[783.99,.17,.30,.044],[1046.5,.265,.46,.047]],
+  correct: [[523.25,0,.28,.065],[659.25,.075,.30,.058],[783.99,.15,.33,.06],[1046.5,.24,.53,.055]],
   "puzzle-correct": [[440,0,.23,.042],[554.37,.095,.27,.044],[659.25,.19,.40,.046]],
   // Low, descending two-note bass motif, still audible on small iPad speakers.
-  wrong: [[220,0,.35,.075],[164.81,.16,.47,.077]],
+  wrong: [[246.94,0,.20,.066],[196,.12,.30,.062]],
   fanfare: [[392,0,.24,.046],[523.25,.11,.28,.048],[659.25,.22,.31,.048],[783.99,.33,.48,.051]],
 };
 function playSound(type, enabled=true) {
@@ -925,7 +925,7 @@ function playSound(type, enabled=true) {
     notesByType[type].forEach(([frequency,offset,duration,peak])=>{
       const start=startAt+offset,end=start+duration;
       const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();
-      oscillator.type=type==="wrong"?"triangle":"sine";
+      oscillator.type="sine";
       oscillator.frequency.setValueAtTime(frequency,start);
       gain.gain.setValueAtTime(.0001,start);
       gain.gain.exponentialRampToValueAtTime(peak,start+.024);

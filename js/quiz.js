@@ -368,7 +368,6 @@ function checkAnswer1(btn, selected, correct) {
     if (selected === correct) {
         btn.style.background = '#4caf50'; btn.style.color = 'white'; btn.style.borderColor = '#4caf50';
         quizScore++;
-        playGentleQuizSound();
     } else {
         btn.style.background = '#f44336'; btn.style.color = 'white'; btn.style.borderColor = '#f44336';
         buttons.forEach(b => {
@@ -378,6 +377,7 @@ function checkAnswer1(btn, selected, correct) {
         });
     }
 
+    if(window.PowerOnPractice?.answerFeedback)window.PowerOnPractice.answerFeedback(selected===correct);else if(selected===correct)playGentleQuizSound();
     setTimeout(() => { 
         if (currentMode === 'quiz' && quizSessionId === sessionId) {
             currentQuizIndex++;
@@ -481,7 +481,7 @@ function handleCorrect2(transcript, targetWord) {
         box.innerText = `${transcript} (OK!)`;
     }
     quizScore++;
-    playGentleQuizSound();
+    if(window.PowerOnPractice?.answerFeedback)window.PowerOnPractice.answerFeedback(true);else playGentleQuizSound();
     
     setTimeout(() => { 
         if (currentMode === 'quiz' && quizSessionId === sessionId) {
