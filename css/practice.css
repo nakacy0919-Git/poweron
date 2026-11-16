@@ -769,3 +769,76 @@ body.po-story-active #mobileGuideMessage,body.po-story-active #mobileAudioContro
 .po-exp-review-tip{color:#785822}
 @media(max-height:680px){.po-explanation-header{padding:9px 17px}.po-explanation-content{padding:8px 17px;gap:6px}.po-explanation-content section{padding:7px 10px}.po-explanation-content h3{margin-bottom:3px}.po-exp-answer>div{padding:6px 10px}.po-explanation-footer{padding:8px 17px}.po-exp-reason p,.po-exp-evidence p{font-size:14px}}
 @media(max-width:520px){.po-explanation{width:96vw;max-width:96vw}.po-explanation-header,.po-explanation-content,.po-explanation-footer{padding-left:12px;padding-right:12px}.po-explanation-footer{flex-wrap:wrap}.po-explanation-footer button{flex:1 1 auto}.po-exp-answer{grid-template-columns:1fr}.po-explanation-content{gap:7px}}
+
+/* Knowledge activities use the usable viewport, not the scrolling text-overlay layout. */
+body.po-knowledge-active .nav-container,body.po-knowledge-active #mobileTopMenu,body.po-knowledge-active #mobileAudioControls,body.po-knowledge-active #windowHeader,body.po-knowledge-active #fontControls,body.po-knowledge-active .po-mobile-actions{display:none!important}
+body.po-knowledge-active .app-container{height:100%;min-height:0;margin:0!important;border-radius:0}
+body.po-knowledge-active #mainScreen,body.po-knowledge-active #mainOverlay{min-height:0;height:100%!important;padding:0!important;overflow:hidden!important}
+body.po-knowledge-active #targetTextDisplay{position:fixed!important;inset:0!important;width:100%!important;height:100vh;height:100dvh!important;margin:0!important;max-height:none!important;min-height:0!important;box-sizing:border-box!important;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))!important;overflow:hidden!important;z-index:1000;background:linear-gradient(135deg,#f3f7fb,#e8f1f7)!important;line-height:1.4!important;border-radius:0!important;touch-action:auto!important}
+body.po-knowledge-active .po-practice.po-knowledge{display:grid;height:100%;width:100%;max-width:1440px;grid-template-rows:auto minmax(0,1fr);gap:6px;padding:0!important;min-height:0}
+body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min-height:0;height:100%;padding:clamp(4px,1.3vh,12px);display:flex;flex-direction:column}
+.po-knowledge .po-story-toolbar,.po-knowledge-nav{flex-shrink:0;min-height:44px;margin:0;gap:6px}
+.po-knowledge .po-story-toolbar strong{font-size:clamp(11px,1.4vw,16px);text-align:center}
+.po-knowledge .po-story-toolbar button,.po-knowledge-nav button,.po-knowledge-nav select{min-height:44px;box-sizing:border-box;padding:6px 10px;font-size:12px}
+.po-knowledge-nav select{flex:1}
+.po-knowledge .po-knowledge-question{height:100%;display:grid;grid-template-rows:auto 7px minmax(0,.72fr) minmax(0,1.45fr) auto;min-height:0;gap:clamp(5px,1.4vh,13px);max-width:1200px}
+.po-knowledge .po-knowledge-prompt{min-height:0;overflow:visible;padding:clamp(9px,2vh,20px)}
+.po-knowledge .po-knowledge-prompt h2{font-size:clamp(20px,min(3.35vw,4.4vh),38px);line-height:1.28}
+.po-knowledge .po-knowledge-options{min-height:0;height:100%;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:clamp(6px,1.5vh,14px)}
+.po-knowledge .po-knowledge-option{min-height:0;height:100%;padding:clamp(8px,1.6vh,18px);font-size:clamp(15px,min(2.45vw,3.2vh),27px);line-height:1.27;word-break:normal;overflow-wrap:anywhere}
+.po-knowledge .po-knowledge-option b{min-width:0}
+.po-knowledge .po-knowledge-bottom{min-height:0;height:auto;display:block}
+.po-knowledge .po-knowledge-bottom .po-note{margin:0;font-size:12px;text-align:center}
+.po-knowledge .po-knowledge-hub{height:100%;padding:5px;gap:clamp(5px,2vh,18px)}
+.po-knowledge .po-knowledge-cards{min-height:0;max-height:none;grid-template-columns:repeat(3,minmax(0,1fr))}
+.po-knowledge .po-knowledge-heading h2{margin:0}
+.po-knowledge .po-knowledge-best{min-height:0;padding:5px 0}
+.po-knowledge .po-knowledge-card{min-height:0;height:100%}
+.po-knowledge .po-knowledge-hub-footer button{min-height:44px}
+.po-knowledge-review-page{width:100%;max-width:1150px;margin:auto;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:12px;height:100%;min-height:0}
+.po-review-heading,.po-review-nav{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.po-review-question{font-size:clamp(15px,2.3vw,26px);font-weight:800;padding:10px;background:white;border-radius:12px}
+.po-review-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-height:0}
+.po-review-group{background:#fff;border-radius:12px;padding:12px;font-size:clamp(13px,min(1.8vw,2.9vh),19px);line-height:1.45;overflow:auto}
+.po-review-group p{margin:0 0 9px;overflow-wrap:anywhere}
+.po-review-group small{color:#5a7890}
+.po-explanation{box-sizing:border-box;width:min(96vw,1100px);max-width:96vw;max-height:94dvh}
+.po-explanation-panel{max-height:94dvh;line-height:1.4}
+.po-explanation-content{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:start;gap:clamp(8px,1.6vw,18px);padding:clamp(8px,2vh,20px) clamp(12px,2.2vw,26px);min-height:0;overflow:auto}
+.po-exp-group{min-width:0;display:flex;flex-direction:column;gap:clamp(6px,1.2vh,12px)}
+.po-exp-group[hidden]{display:none!important}
+.po-explanation.is-paged .po-explanation-content{grid-template-columns:1fr}
+.po-exp-answer{grid-template-columns:1fr;gap:5px}
+.po-exp-answer>div{padding:8px 12px}
+.po-explanation-content p{line-height:1.43}
+.po-explanation-content h3{line-height:1.25;margin:0 0 4px}
+.po-explanation-content section{padding:9px 12px}
+.po-explanation-footer{padding:10px clamp(12px,2.2vw,26px)}
+.po-practice .po-explanation-footer button{min-height:44px;white-space:normal;font-size:clamp(12px,1.6vw,15px)}
+.po-practice .po-explanation-footer .po-primary:hover:not(:disabled){background:var(--exp-accent);filter:brightness(.94)}
+@media(max-width:700px){
+ .po-knowledge .po-knowledge-cards{grid-template-columns:1fr;grid-template-rows:repeat(3,minmax(0,1fr));gap:5px}
+ .po-knowledge .po-knowledge-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;gap:2px;padding:7px 10px}
+ .po-knowledge-card-top{grid-column:1/-1}.po-knowledge-card-top>span{font-size:22px}.po-knowledge-card h3{margin:0;font-size:16px}.po-knowledge-card p{font-size:11px;margin:0}.po-knowledge-best{grid-column:2;grid-row:2/4;padding:0!important;text-align:right}.po-knowledge-best b{font-size:22px}.po-knowledge-link{display:none}
+ .po-knowledge .po-knowledge-heading p{display:none}.po-knowledge .po-knowledge-heading h2{font-size:21px}
+ .po-knowledge-nav{gap:4px}.po-knowledge-nav select,.po-knowledge-nav button{font-size:11px;padding:5px}
+ .po-knowledge .po-story-toolbar{padding:0;gap:3px}.po-knowledge .po-story-toolbar button{font-size:11px;padding:5px}
+ .po-knowledge .po-knowledge-option{font-size:clamp(14px,3.8vw,19px);gap:6px;padding:7px}.po-knowledge-option>span{width:24px;height:24px;flex-basis:24px;font-size:12px}
+ .po-knowledge .po-knowledge-prompt h2{font-size:clamp(18px,5vw,25px)}
+ .po-explanation-content{grid-template-columns:1fr}
+ .po-review-columns{grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(0,1fr))}
+}
+@media(max-height:540px){
+ .po-knowledge .po-story-toolbar,.po-knowledge-nav{min-height:38px}.po-knowledge .po-story-toolbar button,.po-knowledge-nav button,.po-knowledge-nav select{min-height:38px;padding:4px 8px}
+ .po-knowledge .po-knowledge-question{gap:5px;grid-template-rows:auto 5px minmax(0,.75fr) minmax(0,1.25fr) auto}
+ .po-knowledge .po-knowledge-option{padding:5px 8px;font-size:clamp(14px,2.8vh,18px)}.po-knowledge .po-knowledge-prompt h2{font-size:clamp(18px,4vh,25px)}
+ .po-knowledge .po-knowledge-prompt{padding:5px 9px}.po-vocab-context{font-size:12px}
+ .po-knowledge .po-knowledge-hub{gap:5px}.po-knowledge .po-knowledge-heading p{display:none}
+ .po-knowledge .po-knowledge-card{padding:8px 10px}.po-knowledge-card-top>span{font-size:24px}.po-knowledge-card h3{margin:3px 0;font-size:16px}.po-knowledge-card p{font-size:11px}.po-knowledge-best b{font-size:25px}.po-knowledge-link{padding-top:3px}
+ .po-explanation-header{padding:6px 12px}.po-explanation-header h2{font-size:20px}.po-explanation-content{padding:6px 12px;gap:6px}
+ .po-explanation-content section,.po-exp-answer>div{padding:5px 8px}.po-exp-answer strong{font-size:15px}.po-exp-reason p,.po-exp-evidence p,.po-exp-tip p{font-size:13px}.po-explanation-footer{padding:6px 12px}
+}
+/* Accessibility escape hatch for exceptionally small/zoomed viewports: keep content reachable. */
+@media(max-height:320px){body.po-knowledge-active .po-knowledge>.po-content{overflow:auto!important}.po-knowledge .po-knowledge-question{min-height:270px}.po-knowledge .po-knowledge-hub{min-height:270px}}
+
+.po-knowledge .po-review-heading button,.po-knowledge .po-review-nav button{min-height:44px;padding:8px 14px}.po-review-heading h3{margin:0}.po-knowledge .po-review-group{overscroll-behavior:contain;touch-action:pan-y}.po-knowledge .po-knowledge-option:focus-visible{outline-offset:-4px}
