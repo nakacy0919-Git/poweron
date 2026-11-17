@@ -6,8 +6,17 @@
 })(typeof window!=='undefined'?window:globalThis,function(host){
     'use strict';
     // Session generation invalidates callbacks from stopped or previous scenes.
-    function createSession({scenes,rate=.85,play,playRecorded,stop,update,finish,back,setTimer=setTimeout,clearTimer=clearTimeout}){
+    function createSession({scenes,rate=.85,play,playRecorded,stop,update,finish,back,onComplete,setTimer=setTimeout,clearTimer=clearTimeout}){
         let index=0,playing=false,auto=false,finished=false,japanese=false,error='',generation=0,timer=null,watchdog=null,closed=false;
+        const listened=new Set();let notified=false;
+        function audioFinished(from,to){
+            for(let i=from;i<to;i++)listened.add(i);
+            if(listened.size===scenes.length&&!notified){
+                notified=true;
+                // Only actual completed narration earns Story Theater credit.
+                onComplete?.();
+            }
+        }
         const snapshot=()=>({index,total:scenes.length,playing,auto,finished,japanese,error,rate,scene:scenes[index]});
         const paint=()=>{if(!closed)update(snapshot());};
         function cancel(){
@@ -39,6 +48,7 @@
                             if(closed||id!==generation||settled)return;
                             settled=true;clearTimer(watchdog);watchdog=null;
                             if(continuous)index=scenes.length-1;
+                            audioFinished(next,continuous?scenes.length:next+1);
                             playing=auto=false;finished=index===scenes.length-1;paint();
                         },
                         ()=>{
@@ -56,6 +66,7 @@
             try{play(scenes[index],rate,()=>{
                 if(closed||id!==generation||settled)return;
                 settled=true;clearTimer(watchdog);watchdog=null;
+                audioFinished(next,next+1);
                 if(continuous&&next+1<scenes.length){
                     timer=setTimer(()=>{if(!closed&&id===generation)run(next+1,true,false,notice);},650);
                 }else{

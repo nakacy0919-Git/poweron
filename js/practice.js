@@ -468,6 +468,7 @@
         const scenes=app.slides.map(scene=>{const media=sceneMedia(scene);return {english:scene.english,japanese:String(scene.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,''),paragraph:scene.paragraph,image:media.image||'img/L'+Number(currentLesson)+'.webp',isCover:!media.image,audio:media.audio};});
         window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
+            onComplete:()=>window.PowerOnCourses?.theaterCompleted?.(),
             onFinish:()=>open('sceneReading'),onBack:()=>{}});
     }
     function storyScene(index){open('sceneReading');if(Number.isInteger(index)&&index>=0&&index<app.slides.length){app.index=index;render();}}

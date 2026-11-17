@@ -31,6 +31,7 @@ function selectLesson(num, btnElement) {
     updateParaSelect();
     resetAppMode();
     onScopeChange();
+    if(![8,9,10].includes(Number(num)))window.PowerOnCourses?.lessonChanged?.(num);
     if(previousMode&&window.PowerOnPractice)PowerOnPractice.open(previousMode);
 }
 
@@ -77,6 +78,7 @@ function onScopeChange() {
     
     if (typeof clearLoop === 'function') clearLoop();
     if (typeof closeVocabPopup === 'function') closeVocabPopup();
+    window.PowerOnCourses?.scopeChanged?.();
 
     if (typeof currentMode !== 'undefined' && (currentMode === 'shadowing' || currentMode === 'reading')) {
         if (typeof openSpeechOverlay === 'function') openSpeechOverlay(currentMode);
