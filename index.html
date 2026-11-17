@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/practice.css?v=17">
     <link rel="stylesheet" href="css/storyTheater.css?v=1">
     <link rel="stylesheet" href="css/learningMenu.css?v=1">
+    <link rel="stylesheet" href="css/learningCourses.css?v=1">
 </head>
 <body>
 
@@ -58,7 +59,7 @@
                 </div>
 
 <nav class="po-learning-menu po-mobile-actions" aria-label="4ステップ学習メニュー">
-  <div class="po-menu-label"><span>LEARNING PATH</span><small>4ステップで学習</small></div>
+  <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
     <div class="po-step po-step-watch">
       <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/><path d="m10 8 5 3-5 3z"/></svg><span class="po-step-copy"><strong>Watch & Listen</strong><small>Story Theater · 本文鑑賞</small></span></button>
@@ -185,7 +186,7 @@
                     </select>
                 </div>
 <nav class="po-learning-menu" aria-label="4ステップ学習メニュー">
-  <div class="po-menu-label"><span>LEARNING PATH</span><small>4ステップで学習</small></div>
+  <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
     <div class="po-step po-step-watch">
       <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/><path d="m10 8 5 3-5 3z"/></svg><span class="po-step-copy"><strong>Watch & Listen</strong><small>Story Theater · 本文鑑賞</small></span></button>
@@ -283,6 +284,9 @@
     <script src="lessons/comprehensionData.js?v=2"></script>
     <script src="js/storyTheater.js?v=3"></script>
     <script src="js/practice.js?v=22"></script>
+    <script src="js/courseCore.js?v=1"></script>
+    <script src="lessons/courseQuestions.js?v=1"></script>
     <script src="js/learningMenu.js?v=1"></script>
+    <script src="js/learningCourses.js?v=1"></script>
 </body>
 </html>
