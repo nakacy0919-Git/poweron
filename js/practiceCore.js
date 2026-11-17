@@ -131,65 +131,168 @@
             puzzle.ordered.every((card, i) => card.id === selectedIds[i]);
     }
 
+    // Historical personal bests for Story Match must survive material revisions.
+    // Do not reassign a previous scene's completion to different text/images:
+    // preserve the original fingerprinted record, and aggregate only best scores.
+    const PROTECTED_MODES=new Set(['sceneReading','storyPuzzle','storyRandom','storyListen']);
+    const safeMetric=(value)=>Number.isFinite(value)&&value>=0?value:null;
     function createProgressStore(storage, storageKey) {
-        const keyName = storageKey || KEY;
-        let state = {version:1, scopes:{}};
-        let persisted = false;
-        try {
-            const raw = storage && storage.getItem(keyName);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (parsed && parsed.version === 1 && parsed.scopes && typeof parsed.scopes === 'object' &&
-                    !Array.isArray(parsed.scopes)) state = parsed;
+        const keyName=storageKey||KEY;
+        let state={version:1,scopes:{},archives:{}},persisted=false;
+        try{
+            const raw=storage&&storage.getItem(keyName);
+            if(raw){
+                const parsed=JSON.parse(raw);
+                if(parsed&&parsed.version===1&&parsed.scopes&&typeof parsed.scopes==='object'&&!Array.isArray(parsed.scopes)){
+                    state=parsed;
+                    if(!state.archives||typeof state.archives!=='object'||Array.isArray(state.archives))state.archives={};
+                }
             }
-            persisted = !!storage;
-            let changed=false;for(const scope of Object.values(state.scopes)){if(scope&&typeof scope==='object')for(const mode of ['reading','sceneReading'])if(promoteReadingScores(scope[mode]))changed=true;}
+            persisted=!!storage;
+            let changed=false;
+            for(const scope of Object.values(state.scopes)){
+                if(scope&&typeof scope==='object')for(const mode of ['reading','sceneReading'])
+                    if(promoteReadingScores(scope[mode]))changed=true;
+            }
+            for(const scoped of Object.values(state.archives)){
+                if(!scoped||typeof scoped!=='object')continue;
+                for(const mode of ['sceneReading']){
+                    for(const version of Object.values(scoped[mode]||{}))
+                        if(promoteReadingScores(version))changed=true;
+                }
+            }
             if(changed&&storage)storage.setItem(keyName,JSON.stringify(state));
-        } catch (_) { persisted = false; }
-        function read(scope, mode, count, sig) {
-            const previous = state.scopes[scope] && typeof state.scopes[scope]==='object' && state.scopes[scope][mode];
-            if (!MODES.includes(mode) || !previous || previous.fingerprint !== sig ||
-                previous.total !== count) return {total:count, completed:{}, attempts:0, bestAccuracy:null};
-            return {
-                total:count,
-                completed:previous.completed && typeof previous.completed === 'object' ? previous.completed : {},
-                attempts:Number(previous.attempts) || 0,
-                bestAccuracy:Number.isFinite(previous.bestAccuracy) ? previous.bestAccuracy : null,
-                lastAt:previous.lastAt || null,
-                bestPoints:Number.isFinite(previous.bestPoints)?previous.bestPoints:null,bestSeconds:Number.isFinite(previous.bestSeconds)?previous.bestSeconds:null,bestByLevel:Object.assign({},previous.bestByLevel||{}),bestByCount:Object.assign({},previous.bestByCount||{}),
-                scores:Object.assign({}, previous.scores || {}), counts:Object.assign({}, previous.counts || {})
-            };
+        }catch(_){persisted=false;}
+        function recordKey(total,fingerprint){
+            return 'v'+total+':'+String(fingerprint);
         }
-        function record(scope, mode, index, count, sig, options) {
-            if (!MODES.includes(mode) || !/^(?:standard|pre1|grade1):L\d{2}_P\d+_(?:full|p\d+)$/.test(scope) ||
-                !Number.isInteger(index) || index < 0 || index >= count || count > 250) return false;
-            const entry = read(scope, mode, count, sig);
-            options = options || {};
-            if (options.complete||(readingMode(mode)&&Number.isFinite(options.accuracy)&&options.accuracy>=READING_PASS)) entry.completed[index] = true;
-            if (options.attempt) entry.attempts += 1;
-            if(Number.isFinite(options.points)&&options.points>=0){if(Number.isInteger(options.questionCount)&&options.questionCount>0&&options.questionCount<=250){entry.bestByCount=entry.bestByCount||{};entry.bestByCount[options.questionCount]=Math.max(entry.bestByCount[options.questionCount]||0,options.points);}if(options.full!==false)entry.bestPoints=Math.max(entry.bestPoints||0,options.points);}
-            if(Number.isFinite(options.seconds)&&options.seconds>=0){if([1,2,3].includes(options.gameLevel)){entry.bestByLevel=entry.bestByLevel||{};entry.bestByLevel[options.gameLevel]=Math.min(entry.bestByLevel[options.gameLevel]??Infinity,options.seconds);}if(!options.gameLevel||options.gameLevel===3)entry.bestSeconds=Math.min(entry.bestSeconds==null?Infinity:entry.bestSeconds,options.seconds);}
-            entry.scores = entry.scores || {}; entry.counts = entry.counts || {};
-            if (Number.isFinite(options.accuracy)) entry.scores[index] = Math.max(entry.scores[index] || 0, Math.min(100, Math.max(0, Math.round(options.accuracy))));
-            if (options.listen) {entry.counts[index] = (Number(entry.counts[index]) || 0) + 1; if (entry.counts[index] >= 3) entry.completed[index] = true;}
-            if (Number.isFinite(options.accuracy))
-                entry.bestAccuracy = Math.max(entry.bestAccuracy === null ? 0 : entry.bestAccuracy,
-                    Math.min(100, Math.max(0, Math.round(options.accuracy))));
-            entry.fingerprint = sig;
-            entry.lastAt = new Date().toISOString();
-            if (!state.scopes[scope]||typeof state.scopes[scope]!=='object'||Array.isArray(state.scopes[scope])) state.scopes[scope] = {};
-            state.scopes[scope][mode] = entry;
-            try {
-                if (storage) {
-                    storage.setItem(keyName, JSON.stringify(state));
-                    persisted = true;
-                } else persisted = false;
-            } catch (_) { persisted = false; }
+        function modeArchives(scope,mode,create){
+            const scoped=state.archives?.[scope];
+            if(!create)return scoped?.[mode]||{};
+            if(!state.archives||typeof state.archives!=='object')state.archives={};
+            if(!state.archives[scope]||typeof state.archives[scope]!=='object')state.archives[scope]={};
+            if(!state.archives[scope][mode]||typeof state.archives[scope][mode]!=='object')state.archives[scope][mode]={};
+            return state.archives[scope][mode];
+        }
+        function activeRecord(scope,mode){
+            return state.scopes[scope]&&typeof state.scopes[scope]==='object'&&state.scopes[scope][mode];
+        }
+        function matching(row,count,sig){
+            return !!row&&row.fingerprint===sig&&row.total===count;
+        }
+        function archivedVersions(scope,mode){
+            const archived=Object.values(modeArchives(scope,mode,false));
+            const current=activeRecord(scope,mode);
+            return current?[current,...archived]:archived;
+        }
+        function personalBest(scope,mode){
+            if(!PROTECTED_MODES.has(mode))return null;
+            let bestAccuracy=null,bestPoints=null,bestSeconds=null;
+            const bestByLevel={},bestByCount={};
+            for(const entry of archivedVersions(scope,mode)){
+                if(!entry||typeof entry!=='object')continue;
+                const accuracy=safeMetric(entry.bestAccuracy),points=safeMetric(entry.bestPoints),
+                    seconds=safeMetric(entry.bestSeconds);
+                if(accuracy!==null)bestAccuracy=Math.max(bestAccuracy??0,accuracy);
+                if(points!==null)bestPoints=Math.max(bestPoints??0,points);
+                if(seconds!==null)bestSeconds=Math.min(bestSeconds??Infinity,seconds);
+                for(const [level,value] of Object.entries(entry.bestByLevel||{})){
+                    const n=safeMetric(value);
+                    if(n!==null)bestByLevel[level]=Math.min(bestByLevel[level]??Infinity,n);
+                }
+                for(const [count,value] of Object.entries(entry.bestByCount||{})){
+                    const n=safeMetric(value);
+                    if(n!==null)bestByCount[count]=Math.max(bestByCount[count]??0,n);
+                }
+            }
+            return {bestAccuracy,bestPoints,bestSeconds,bestByLevel,bestByCount};
+        }
+        function read(scope,mode,count,sig){
+            const current=activeRecord(scope,mode);
+            const previous=matching(current,count,sig)?current:
+                PROTECTED_MODES.has(mode)?modeArchives(scope,mode,false)[recordKey(count,sig)]:null;
+            const matches=matching(previous,count,sig);
+            const result={
+                total:count,
+                completed:matches&&previous.completed&&typeof previous.completed==='object'?{...previous.completed}:{},
+                attempts:matches?(Number(previous.attempts)||0):0,
+                bestAccuracy:matches&&safeMetric(previous.bestAccuracy)!==null?previous.bestAccuracy:null,
+                lastAt:matches?previous.lastAt||null:null,
+                bestPoints:matches&&safeMetric(previous.bestPoints)!==null?previous.bestPoints:null,
+                bestSeconds:matches&&safeMetric(previous.bestSeconds)!==null?previous.bestSeconds:null,
+                bestByLevel:matches?Object.assign({},previous.bestByLevel||{}):{},
+                bestByCount:matches?Object.assign({},previous.bestByCount||{}):{},
+                scores:matches?Object.assign({},previous.scores||{}):{},
+                counts:matches?Object.assign({},previous.counts||{}):{}
+            };
+            // Historic bests remain visible across fingerprint changes, but
+            // current-scene completion and indexed reading scores do NOT migrate.
+            const best=personalBest(scope,mode);
+            if(best)Object.assign(result,best);
+            return result;
+        }
+        function record(scope,mode,index,count,sig,options){
+            if(!MODES.includes(mode)||!/^(?:standard|pre1|grade1):L\d{2}_P\d+_(?:full|p\d+)$/.test(scope)||
+                !Number.isInteger(index)||index<0||index>=count||count>250)return false;
+            options=options||{};
+            const current=activeRecord(scope,mode);
+            const protectedMode=PROTECTED_MODES.has(mode);
+            // Archive FIRST, then replace the active version. Never discard
+            // previously completed scenes or best scores on source revisions.
+            if(protectedMode&&current&&!matching(current,count,sig)&&
+                Number.isInteger(current.total)&&current.total>0&&current.fingerprint!=null){
+                modeArchives(scope,mode,true)[recordKey(current.total,current.fingerprint)]=current;
+            }
+            const entry=read(scope,mode,count,sig);
+            if(options.complete||(readingMode(mode)&&Number.isFinite(options.accuracy)&&options.accuracy>=READING_PASS))
+                entry.completed[index]=true;
+            if(options.attempt)entry.attempts+=1;
+            if(Number.isFinite(options.points)&&options.points>=0){
+                if(Number.isInteger(options.questionCount)&&options.questionCount>0&&options.questionCount<=250){
+                    entry.bestByCount[options.questionCount]=
+                        Math.max(entry.bestByCount[options.questionCount]||0,options.points);
+                }
+                if(options.full!==false)entry.bestPoints=Math.max(entry.bestPoints||0,options.points);
+            }
+            if(Number.isFinite(options.seconds)&&options.seconds>=0){
+                if([1,2,3].includes(options.gameLevel))
+                    entry.bestByLevel[options.gameLevel]=Math.min(entry.bestByLevel[options.gameLevel]??Infinity,options.seconds);
+                if(!options.gameLevel||options.gameLevel===3)
+                    entry.bestSeconds=Math.min(entry.bestSeconds??Infinity,options.seconds);
+            }
+            if(!entry.scores||typeof entry.scores!=='object')entry.scores={};
+            if(!entry.counts||typeof entry.counts!=='object')entry.counts={};
+            if(Number.isFinite(options.accuracy)){
+                const accuracy=Math.min(100,Math.max(0,Math.round(options.accuracy)));
+                entry.scores[index]=Math.max(entry.scores[index]||0,accuracy);
+                entry.bestAccuracy=Math.max(entry.bestAccuracy??0,accuracy);
+            }
+            if(options.listen){
+                entry.counts[index]=(Number(entry.counts[index])||0)+1;
+                if(entry.counts[index]>=3)entry.completed[index]=true;
+            }
+            entry.fingerprint=sig;
+            entry.lastAt=new Date().toISOString();
+            if(!state.scopes[scope]||typeof state.scopes[scope]!=='object'||Array.isArray(state.scopes[scope]))
+                state.scopes[scope]={};
+            state.scopes[scope][mode]=entry;
+            try{
+                if(storage){
+                    storage.setItem(keyName,JSON.stringify(state));
+                    persisted=true;
+                }else persisted=false;
+            }catch(_){persisted=false;}
             return true;
         }
         return {
-            get:read, record:record, snapshot:function(){return JSON.parse(JSON.stringify(state));},
-            isPersistent:function(){return persisted;}, key:keyName
+            get:read,record:record,
+            snapshot:function(){return JSON.parse(JSON.stringify(state));},
+            personalBest:personalBest,
+            history:function(scope,mode){
+                if(!PROTECTED_MODES.has(mode))return [];
+                return archivedVersions(scope,mode).filter(Boolean).map(x=>JSON.parse(JSON.stringify(x)));
+            },
+            isPersistent:function(){return persisted;},key:keyName
         };
     }
     return {READING_PASS,splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
