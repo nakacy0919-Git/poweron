@@ -22,7 +22,9 @@
                 if(closed||id!==generation||settled)return;
                 settled=true;cancel();error='音声が再生できませんでした。もう一度再生するか、手動で次へ進んでください。';paint();
             };
-            if(recorded&&typeof playRecorded==='function'){
+            // A scene-specific MP3 always takes priority over the old Part-level recording.
+            // Without one, retain the continuous Part audio for Parts 3/4 and other lessons.
+            if(recorded&&!scenes[next].audio&&typeof playRecorded==='function'){
                 // Use existing, real Part recordings for both manual and automatic
                 // theater narration. For automatic playback this is one continuous
                 // MP3, not a new play() call for every scene.
@@ -131,6 +133,42 @@
         catch(e){fail(e);}
         return {stop,player};
     }
+    // Reuse a single media element for sequential scene clips. Mobile Safari is
+    // more reliable when every scene does not create another Audio object.
+    function createSceneClipPlayer(host){
+        let audio=null,generation=0;
+        function stop(){
+            generation++;
+            if(audio){
+                audio.onended=null;audio.onerror=null;
+                try{audio.pause();}catch(_){}
+            }
+        }
+        function play({url,rate,onEnd,onError}){
+            stop();
+            if(!url||!host.Audio){onError(new Error('Scene MP3 unavailable'));return;}
+            const id=generation;
+            let settled=false;
+            const fail=e=>{
+                if(id!==generation||settled)return;
+                settled=true;stop();onError(e);
+            };
+            try{
+                if(!audio)audio=new host.Audio();
+                audio.preload='auto';audio.playsInline=true;
+                audio.src=url;audio.playbackRate=rate;
+                audio.onended=()=>{
+                    if(id!==generation||settled)return;
+                    settled=true;
+                    audio.onended=null;audio.onerror=null;onEnd();
+                };
+                audio.onerror=()=>fail(audio.error||new Error('Scene MP3 loading failed'));
+                const task=audio.play();
+                task?.catch?.(fail);
+            }catch(e){fail(e);}
+        }
+        return {play,stop};
+    }
     let active=null;
     function dismiss(){if(active)active.remove();}
     function pause(){if(active)active.session.pause();}
@@ -150,6 +188,7 @@
         q('[data-title]').textContent=config.title+' · STORY THEATER';
         let observer=null,last=-1,showJa=false,removed=false,recordedHandle=null;
         const stopRecorded=()=>{recordedHandle?.stop();recordedHandle=null;};
+        const sceneClips=createSceneClipPlayer(host);
         function fit(){
             for(const [selector,lines,min] of [['.theater-en',2,16],['.theater-ja',1,13]]){
                 const el=q(selector);if(el.hidden||!el.clientWidth)continue;
@@ -188,7 +227,15 @@
             fit();
         }
         const session=createSession({...config,
-            stop:()=>{stopRecorded();config.stop();},
+            stop:()=>{stopRecorded();sceneClips.stop();config.stop();},
+            play:(scene,rate,onEnd,onError)=>{
+                if(scene.audio){
+                    sceneClips.play({
+                        url:scene.audio,rate,onEnd,
+                        onError:()=>config.play({...scene,audio:null},rate,onEnd,onError)
+                    });
+                }else config.play(scene,rate,onEnd,onError);
+            },
             playRecorded:config.recordedAudio?((startIndex,endIndex,rate,onScene,onEnd,onError)=>{
                 stopRecorded();
                 recordedHandle=playRecordedAudio(host,{
@@ -223,5 +270,5 @@
         if(typeof host.ResizeObserver==='function'){observer=new host.ResizeObserver(fit);observer.observe(frame);}
         host.addEventListener('resize',fit);session.paint();root.focus();
     }
-    return {open,dismiss,pause,createSession,sceneBoundaries,playRecordedAudio};
+    return {open,dismiss,pause,createSession,sceneBoundaries,playRecordedAudio,createSceneClipPlayer};
 });
