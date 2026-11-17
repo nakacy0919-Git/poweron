@@ -1,8 +1,8 @@
 {
   "version": 1,
   "level": "standard",
-  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words. Lesson 8 Part 1 standard uses eight curated groups matched to the supplied illustrations. Lesson 8 Part 2 standard uses twelve curated groups, including one three-sentence scene for the decision to escape. Lesson 8 Parts 3 and 4 use eight and four curated scene groups, respectively.",
-  "status": "Lesson 8 Parts 1–4: 32 WebP images included; other lesson illustrations pending.",
+  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words. Lesson 8 Part 1 standard uses eight curated groups matched to the supplied illustrations. Lesson 8 Part 2 standard uses twelve curated groups, including one three-sentence scene for the decision to escape. Lesson 8 Parts 3 and 4 use eight and four curated scene groups, respectively. Lesson 9 Part 1 uses seven curated groups matched to uploaded illustrations.",
+  "status": "Lesson 8 Parts 1–4: 32 WebP images included. Lesson 9 Part 1: seven-scene mapping prepared; image files pending GitHub upload.",
   "scenes": [
     {
       "id": "L01_P1_p1_s01",
@@ -1450,7 +1450,7 @@
       "paragraph": 1,
       "firstSentence": 1,
       "lastSentence": 2,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p1_s01.webp",
+      "image": "lessons/lesson9/part1/images/L09_P1_01.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p1_s01.mp3"
     },
     {
@@ -1459,7 +1459,7 @@
       "paragraph": 1,
       "firstSentence": 3,
       "lastSentence": 3,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p1_s03.webp",
+      "image": "lessons/lesson9/part1/images/L09_P1_02.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p1_s03.mp3"
     },
     {
@@ -1467,9 +1467,18 @@
       "part": "L09_P1",
       "paragraph": 2,
       "firstSentence": 1,
-      "lastSentence": 2,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s01.webp",
+      "lastSentence": 1,
+      "image": "lessons/lesson9/part1/images/L09_P1_03.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s01.mp3"
+    },
+    {
+      "id": "L09_P1_p2_s02",
+      "part": "L09_P1",
+      "paragraph": 2,
+      "firstSentence": 2,
+      "lastSentence": 2,
+      "image": "lessons/lesson9/part1/images/L09_P1_04.webp",
+      "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s02.mp3"
     },
     {
       "id": "L09_P1_p2_s03",
@@ -1477,7 +1486,7 @@
       "paragraph": 2,
       "firstSentence": 3,
       "lastSentence": 4,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s03.webp",
+      "image": "lessons/lesson9/part1/images/L09_P1_05.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s03.mp3"
     },
     {
@@ -1486,7 +1495,7 @@
       "paragraph": 2,
       "firstSentence": 5,
       "lastSentence": 5,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s05.webp",
+      "image": "lessons/lesson9/part1/images/L09_P1_06.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s05.mp3"
     },
     {
@@ -1495,7 +1504,7 @@
       "paragraph": 2,
       "firstSentence": 6,
       "lastSentence": 7,
-      "image": "lessons/lesson9/part1/scenes/L09_P1_p2_s06.webp",
+      "image": "lessons/lesson9/part1/images/L09_P1_07.webp",
       "audio": "lessons/lesson9/part1/scenes/L09_P1_p2_s06.mp3"
     },
     {

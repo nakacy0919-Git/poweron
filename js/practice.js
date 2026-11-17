@@ -107,7 +107,7 @@
             const key = partKey + '_p' + number;
             return {key:key, number:number, english:dataOf('script',key), japanese:dataOf('translation',key)};
         }).filter(function(item){return item.english.trim();});
-        app.slides = core.buildScenes(app.paragraphs, core.splitSentences, currentLevel === 'standard' ? core.LESSON8_SCENE_SIZES : undefined);
+        app.slides = core.buildScenes(app.paragraphs, core.splitSentences, currentLevel === 'standard' ? core.CURATED_SCENE_SIZES : undefined);
         app.result=null; app.recording=false;
         app.candidates = app.sentences.map(function (sentence, i) {
             return {sentence:sentence, i:i};

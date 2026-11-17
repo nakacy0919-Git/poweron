@@ -48,6 +48,13 @@
         L08_P4_p10: Object.freeze([2, 1, 1])
     });
 
+    // Lesson 9 Part 1 uses seven illustrations supplied for its paragraph-by-paragraph scenes.
+    const LESSON9_SCENE_SIZES = Object.freeze({
+        L09_P1_p1: Object.freeze([2, 1]),
+        L09_P1_p2: Object.freeze([1, 1, 2, 1, 2])
+    });
+    const CURATED_SCENE_SIZES = Object.freeze({...LESSON8_SCENE_SIZES, ...LESSON9_SCENE_SIZES});
+
     function buildScenes(paragraphs, split, sceneSizes) {
         const result = [];
         for (const paragraph of paragraphs) {
@@ -192,7 +199,7 @@
             isPersistent:function(){return persisted;}, key:keyName
         };
     }
-    return {READING_PASS,splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
+    return {READING_PASS,splitSentences:splitSentences, buildScenes:buildScenes, LESSON8_SCENE_SIZES:LESSON8_SCENE_SIZES, LESSON9_SCENE_SIZES:LESSON9_SCENE_SIZES, CURATED_SCENE_SIZES:CURATED_SCENE_SIZES, fingerprint:fingerprint, normalizeWords:normalizeWords,
         transcriptAccuracy:transcriptAccuracy, makePuzzle:makePuzzle, puzzleCorrect:puzzleCorrect,
         createProgressStore:createProgressStore};
 });
