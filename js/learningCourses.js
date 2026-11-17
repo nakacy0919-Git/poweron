@@ -75,21 +75,17 @@
     if(!root){
       root=host.document.createElement("section");
       root.id="po-course-overlay";root.className="po-course-overlay";
-      root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");
+      // Embedded PowerSlide learning panel: lessons and sidebar remain usable.
+      root.setAttribute("role","region");
       root.setAttribute("aria-label","PowerOn 学習コース");
       root.setAttribute("tabindex","-1");
       root.addEventListener("click",click);
       root.addEventListener("change",change);
       root.addEventListener("keydown",e=>{
         if(e.key==="Escape"){e.preventDefault();close();}
-        if(e.key==="Tab"){
-          const focusable=[...root.querySelectorAll("button:not([disabled]),select:not([disabled])")];
-          if(!focusable.length)return;
-          if(e.shiftKey&&host.document.activeElement===focusable[0]){e.preventDefault();focusable.at(-1).focus();}
-          else if(!e.shiftKey&&host.document.activeElement===focusable.at(-1)){e.preventDefault();focusable[0].focus();}
-        }
       });
-      host.document.body.appendChild(root);
+      const screen=host.document.getElementById("mainScreen")||host.document.body;
+      screen.appendChild(root);
     }
     host.document.body.classList.add("po-course-open");
     return root;
@@ -162,8 +158,12 @@
     if(!core.COURSES[currentData.course]?.steps.includes(step)&&!["theater","vocabulary"].includes(step))return;
     cancelFeedbackTimer();
     activeLearningStep=null;activeScope=null;
-    if(step==="comprehension"||step==="vocabulary"){
-      quizKind=step;quiz=null;quizIndex=0;quizAnswers=[];quizTimes=[];view="quiz";paint();return;
+    if(step==="vocabulary"){
+      // No redundant "9 questions × 2 languages" setup. Start immediately.
+      quizKind="vocabulary";quiz=null;view="quiz";newQuiz(10,"vocabulary");return;
+    }
+    if(step==="comprehension"){
+      quizKind="comprehension";quiz=null;quizIndex=0;quizAnswers=[];quizTimes=[];view="quiz";paint();return;
     }
     if(step==="review"){view="review";paint();return;}
     hide();floatButton(true);
@@ -188,7 +188,7 @@
     if(kind==="vocabulary"){
       const vocab=typeof lessonVocab!=="undefined"?lessonVocab:{};
       questions=core.createVocabularyQuiz(currentContext.lesson,currentContext.part,vocab,Math.random,host.PowerOnCourseVocabGlosses||{});
-      if(!questions.length){notice("このPartの語彙問題は準備中です。");return;}
+      if(!questions.length){quiz=null;view="quiz";paint();notice("このPartの語彙問題は準備中です。");return;}
     }else{
       available=pool();
       if(kind==="review"){
@@ -239,8 +239,21 @@
   function button(action,label,extra="",cls=""){
     return '<button type="button" data-action="'+action+'" '+extra+' class="'+cls+'">'+label+'</button>';
   }
+  function compactLessonNav(){
+    // The desktop Lesson 1–10 bar stays visible outside the embedded panel.
+    // The original mobile menu is behind mainOverlay, so give phone/iPad
+    // portrait users an equally clear lesson switcher inside the panel.
+    const current=Number(currentContext?.lesson)||8;
+    return '<nav class="po-course-mobile-lessons" aria-label="Lessonを選ぶ">'+
+      Array.from({length:10},(_,i)=>i+1).map(n=>
+        button("switchLesson","Lesson "+n,
+          'data-lesson="'+n+'" aria-current="'+(n===current?'page':'false')+'"',
+          "po-course-lesson-btn"+(n===current?" is-active":""))).join("")+'</nav>';
+  }
   function header(title,sub){
-    return '<header class="po-course-header"><div><span>POWER ON III · LEARNING COURSES</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>';
+    return '<header class="po-course-header"><div><span>POWER ON III · LEARNING COURSES</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+
+      button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>'+
+      compactLessonNav();
   }
   function partPicker(){
     if(![8,9,10].includes(currentContext.lesson))return "";
@@ -330,23 +343,27 @@
   }
   function quizScreen(){
     if(!quiz){
-      const vocabulary=quizKind==="vocabulary",size=vocabulary?
-        Math.min(10,core.vocabularyPool(currentContext.lesson,currentContext.part,typeof lessonVocab!=="undefined"?lessonVocab:{}).length):pool().length;
-      const heading=vocabulary?"Vocabulary Check":"Comprehension Challenge";
-      const description=vocabulary?
-        "日本語で意味を確認したあと、英語の説明を選びます。両方の全問正解でクリア。":
-        "日本語で内容を確認したあと、英語で同じ内容に挑戦します。";
-      return header(heading,"Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
-        '<div class="po-course-quiz-setup"><h3>'+description+'</h3>'+
-        '<div class="po-course-phase-stages"><span class="is-next">STEP 1 日本語</span><span>→</span><span>STEP 2 English</span></div>'+
-        '<p class="po-course-two-language-note">言語切替は不要です。日本語の問題を終えると、英語ステージへ進みます。</p>'+
-        '<div class="po-course-count"><span>各言語の問題数</span>'+(vocabulary?
-          button("newQuiz",size+"問 × 2言語 = "+size*2+"問",'data-count="10"'+(!size?' disabled':"")):
-          [5,10,20].map(n=>button("newQuiz",n+"問 × 2言語 = "+n*2+"問",'data-count="'+n+'"'+(size<n?' disabled':""))).join(""))+'</div>'+
-        (currentContext.level!=="standard"?'<p class="po-course-warning">現在の問題はStandard本文に対応しています。</p>':"")+
-        (!size?'<p class="po-course-warning">このPartの問題は準備中です。</p>':
-         '<p>出題候補 '+size+'問。内容理解は各言語10問以上で全問正解するとミッションクリア。5問×2は練習用です。</p>')+
-        button("dashboard","← コースへ戻る",'',"po-course-ghost")+'</div><p id="po-course-message" role="status" hidden></p>';
+      if(quizKind==="vocabulary"){
+        // Visible only when the source data is unavailable (normally auto-started).
+        return header("Vocabulary Check","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+          '<div class="po-course-quiz-setup po-course-quiz-empty"><h3>語彙問題を準備できませんでした</h3>'+
+          '<p>Partを確認してもう一度お試しください。</p>'+
+          button("newQuiz","もう一度試す",'data-count="10"',"po-course-start")+
+          button("dashboard","← コースへ戻る",'',"po-course-ghost")+
+          '<p id="po-course-message" role="status"></p></div>';
+      }
+      const size=pool().length;
+      return header("Comprehension Challenge","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+        '<div class="po-course-quiz-setup po-course-quiz-compact">'+
+        '<h3>内容理解に挑戦</h3>'+
+        '<div class="po-course-phase-stages"><span class="is-next">日本語</span><span>→</span><span>English</span></div>'+
+        '<div class="po-course-count po-course-count-compact">'+
+          [5,10,20].map(n=>button("newQuiz",n===5?"練習 5問":n===10?"10問チャレンジ":"発展 20問",
+            'data-count="'+n+'"'+(size<n?' disabled':""),"po-course-count-choice")).join("")+
+        '</div>'+
+        button("dashboard","← コースへ戻る",'',"po-course-ghost")+
+        (!size?'<p class="po-course-warning">このPartの内容理解問題は準備中です。</p>':"")+
+        '<p id="po-course-message" role="status" hidden></p></div>';
     }
     const q=quiz[quizIndex],lang=q.phase,locale=q[lang],answered=quizAnswers[quizIndex],done=answered!==undefined;
     const half=quiz.length/2,partIndex=quizIndex%half+1,vocabulary=quizKind==="vocabulary";
@@ -359,8 +376,8 @@
       '<div class="po-course-phase-stages" aria-label="出題ステージ">'+
         '<span class="'+(japanese?'is-next':'is-done')+'">STEP 1 日本語 '+(japanese?partIndex+'/'+half:'✓')+'</span>'+
         '<span>→</span><span class="'+(!japanese?'is-next':'')+'">STEP 2 English'+(!japanese?' '+partIndex+'/'+half:'')+'</span></div>'+
-      '<div class="po-course-question-top"><span>QUESTION '+partIndex+' / '+half+' · '+phaseLabel+'</span>'+
-      '<span>合計 '+(quizIndex+1)+' / '+quiz.length+' · '+escape(q.difficulty)+' · '+(vocabulary?'Vocabulary':'Paragraph '+q.paragraph)+'</span></div>'+
+      '<div class="po-course-question-top"><span>QUESTION '+partIndex+' / '+half+'</span>'+
+      '<span>'+(vocabulary?'Vocabulary':'Comprehension')+'</span></div>'+
       '<h3>'+escapeContent(locale[0])+'</h3>'+
       '<div class="po-course-answer-grid">'+locale[1].map((value,i)=>
         button("answer",'<b>'+String.fromCharCode(65+i)+'</b><span>'+escapeContent(value)+'</span>',
@@ -371,7 +388,7 @@
         '<p>'+escape(q.explanation||"")+'</p><small>根拠：'+escape(q.evidence||"")+'</small>'+
         '<small>解答時間 '+quizTimes[quizIndex].toFixed(1)+'秒 · 目標目安 '+core.targetSeconds(q,lang)+'秒（時間超過は不合格にはなりません）</small></section>':"")+
       '<div class="po-course-question-footer">'+(!vocabulary&&done?button("nextQuestion",nextLabel,'',"po-course-start"):"")+
-      button("dashboard","中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
+      button("dashboard","← コースへ戻る",'',"po-course-ghost")+'</div>'+
       (vocabulary&&done?
         '<div class="po-course-feedback-backdrop" role="status" aria-live="polite">'+
           '<section class="po-course-answer-popup '+(answered===q.correct?'is-correct':'is-incorrect')+'" aria-label="回答の説明">'+
@@ -379,7 +396,6 @@
           '<strong>'+(answered===q.correct?'Correct! 正解':'Incorrect! 惜しい！')+'</strong>'+
           '<p class="po-course-popup-solution">'+(japanese?'正解：':'Correct answer: ')+'<b>'+String.fromCharCode(65+q.correct)+'. '+escapeContent(locale[1][q.correct])+'</b></p>'+
           '<p class="po-course-popup-explanation">'+escape(q.explanation||'')+'</p>'+
-          '<small>'+escape(q.evidence||'')+'</small>'+
           '<div class="po-course-popup-actions">'+
           (feedbackPaused?'<span>説明を確認したら次へ進んでください</span>':
             '<span>まもなく自動で'+(quizIndex===quiz.length-1?'結果画面':quizIndex+1===half?'英語ステージ':'次の問題')+'へ進みます</span>')+
@@ -442,6 +458,19 @@
       case "free":choose("free");break;
       case "stage":stage(btn.dataset.step);break;
       case "selectPart":selectPart(String(btn.dataset.part));break;
+      case "switchLesson":{
+        const n=Number(btn.dataset.lesson);
+        if(!Number.isInteger(n)||n<1||n>10)break;
+        if(n===currentContext?.lesson){open();break;}
+        // Reuse PowerSlide's existing lesson navigation and selection logic.
+        if(typeof selectLesson==="function"){
+          const matching=host.document.querySelectorAll?.(".nav-btn")?.[n-1];
+          selectLesson(n,matching||null);
+          if([8,9,10].includes(n))lessonChanged(n);
+          else close();
+        }
+        break;
+      }
       case "newQuiz":newQuiz(Number(btn.dataset.count),quizKind);break;
       case "answer":answer(Number(btn.dataset.index));break;
       case "nextQuestion":nextQuestion();break;

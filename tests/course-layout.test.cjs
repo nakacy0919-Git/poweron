@@ -15,9 +15,11 @@ function fixture(){
   const doc={body,activeElement:null,hidden:false,events:{},
     addEventListener(name,fn){this.events[name]=fn;},
     createElement(tag){return {tag,id:"",innerHTML:"",style:{},events:{},
-      setAttribute(){},addEventListener(type,fn){this.events[type]=fn;},
+      attrs:{},setAttribute(name,value){this.attrs[name]=value},addEventListener(type,fn){this.events[type]=fn;},
       focus(){doc.activeElement=this},remove(){dom.delete(this.id)},querySelectorAll(){return []}};},
     getElementById:id=>dom.get(id)||null};
+  const mainScreen={id:"mainScreen",children:[],appendChild(e){this.children.push(e);e.parentId=this.id;dom.set(e.id,e)}};
+  dom.set("mainScreen",mainScreen);
   dom.set("partSelect",{value:"1"});dom.set("paraSelect",{value:"full"});dom.set("levelSelect",{value:"standard"});
   const vocab={L08_P1:Array.from({length:10},(_,i)=>({word:"word"+i,meaning:"意味"+i})),
     L08_P2:Array.from({length:10},(_,i)=>({word:"other"+i,meaning:"別の意味"+i}))};
@@ -36,6 +38,7 @@ function fixture(){
   const structure={8:{1:[1],2:[2],3:[3],4:[4]}};
   const appScript='let currentLesson=8,currentKey="L08_P1_full",currentLevel="standard";'+
     'function updateParaSelect(){};function resetAppMode(){};'+
+    'function selectLesson(n){currentLesson=Number(n);currentKey="L"+String(n).padStart(2,"0")+"_P1_full";window.PowerOnCourses?.scopeChanged();}'+
     'function onScopeChange(){currentKey="L08_P"+window.document.getElementById("partSelect").value+"_full";window.PowerOnCourses?.scopeChanged();}'+
     read("js/learningCourses.js")+';return {currentKey:()=>currentKey};';
   const runtime=new Function("window","lessonVocab","lessonStructure",appScript)(win,vocab,structure);
@@ -72,7 +75,6 @@ test("Mastery dashboard is a compact four-card path and speed has three cards",(
 });
 test("Vocabulary shows fixed explanation and auto-advances without scrolling",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
-  f.click("newQuiz",{count:"10"});
   const q=f.course._test.getQuiz();assert.equal(q.length,20);
   let h=f.html();assert.ok(h.includes('po-course-question is-vocabulary'));
   assert.ok(h.includes('po-course-answer-grid'));
@@ -85,7 +87,7 @@ test("Vocabulary shows fixed explanation and auto-advances without scrolling",()
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
 });
 test("Wrong answer popup can be held for reading or advanced manually, never double advances",()=>{
-  const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");f.click("newQuiz",{count:"10"});
+  const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
   const q=f.course._test.getQuiz();
   f.tick(8000);f.click("answer",{index:String((q[0].correct+1)%4)});
   assert.ok(f.html().includes("Incorrect! 惜しい！"));
@@ -102,7 +104,9 @@ test("Responsive styles define 2 by 2 vocabulary answers and compact 2 by 2 cour
   assert.match(css,/\.po-course-question\.is-vocabulary \.po-course-answer-grid\s*\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/s);
   assert.match(css,/\.po-course-stage-list\s*\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/s);
   assert.ok(css.includes("@media(max-width:620px)"));
-  assert.ok(css.includes(".po-course-feedback-backdrop{position:fixed;"));
+  assert.ok(css.includes("#po-course-overlay .po-course-feedback-backdrop{"));
+  assert.ok(css.includes("position:absolute!important;inset:0!important;"));
+  assert.ok(css.includes("#po-course-overlay.po-course-overlay{"));
 });
 
 test("Switching Part buttons actually selects the new Part without overwriting existing progress",()=>{
@@ -122,7 +126,7 @@ test("Switching Part buttons actually selects the new Part without overwriting e
 });
 test("Vocabulary progresses through Japanese 10 questions, English 10 questions, then the results",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");
-  f.course.launchStep("vocabulary");f.click("newQuiz",{count:"10"});
+  f.course.launchStep("vocabulary");
   const questions=f.course._test.getQuiz();
   assert.equal(questions.length,20);
   for(let i=0;i<questions.length;i++){
@@ -146,7 +150,6 @@ test("Vocabulary progresses through Japanese 10 questions, English 10 questions,
 
 test("Japanese-first questions have Japanese choices; English stage has English-only explanations",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
-  f.click("newQuiz",{count:"10"});
   const q=f.course._test.getQuiz();
   assert.ok(q.every((x,i)=>x.phase===(i<10?"ja":"en")));
   assert.ok(q.slice(0,10).every(x=>x.ja[1].every(v=>v.includes("意味"))));
@@ -157,7 +160,7 @@ test("Japanese-first questions have Japanese choices; English stage has English-
 });
 test("Comprehension uses 10 Japanese questions then 10 English questions, with independent totals",()=>{
   const f=fixture();f.course.open();f.course.choose("speed");f.course.launchStep("comprehension");
-  assert.ok(f.html().includes("10問 × 2言語 = 20問"));
+  assert.ok(f.html().includes("10問チャレンジ"));
   f.click("newQuiz",{count:"10"});
   const questions=f.course._test.getQuiz();assert.equal(questions.length,20);
   for(let i=0;i<20;i++){
@@ -202,5 +205,55 @@ test("A wrong Japanese answer remains pending after a correct English answer to 
   assert.equal(result.clear,false);
   assert.ok(data.pendingWrong.speed.includes(questions[0].id+"::ja"));
   assert.ok(!data.pendingWrong.speed.includes(questions[0].id+"::en"));
+  assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
+});
+
+test("Course interface renders INSIDE PowerSlide mainScreen without a modal covering Lesson tabs or sidebar",()=>{
+  const f=fixture();f.course.open();
+  const panel=f.dom.get("po-course-overlay");
+  assert.equal(panel.parentId,"mainScreen");
+  assert.equal(panel.attrs.role,"region");
+  assert.equal(panel.attrs["aria-modal"],undefined);
+  assert.ok(f.uiClasses.has("po-course-open"));
+  assert.ok(f.html().includes("Choose Your Learning Course"));
+  f.course.choose("mastery");
+  assert.equal(f.dom.get("po-course-overlay").parentId,"mainScreen");
+  f.course.close();
+  assert.ok(!f.dom.has("po-course-overlay"));
+  assert.ok(!f.uiClasses.has("po-course-open"));
+});
+test("Clicking Vocabulary Training starts Japanese question ONE immediately without a setup/count button",()=>{
+  const f=fixture();f.course.open();f.course.choose("mastery");
+  f.course.launchStep("vocabulary");
+  assert.equal(f.course._test.getView(),"quiz");
+  assert.equal(f.course._test.getQuiz().length,20);
+  assert.equal(f.course._test.getQuiz()[0].phase,"ja");
+  assert.ok(f.html().includes("QUESTION 1 / 10"));
+  assert.ok(!f.html().includes('data-action="newQuiz"'));
+  assert.ok(!f.html().includes("10問 × 2言語"));
+  assert.ok(f.html().includes("← コースへ戻る"));
+});
+test("Light embedded course CSS keeps the existing top lesson navigation and right sidebar visible",()=>{
+  const css=read("css/learningCourses.css");
+  const html=read("index.html");
+  assert.ok(css.includes("body.po-course-open #mainScreen > #mainOverlay"));
+  assert.ok(css.includes("background:linear-gradient(150deg,#fbfdff"));
+  assert.ok(css.includes("#po-course-overlay .po-course-answer{"));
+  assert.ok(html.includes('class="nav-container"'));
+  assert.ok(html.includes('id="sidebar"'));
+  assert.ok(html.includes('id="mainScreen"'));
+});
+
+test("On mobile the course provides Lesson 1–10 navigation without obscuring PowerSlide lesson changes",()=>{
+  const f=fixture();f.course.open();
+  for(let n=1;n<=10;n++)assert.ok(f.html().includes('data-lesson="'+n+'"'));
+  assert.ok(f.html().includes('aria-label="Lessonを選ぶ"'));
+  f.click("switchLesson",{lesson:"9"});
+  assert.equal(f.course.context().lesson,9);
+  assert.equal(f.runtime.currentKey(),"L09_P1_full");
+  assert.ok(f.dom.has("po-course-overlay"));
+  f.click("switchLesson",{lesson:"2"});
+  assert.equal(f.runtime.currentKey(),"L02_P1_full");
+  assert.ok(!f.dom.has("po-course-overlay"));
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
 });
