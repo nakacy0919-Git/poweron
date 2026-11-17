@@ -1,0 +1,47 @@
+/* Navigation only: keeps all existing activity handlers and storage untouched. */
+.po-learning-menu{display:flex;flex-direction:column;gap:7px;min-width:0;width:100%;font-family:inherit;color:#24364e}
+.po-menu-label{display:flex;align-items:baseline;justify-content:space-between;gap:4px;flex-wrap:wrap;padding:1px 2px}
+.po-menu-label span{font-size:10px;font-weight:850;letter-spacing:1.2px;color:#40536e}.po-menu-label small{font-size:10px;color:#53647c}
+.po-step-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;min-width:0}
+.po-step{--tone:#215b8b;--wash:#e9f3fc;display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:0;border:1px solid #d6dce7;border-color:color-mix(in srgb,var(--tone) 24%,white);background:var(--wash);border-radius:12px;min-width:0;overflow:hidden}
+.po-step-watch{--tone:#3458a5;--wash:#e9eefc}.po-step-read{--tone:#126a61;--wash:#e3f4ef}.po-step-play{--tone:#925018;--wash:#fff0df}.po-step-check{--tone:#7750a0;--wash:#f0e9fa}
+.po-learning-menu button{font-family:inherit;cursor:pointer;touch-action:manipulation;color:inherit;box-sizing:border-box}
+.po-learning-menu .po-step-primary{display:flex;align-items:center;gap:6px;min-width:0;min-height:54px;text-align:left;padding:7px 5px 7px 7px;background:transparent;border:0;border-radius:0;color:var(--tone)}
+.po-step-primary>svg{flex:0 0 18px;width:18px;height:18px}
+.po-step-num{display:grid;place-items:center;flex:0 0 20px;height:20px;border-radius:50%;background:var(--tone);color:white;font-size:12px;font-weight:850}
+.po-step-copy{display:grid;gap:3px;min-width:0;flex:1}
+.po-step-copy strong{font-size:12px;line-height:1.15;overflow-wrap:anywhere;font-weight:850}
+.po-step-copy small{font-size:10px;line-height:1.25;color:#43546a;font-weight:650}
+.po-learning-menu .po-step-expand{display:grid;place-items:center;background:transparent;border:0;border-left:1px solid #00000012;color:var(--tone);padding:0;min-height:44px;border-radius:0}
+.po-step-expand svg{width:17px;height:17px;transition:transform .15s}.po-step-expand[aria-expanded=true] svg{transform:rotate(180deg)}
+.po-step-primary:hover,.po-step-expand:hover{background:#ffffff7d}
+.po-step-options{grid-column:1/-1;display:grid;gap:4px;padding:5px;background:#ffffffa8;border-top:1px solid #00000013}
+.po-learning-menu [hidden]{display:none!important}
+.po-learning-menu .po-step-options button{display:grid;gap:2px;text-align:left;min-height:42px;background:white;border:1px solid #d9e2ed;border-radius:8px;padding:6px 8px;color:#273c55}
+.po-step-options strong{font-size:12px}.po-step-options small{font-size:10px;font-weight:500;color:#596a7d}
+.po-quick-label{padding-top:5px;border-top:1px solid #d8dde7}
+.po-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.po-learning-menu .po-quick-grid button{min-width:0;min-height:40px;border:1px solid #cbd7e7;background:#fff;color:#354b66;border-radius:8px;font-size:11px;font-weight:760;padding:5px 4px;line-height:1.15;text-align:center;overflow-wrap:anywhere}
+.po-quick-grid button small{display:block;font-size:9px;font-weight:500;margin-top:3px}
+.po-learning-menu .po-progress-link{grid-column:1/-1;background:#e6eef8;color:#274d79;min-height:40px}
+.po-learning-menu .po-screen-reset{grid-column:1/-1;background:transparent;border:0;color:#5c6c7d;min-height:30px;font-weight:600}
+.po-learning-menu button:focus-visible{outline:2px solid #2467af;outline-offset:-3px}
+.sidebar .po-learning-menu{gap:5px}
+@media(max-width:768px){
+ .po-learning-menu.po-mobile-actions{display:grid!important;gap:5px;padding:6px 8px;max-height:44dvh;overflow:auto;flex:0 0 auto;box-sizing:border-box}
+ .po-mobile-actions .po-step-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:5px}
+ .po-mobile-actions .po-step{grid-template-columns:minmax(0,1fr) 32px}
+ .po-mobile-actions .po-step-primary{min-height:44px;padding:5px;gap:5px;white-space:normal}
+ .po-mobile-actions .po-step-primary>svg{display:none}
+ .po-mobile-actions .po-step-copy strong{font-size:12px}
+ .po-mobile-actions .po-step-copy small{font-size:9px}
+ .po-mobile-actions .po-step-expand{min-height:44px}
+ .po-mobile-actions .po-quick-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .po-mobile-actions .po-quick-grid button{grid-column:auto;min-height:36px;white-space:normal}
+ .po-mobile-actions .po-quick-grid button small{display:none}
+ .po-mobile-actions .po-quick-label{display:none}
+ body.po-story-active .po-learning-menu.po-mobile-actions,body.po-knowledge-active .po-learning-menu.po-mobile-actions{display:none!important}
+}
+@media(min-width:769px){.po-learning-menu.po-mobile-actions{display:none!important}}
+@media(max-height:650px) and (min-width:769px){.po-step-grid{gap:4px}.po-learning-menu .po-step-primary{min-height:46px;padding-block:4px}.po-step-copy strong{font-size:11px}.po-step-copy small{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.po-step-expand svg{transition:none}}
