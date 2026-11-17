@@ -24,17 +24,32 @@
 /* =========================================
    基本設定とベースレイアウト (PC & iPad 共通フィット)
 ========================================= */
-html, body { 
+/* iPad Chrome/Safari: html is the viewport, not another full-height flex
+   container. Nesting two 100dvh flex boxes can reserve an extra top strip
+   when the browser toolbar/visual viewport changes. */
+html {
     margin: 0 !important;
     padding: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important; /* SafariのURLバー対策。画面高さにピッタリ合わせる */
-    overflow: hidden !important; /* 画面全体の無駄なスクロールを完全禁止 */
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+    display: block !important;
+}
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
     background-color: #f5f5f5;
     box-sizing: border-box;
     display: flex !important;
-    flex-direction: column !important; /* 上(Nav)・下(App)に縦並び */
-    touch-action: none !important; /* iPadでの意図しないスワイプ動作を防止 */
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    touch-action: none !important;
 }
 
 /* --- ナビゲーション（上部レッスンボタン） --- */
@@ -72,6 +87,7 @@ html, body {
 .app-container { 
     width: 100%; 
     flex: 1 1 0 !important; /* 残りの高さをすべて埋める */
+    min-height: 0 !important; /* iPadではメイン領域のみ伸縮させる */
     display: flex !important; 
     flex-direction: row !important; /* 左(Main)・右(Sidebar)に横並び */
     box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
@@ -331,10 +347,13 @@ hr { border: 0; border-top: 2px dashed #ce93d8; width: 100%; margin: 4px 0; }
 ========================================== */
 
 /* 1. 上部のLesson 1-10 ボタンをスリム化 */
-.nav-container { 
-    height: auto !important; 
-    min-height: 30px !important; 
-    margin-bottom: 4px !important; 
+.nav-container {
+    height: auto !important;
+    min-height: 30px !important;
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+    flex: 0 0 auto !important;
+    align-self: stretch !important;
 }
 .nav-btn { 
     padding: 2px 2px !important; 
