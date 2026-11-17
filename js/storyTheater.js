@@ -6,7 +6,7 @@
 })(typeof window!=='undefined'?window:globalThis,function(host){
     'use strict';
     // Session generation invalidates callbacks from stopped or previous scenes.
-    function createSession({scenes,rate=.85,play,stop,update,finish,back,setTimer=setTimeout,clearTimer=clearTimeout}){
+    function createSession({scenes,rate=.85,play,playRecorded,stop,update,finish,back,setTimer=setTimeout,clearTimer=clearTimeout}){
         let index=0,playing=false,auto=false,finished=false,japanese=false,error='',generation=0,timer=null,watchdog=null,closed=false;
         const snapshot=()=>({index,total:scenes.length,playing,auto,finished,japanese,error,rate,scene:scenes[index]});
         const paint=()=>{if(!closed)update(snapshot());};
@@ -14,20 +14,48 @@
             ++generation;clearTimer(timer);clearTimer(watchdog);timer=watchdog=null;
             playing=auto=false;stop();
         }
-        function run(next,continuous){
+        function run(next,continuous,recorded=true,notice=""){
             if(closed||!scenes[next])return;
             cancel();const id=generation;let settled=false;
-            index=next;playing=true;auto=continuous;finished=false;error='';paint();
+            index=next;playing=true;auto=continuous;finished=false;error=notice;paint();
             const fail=()=>{
                 if(closed||id!==generation||settled)return;
                 settled=true;cancel();error='音声が再生できませんでした。もう一度再生するか、手動で次へ進んでください。';paint();
             };
+            if(recorded&&typeof playRecorded==='function'){
+                // Use existing, real Part recordings for both manual and automatic
+                // theater narration. For automatic playback this is one continuous
+                // MP3, not a new play() call for every scene.
+                watchdog=setTimer(fail,600000);
+                try{
+                    playRecorded(next,continuous?scenes.length:next+1,rate,
+                        sceneIndex=>{
+                            if(closed||id!==generation||settled)return;
+                            index=sceneIndex;paint();
+                        },
+                        ()=>{
+                            if(closed||id!==generation||settled)return;
+                            settled=true;clearTimer(watchdog);watchdog=null;
+                            if(continuous)index=scenes.length-1;
+                            playing=auto=false;finished=index===scenes.length-1;paint();
+                        },
+                        ()=>{
+                            if(closed||id!==generation||settled)return;
+                            settled=true;
+                            // A missing/blocked MP3 falls back to exact-scene
+                            // browser speech instead of leaving the screen silent.
+                            run(index,continuous,false,'録音音声が利用できないため、端末の読み上げに切り替えました。');
+                        }
+                    );
+                }catch(_){run(index,continuous,false,'録音音声が利用できないため、端末の読み上げに切り替えました。');}
+                return;
+            }
             watchdog=setTimer(fail,Math.max(35000,scenes[index].english.length*180/rate));
             try{play(scenes[index],rate,()=>{
                 if(closed||id!==generation||settled)return;
                 settled=true;clearTimer(watchdog);watchdog=null;
                 if(continuous&&next+1<scenes.length){
-                    timer=setTimer(()=>{if(!closed&&id===generation)run(next+1,true);},650);
+                    timer=setTimer(()=>{if(!closed&&id===generation)run(next+1,true,false,notice);},650);
                 }else{
                     playing=auto=false;finished=next===scenes.length-1;paint();
                 }
@@ -42,6 +70,66 @@
             toggleJapanese(){if(!closed){japanese=!japanese;paint();}},
             changeRate(value){if(!closed&&!playing&&[.65,.85,1].includes(Number(value))){rate=Number(value);paint();}}
         };
+    }
+
+    // The original MP3 has no per-scene timestamps. Estimate scene boundaries
+    // without altering the recording, and keep the same media element playing
+    // continuously across an entire Part in automatic mode.
+    function sceneBoundaries(scenes){
+        const weights=scenes.map(scene=>{
+            const text=String(scene?.english||'');
+            const words=text.trim().split(/\s+/).filter(Boolean);
+            return Math.max(1,words.reduce((sum,word)=>sum+Math.max(1,Math.sqrt(word.replace(/[^a-z]/gi,'').length||1)),0)+Math.min(5,(text.match(/[.!?]/g)||[]).length));
+        });
+        const total=weights.reduce((sum,x)=>sum+x,0);
+        const boundaries=[0];let sum=0;
+        for(const weight of weights){sum+=weight;boundaries.push(sum/total);}
+        boundaries[boundaries.length-1]=1;
+        return boundaries;
+    }
+    function playRecordedAudio(host,{url,scenes,startIndex,endIndex,rate,onScene,onEnd,onError}){
+        if(!url||!scenes.length||!host.Audio)throw Error('Recorded media unavailable');
+        const player=new host.Audio(url),boundaries=sceneBoundaries(scenes);
+        let active=true,settled=false,seeked=startIndex===0,lastIndex=-1;
+        player.preload='auto';player.playsInline=true;player.playbackRate=rate;
+        const cleanup=()=>{
+            player.onloadedmetadata=null;player.ontimeupdate=null;
+            player.onended=null;player.onerror=null;
+        };
+        const stop=()=>{
+            if(!active)return;
+            active=false;cleanup();try{player.pause();}catch(_){}
+        };
+        const finish=()=>{
+            if(!active||settled)return;settled=true;stop();onEnd();
+        };
+        const fail=error=>{
+            if(!active||settled)return;settled=true;stop();onError(error);
+        };
+        const ensureSeek=()=>{
+            if(!active||seeked||!Number.isFinite(player.duration)||player.duration<=0)return;
+            seeked=true;
+            try{player.currentTime=Math.min(Math.max(0,player.duration*boundaries[startIndex]),Math.max(0,player.duration-.1));}
+            catch(_){fail(new Error('Unable to seek recorded audio'));}
+        };
+        const update=()=>{
+            if(!active||!Number.isFinite(player.duration)||player.duration<=0)return;
+            ensureSeek();if(!active||!seeked)return;
+            const progress=Math.max(0,Math.min(1,player.currentTime/player.duration));
+            if(progress>=boundaries[endIndex]-0.0003){finish();return;}
+            let next=startIndex;
+            while(next+1<endIndex&&progress>=boundaries[next+1])next++;
+            if(next!==lastIndex){lastIndex=next;onScene(next);}
+        };
+        player.onloadedmetadata=()=>{ensureSeek();update();};
+        player.ontimeupdate=update;
+        player.onended=finish;
+        player.onerror=()=>fail(player.error||new Error('Audio loading error'));
+        // play() is invoked directly from the user's gesture on Safari/iPad.
+        // Do not await metadata first, or iOS can reject play() as autoplay.
+        try{const result=player.play();result?.catch?.(fail);}
+        catch(e){fail(e);}
+        return {stop,player};
     }
     let active=null;
     function dismiss(){if(active)active.remove();}
@@ -60,7 +148,8 @@
         for(const child of doc.body.children){if('inert' in child){previousInert.set(child,child.inert);child.inert=true;}}
         doc.body.appendChild(root);doc.body.classList.add('po-theater-active');
         q('[data-title]').textContent=config.title+' · STORY THEATER';
-        let observer=null,last=-1,showJa=false,removed=false;
+        let observer=null,last=-1,showJa=false,removed=false,recordedHandle=null;
+        const stopRecorded=()=>{recordedHandle?.stop();recordedHandle=null;};
         function fit(){
             for(const [selector,lines,min] of [['.theater-en',2,16],['.theater-ja',1,13]]){
                 const el=q(selector);if(el.hidden||!el.clientWidth)continue;
@@ -98,7 +187,17 @@
             const msg=q('.theater-message');msg.textContent=s.error||(s.finished?'✓ 最後のシーンまで再生しました。次は音読練習です。':'');msg.hidden=!msg.textContent;msg.setAttribute('role',s.error?'alert':'status');
             fit();
         }
-        const session=createSession({...config,update:paint,finish:()=>{remove();config.onFinish();},back:()=>{remove();config.onBack();}});
+        const session=createSession({...config,
+            stop:()=>{stopRecorded();config.stop();},
+            playRecorded:config.recordedAudio?((startIndex,endIndex,rate,onScene,onEnd,onError)=>{
+                stopRecorded();
+                recordedHandle=playRecordedAudio(host,{
+                    url:config.recordedAudio,scenes:config.scenes,
+                    startIndex,endIndex,rate,onScene,onEnd,onError
+                });
+            }):undefined,
+            update:paint,finish:()=>{remove();config.onFinish();},back:()=>{remove();config.onBack();}
+        });
         function remove(){
             if(removed)return;removed=true;session.close();observer?.disconnect();host.removeEventListener('resize',fit);root.remove();doc.body.classList.remove('po-theater-active');
             for(const [child,value] of previousInert)child.inert=value;
@@ -124,5 +223,5 @@
         if(typeof host.ResizeObserver==='function'){observer=new host.ResizeObserver(fit);observer.observe(frame);}
         host.addEventListener('resize',fit);session.paint();root.focus();
     }
-    return {open,dismiss,pause,createSession};
+    return {open,dismiss,pause,createSession,sceneBoundaries,playRecordedAudio};
 });

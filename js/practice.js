@@ -75,7 +75,7 @@
             (app.sentences[app.index] || '');
     }
     function stopSpeech() {
-        app.micToken++; app.recording=false;
+        app.micToken++; app.recording=false;app.sceneUtterance=null;
         const sceneHandle=sceneMicRun;sceneMicRun=null;
         if(sceneMic){try{sceneMic.cancel();}catch(_){}}
         if(sceneHandle&&app.recognizer===sceneHandle.handle)app.recognizer=null;
@@ -438,9 +438,9 @@
     function speakModel(text,url,onEnd,onError,onStart,playbackRate=app.rate){
         stopSpeech();const token=app.micToken;let finished=false;
         const valid=()=>token===app.micToken&&!finished;
-        const finish=()=>{if(!valid())return;finished=true;app.sceneAudio=null;onEnd?.();};
-        const fail=()=>{if(!valid())return;finished=true;app.sceneAudio=null;onError?.();};
-        const speak=()=>{if(!valid())return;try{const synth=window.speechSynthesis,U=window.SpeechSynthesisUtterance;if(!synth||!U){fail();return;}const u=new U(text);u.lang='en-US';u.rate=playbackRate;const voices=synth.getVoices?.()||[];u.voice=voices.find(v=>v.name?.includes('Google US English'))||voices.find(v=>v.name?.includes('Samantha'))||voices.find(v=>v.lang==='en-US')||null;u.onstart=()=>{if(valid())onStart?.();};u.onend=finish;u.onerror=fail;try{synth.resume?.();}catch(_){}synth.speak(u);}catch(_){fail();}};
+        const finish=()=>{if(!valid())return;finished=true;app.sceneAudio=null;app.sceneUtterance=null;onEnd?.();};
+        const fail=()=>{if(!valid())return;finished=true;app.sceneAudio=null;app.sceneUtterance=null;onError?.();};
+        const speak=()=>{if(!valid())return;try{const synth=window.speechSynthesis,U=window.SpeechSynthesisUtterance;if(!synth||!U){fail();return;}const u=new U(text);app.sceneUtterance=u;u.lang='en-US';u.rate=playbackRate;const voices=synth.getVoices?.()||[];u.voice=voices.find(v=>v.name?.includes('Google US English'))||voices.find(v=>v.name?.includes('Samantha'))||voices.find(v=>v.lang==='en-US')||null;u.onstart=()=>{if(valid())onStart?.();};u.onend=finish;u.onerror=fail;try{synth.resume?.();}catch(_){}synth.speak(u);}catch(_){fail();}};
         if(!url||failedAudio.has(url)){speak();return;}
         try{const player=new Audio(url);app.sceneAudio=player;player.playbackRate=playbackRate;let tried=false;const fallback=()=>{if(!valid()||tried||app.sceneAudio!==player)return;tried=true;failedAudio.add(url);player.onended=null;player.onerror=null;try{player.pause();}catch(_){}app.sceneAudio=null;speak();};player.onended=finish;player.onerror=fallback;player.onplaying=()=>{if(valid())onStart?.();};const result=player.play();result?.catch?.(fallback);}catch(_){failedAudio.add(url);speak();}
     }
@@ -453,12 +453,20 @@
         speakModel(scene.english,sceneMedia(scene).audio,()=>{if(!valid())return;run.ready=true;run.questionStart??=Date.now();run.message='合う画像を選んでください。';render();},()=>{if(!valid())return;run.ready=false;run.message='音声を再生できません。もう一度お試しください。';render();});
     }
 
+    function theaterPartAudio(){
+        if(currentLevel!=='standard')return '';
+        const part=Number(currentKey.split('_')[1]?.replace(/^P/,''));
+        if(!Number.isInteger(part)||part<1||part>9)return '';
+        const root='lessons/lesson'+Number(currentLesson)+'/part'+part+'/';
+        const folder=currentLesson===8&&part===4?'':'audio/';
+        return root+folder+'L'+String(currentLesson).padStart(2,'0')+'_P'+part+'_full.mp3';
+    }
     function openTheater(){
         if(app.mode!=='storyHub')open('storyHub');
         if(!app.slides.length||!window.PowerOnStoryTheater){open('sceneReading');return;}
         stopSpeech();
         const scenes=app.slides.map(scene=>{const media=sceneMedia(scene);return {english:scene.english,japanese:String(scene.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,''),paragraph:scene.paragraph,image:media.image||'img/L'+Number(currentLesson)+'.webp',isCover:!media.image,audio:media.audio};});
-        window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,
+        window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
             onFinish:()=>open('sceneReading'),onBack:()=>{}});
     }
