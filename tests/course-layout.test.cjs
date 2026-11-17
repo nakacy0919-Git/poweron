@@ -26,7 +26,9 @@ function fixture(){
     en:["Question "+i,["A","B","C","D"]],ja:["問題 "+i,["ア","イ","ウ","エ"]],
     correct:i%4,evidence:"Example sentence",explanation:"日本語解説"
   }));
-  const win={document:doc,PowerOnCourseCore:core,PowerOnCourseQuestionBank:questions,
+  const glosses=Object.fromEntries([...Array.from({length:10},(_,i)=>["word"+i,"Definition "+i]),
+    ...Array.from({length:10},(_,i)=>["other"+i,"Other definition "+i])]);
+  const win={document:doc,PowerOnCourseCore:core,PowerOnCourseQuestionBank:questions,PowerOnCourseVocabGlosses:glosses,
     PowerOnComprehension:{},PowerOnPractice:{getProgress:()=>({scopes:{}}),open:()=>{},openTheater:()=>{}},
     performance:{now:()=>time},localStorage:{getItem:k=>stored.get(k)||null,setItem:(k,v)=>stored.set(k,v)},
     setTimeout(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id;},
@@ -71,7 +73,7 @@ test("Mastery dashboard is a compact four-card path and speed has three cards",(
 test("Vocabulary shows fixed explanation and auto-advances without scrolling",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
   f.click("newQuiz",{count:"10"});
-  const q=f.course._test.getQuiz();assert.equal(q.length,10);
+  const q=f.course._test.getQuiz();assert.equal(q.length,20);
   let h=f.html();assert.ok(h.includes('po-course-question is-vocabulary'));
   assert.ok(h.includes('po-course-answer-grid'));
   f.tick(5000);f.click("answer",{index:String(q[0].correct)});
@@ -118,17 +120,87 @@ test("Switching Part buttons actually selects the new Part without overwriting e
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
   assert.equal(f.course._test.getView(),"choose");
 });
-test("Vocabulary auto-advance reaches the results only after the tenth answer",()=>{
+test("Vocabulary progresses through Japanese 10 questions, English 10 questions, then the results",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");
   f.course.launchStep("vocabulary");f.click("newQuiz",{count:"10"});
   const questions=f.course._test.getQuiz();
+  assert.equal(questions.length,20);
   for(let i=0;i<questions.length;i++){
+    if(i===10){
+      assert.equal(f.course._test.getView(),"phaseIntro");
+      assert.ok(f.html().includes("English Stage を始める"));
+      f.click("startEnglish");
+    }
+    assert.equal(questions[i].phase,i<10?"ja":"en");
     f.tick(4000);f.click("answer",{index:String(questions[i].correct)});
     assert.equal(f.timers.size,1);
     f.nextScheduled();
   }
   assert.equal(f.course._test.getView(),"result");
+  assert.ok(f.html().includes("日本語"));
+  assert.ok(f.html().includes("English"));
   assert.ok(f.html().includes("MISSION CLEAR!"));
   assert.equal(f.course._test.getData().done.mastery.vocabulary,true);
+  assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
+});
+
+test("Japanese-first questions have Japanese choices; English stage has English-only explanations",()=>{
+  const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
+  f.click("newQuiz",{count:"10"});
+  const q=f.course._test.getQuiz();
+  assert.ok(q.every((x,i)=>x.phase===(i<10?"ja":"en")));
+  assert.ok(q.slice(0,10).every(x=>x.ja[1].every(v=>v.includes("意味"))));
+  assert.ok(q.slice(10).every(x=>x.en[1].every(v=>/definition/i.test(v))));
+  assert.ok(!f.html().includes('data-lang="en"'));
+  assert.ok(!f.html().includes('data-lang="ja"'));
+  assert.ok(f.html().includes("STEP 1 日本語"));
+});
+test("Comprehension uses 10 Japanese questions then 10 English questions, with independent totals",()=>{
+  const f=fixture();f.course.open();f.course.choose("speed");f.course.launchStep("comprehension");
+  assert.ok(f.html().includes("10問 × 2言語 = 20問"));
+  f.click("newQuiz",{count:"10"});
+  const questions=f.course._test.getQuiz();assert.equal(questions.length,20);
+  for(let i=0;i<20;i++){
+    if(i===10){assert.equal(f.course._test.getView(),"phaseIntro");f.click("startEnglish");}
+    assert.ok(f.html().includes(i<10?"STEP 1 日本語":"STEP 2 English"));
+    f.tick(6000);f.click("answer",{index:String(questions[i].correct)});
+    f.click("nextQuestion");
+  }
+  assert.equal(f.course._test.getView(),"result");
+  const latest=f.course._test.getData().latest.speed.comprehension;
+  assert.equal(latest.score,20);assert.equal(latest.total,20);
+  assert.equal(latest.sections.ja.score,10);assert.equal(latest.sections.en.score,10);
+  assert.equal(latest.bilingual,true);assert.equal(latest.clear,true);
+  assert.ok(f.html().includes("20 / 20"));
+  assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
+});
+test("Comprehension five questions per language is practice-only even with perfect 10/10",()=>{
+  const f=fixture();f.course.open();f.course.choose("speed");f.course.launchStep("comprehension");
+  f.click("newQuiz",{count:"5"});const questions=f.course._test.getQuiz();
+  assert.equal(questions.length,10);
+  for(let i=0;i<10;i++){
+    if(i===5)f.click("startEnglish");
+    f.tick(5000);f.click("answer",{index:String(questions[i].correct)});
+    f.click("nextQuestion");
+  }
+  const last=f.course._test.getData().latest.speed.comprehension;
+  assert.equal(last.total,10);assert.equal(last.clear,false);
+  assert.equal(f.course._test.status().steps.comprehension.clear,false);
+  assert.ok(f.html().includes("練習終了"));
+});
+test("A wrong Japanese answer remains pending after a correct English answer to the same item",()=>{
+  const f=fixture();f.course.open();f.course.choose("speed");f.course.launchStep("comprehension");
+  f.click("newQuiz",{count:"10"});const questions=f.course._test.getQuiz();
+  for(let i=0;i<20;i++){
+    if(i===10)f.click("startEnglish");
+    f.tick(4000);
+    f.click("answer",{index:String(i===0?(questions[i].correct+1)%4:questions[i].correct)});
+    f.click("nextQuestion");
+  }
+  const data=f.course._test.getData(),result=data.latest.speed.comprehension;
+  assert.equal(result.sections.ja.score,9);assert.equal(result.sections.en.score,10);
+  assert.equal(result.clear,false);
+  assert.ok(data.pendingWrong.speed.includes(questions[0].id+"::ja"));
+  assert.ok(!data.pendingWrong.speed.includes(questions[0].id+"::en"));
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
 });

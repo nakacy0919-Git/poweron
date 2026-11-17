@@ -199,3 +199,39 @@ body.po-course-guided:not(.po-course-free-mode) .po-course-launch button {min-he
  .po-course-question.is-vocabulary .po-course-answer-grid{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){.po-course-answer-popup{animation:none}}
+
+
+/* Japanese-first / English-second quiz sequence. Not a language toggle. */
+.po-course-phase-stages{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;
+  gap:8px;margin:8px auto 15px;color:#b5cbe4;font-weight:800;font-size:12px}
+.po-course-phase-stages span:not(.is-next):not(.is-done){color:#b8cbdf}
+.po-course-phase-stages span.is-next,.po-course-phase-stages span.is-done{
+  padding:9px 13px;border-radius:10px;background:#2d5575;border:1px solid #85bce5;color:#f0f9ff}
+.po-course-phase-stages span.is-done{background:#1f6159;border-color:#5ac4a5;color:#e8fff4}
+.po-course-question>.po-course-phase-stages{margin:0 auto 6px}
+.po-course-two-language-note{padding:10px 14px;background:#25445d;border:1px solid #476f8e;
+  border-radius:9px;text-align:center;font-size:13px;line-height:1.6}
+.po-course-quiz-setup .po-course-count button{white-space:normal;line-height:1.4}
+.po-course-phase-intro{max-width:690px;margin:24px auto;text-align:center;padding:30px 25px;
+  display:flex;flex-direction:column;align-items:center;gap:13px;border:1px solid #6b94b2;
+  background:linear-gradient(155deg,#274562,#1c354f);border-radius:18px}
+.po-course-phase-intro h3{font-size:clamp(18px,3vw,26px);margin:6px 0 0;color:white}
+.po-course-phase-intro p{font-size:14px;line-height:1.8;color:#d2e2f3;margin:0}
+.po-course-phase-intro b{color:#fff}
+.po-course-phase-intro .po-course-phase-count{color:#c9f3de;font-weight:850;font-size:16px}
+.po-course-phase-intro .po-course-phase-note{font-size:12px;color:#ffd69d}
+.po-course-phase-celebration{width:64px;height:64px;display:grid;place-items:center;
+  border-radius:50%;background:#16816e;color:#fff;font-size:34px;font-weight:900}
+.po-course-phase-start{font-size:15px!important;padding:13px 20px!important;min-height:48px;margin-top:10px}
+.po-course-language-results{width:min(100%,530px);margin:16px auto;display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.po-course-language-results>div{display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:#2e506d;border:1px solid #7cabc8;border-radius:12px;padding:15px 9px;color:#c8e4f9}
+.po-course-language-results>div strong{font-size:23px;color:#fff}
+.po-course-language-results>div span{font-size:12px;font-weight:800}
+@media(max-width:440px){
+ .po-course-phase-stages{font-size:11px;gap:5px}
+ .po-course-phase-stages span.is-next,.po-course-phase-stages span.is-done{padding:6px 8px}
+ .po-course-language-results{gap:7px}
+ .po-course-phase-intro{padding:18px 13px}
+}
