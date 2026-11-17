@@ -49,11 +49,14 @@ window.syncMobileMenu = function() {
 
     // Do not start recognition before every selection has been made.
     if (!lesson || !part || !para) {
-        if (lesson && Number(currentLesson) !== Number(lesson))
+        if (lesson && Number(currentLesson) !== Number(lesson)){
             selectLesson(Number(lesson),document.querySelectorAll('.nav-btn')[Number(lesson)-1]);
+            window.PowerOnCourses?.lessonChanged?.(Number(lesson));
+        }
         return;
     }
-    if (Number(currentLesson) !== Number(lesson))
+    const lessonChanged=Number(currentLesson)!==Number(lesson);
+    if (lessonChanged)
         selectLesson(Number(lesson),document.querySelectorAll('.nav-btn')[Number(lesson)-1]);
 
     const desktopPart = document.getElementById('partSelect');
@@ -63,6 +66,9 @@ window.syncMobileMenu = function() {
     if (desktopPara) desktopPara.value = para;
     if (typeof onScopeChange === 'function') onScopeChange();
 
+    // On iPad the lesson/part selector must open the course chooser first.
+    if(lessonChanged)window.PowerOnCourses?.lessonChanged?.(Number(lesson));
+    if([8,9,10].includes(Number(currentLesson))&&document.getElementById('po-course-overlay'))return;
     // Keep the chosen Study Lab mode when an iPad learner switches lesson/part.
     if (previousStudyMode && window.PowerOnPractice) PowerOnPractice.open(previousStudyMode);
     else {

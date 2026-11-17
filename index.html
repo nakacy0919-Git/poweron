@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/practice.css?v=17">
     <link rel="stylesheet" href="css/storyTheater.css?v=1">
     <link rel="stylesheet" href="css/learningMenu.css?v=1">
-    <link rel="stylesheet" href="css/learningCourses.css?v=1">
+    <link rel="stylesheet" href="css/learningCourses.css?v=2">
 </head>
 <body>
 
@@ -26,9 +26,9 @@
         <button class="nav-btn color-pink" onclick="selectLesson(5, this)">Lesson <span class="num">5</span></button>
         <button class="nav-btn color-blue" onclick="selectLesson(6, this)">Lesson <span class="num">6</span></button>
         <button class="nav-btn color-orange" onclick="selectLesson(7, this)">Lesson <span class="num">7</span></button>
-        <button class="nav-btn color-purple" onclick="selectLesson(8, this)">Lesson <span class="num">8</span></button>
-        <button class="nav-btn color-green" onclick="selectLesson(9, this)">Lesson <span class="num">9</span></button>
-        <button class="nav-btn color-pink" onclick="selectLesson(10, this)">Lesson <span class="num">10</span></button>
+        <button class="nav-btn color-purple" onclick="selectLesson(8, this);window.PowerOnCourses?.lessonChanged?.(8)">Lesson <span class="num">8</span></button>
+        <button class="nav-btn color-green" onclick="selectLesson(9, this);window.PowerOnCourses?.lessonChanged?.(9)">Lesson <span class="num">9</span></button>
+        <button class="nav-btn color-pink" onclick="selectLesson(10, this);window.PowerOnCourses?.lessonChanged?.(10)">Lesson <span class="num">10</span></button>
     </div>
 
     <div class="app-container" id="appContainer">
@@ -273,20 +273,20 @@
     <script src="js/quiz.js?v=25"></script>
     <script src="js/lesson8Practice.js?v=3"></script>
     <script src="js/ui.js?v=23"></script>
-    <script src="js/main.js?v=22"></script>
+    <script src="js/main.js?v=23"></script>
     <script src="js/speech.js?v=22"></script>
-    <script src="js/mobile.js?v=21"></script>
+    <script src="js/mobile.js?v=22"></script>
     <script src="lessons/sceneMedia.js?v=3"></script>
     <script src="js/practiceCore.js?v=9"></script>
     <script src="js/vendor/qrcode.min.js"></script>
     <script src="js/storyGameCore.js?v=2"></script>
     <script src="js/storyReading.js?v=5"></script>
     <script src="lessons/comprehensionData.js?v=2"></script>
-    <script src="js/storyTheater.js?v=3"></script>
-    <script src="js/practice.js?v=22"></script>
-    <script src="js/courseCore.js?v=1"></script>
+    <script src="js/storyTheater.js?v=4"></script>
+    <script src="js/practice.js?v=23"></script>
+    <script src="js/courseCore.js?v=2"></script>
     <script src="lessons/courseQuestions.js?v=1"></script>
     <script src="js/learningMenu.js?v=1"></script>
-    <script src="js/learningCourses.js?v=1"></script>
+    <script src="js/learningCourses.js?v=2"></script>
 </body>
 </html>
