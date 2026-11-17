@@ -5,6 +5,44 @@
   if(!core)return;
   let view="choose",quiz=null,quizIndex=0,quizAnswers=[],quizTimes=[],quizLangs=[],latestResult=null,quizKind="comprehension";
   let questionStartedAt=0,pausedAt=null,activeLearningStep=null,activeScope=null;
+  // UI-only timers; the scoring and existing Story Match storage are unchanged.
+  let feedbackTimer=null,feedbackPaused=false;
+  function cancelFeedbackTimer(){
+    if(feedbackTimer!==null){(host.clearTimeout||clearTimeout)(feedbackTimer);feedbackTimer=null;}
+    feedbackPaused=false;
+  }
+  function pauseFeedback(){
+    if(!quiz||quizAnswers[quizIndex]===undefined||quizKind!=="vocabulary")return;
+    cancelFeedbackTimer();feedbackPaused=true;paint();
+  }
+  function advanceVocabularyAfterFeedback(){
+    if(quizKind!=="vocabulary"||!quiz||quizAnswers[quizIndex]===undefined)return;
+    cancelFeedbackTimer();
+    const capturedQuiz=quiz,capturedIndex=quizIndex;
+    const correct=quizAnswers[quizIndex]===quiz[quizIndex].correct;
+    feedbackTimer=(host.setTimeout||setTimeout)(()=>{
+      feedbackTimer=null;
+      if(view==="quiz"&&quiz===capturedQuiz&&quizIndex===capturedIndex&&!feedbackPaused){
+        nextQuestion();
+      }
+    },correct?1500:2600);
+  }
+  function answerTone(correct){
+    try{
+      const Context=host.AudioContext||host.webkitAudioContext;
+      if(!Context)return;
+      const ctx=new Context(),osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type="sine";osc.frequency.setValueAtTime(correct?760:240,ctx.currentTime);
+      if(correct)osc.frequency.exponentialRampToValueAtTime(1020,ctx.currentTime+.13);
+      else osc.frequency.exponentialRampToValueAtTime(175,ctx.currentTime+.16);
+      gain.gain.setValueAtTime(.0001,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(correct?.055:.04,ctx.currentTime+.025);
+      gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+(correct?.24:.33));
+      osc.connect(gain);gain.connect(ctx.destination);osc.start();
+      osc.stop(ctx.currentTime+(correct?.25:.35));
+      osc.onended=()=>ctx.close?.();
+    }catch(_){/* Audio is optional and must never block answering. */}
+  }
   const clock=()=>host.performance?.now?.()??Date.now();
   host.document.addEventListener?.("visibilitychange",()=>{
     if(host.document.hidden){if(quiz&&view==="quiz"&&quizAnswers[quizIndex]===undefined)pausedAt=clock();}
@@ -71,21 +109,21 @@
       host.document.body.appendChild(b);
     }
   }
-  function close(){hide();floatButton(false);activeLearningStep=null;activeScope=null;}
+  function close(){cancelFeedbackTimer();hide();floatButton(false);activeLearningStep=null;activeScope=null;}
   function open(){
-    refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
+    cancelFeedbackTimer();refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
     host.document.body.classList.toggle("po-course-guided",[8,9,10].includes(currentContext.lesson));
     host.document.body.classList.remove("po-course-free-mode");
     paint();overlay().focus();
   }
   function openDashboard(){
-    refresh();view=currentData.course&&currentData.course!=="free"?"dashboard":"choose";
+    cancelFeedbackTimer();refresh();view=currentData.course&&currentData.course!=="free"?"dashboard":"choose";
     if(view==="dashboard"&&currentData.lastQuizByCourse?.[currentData.course])latestResult=currentData.lastQuizByCourse[currentData.course];
     paint();floatButton(false);overlay().focus();
   }
   function choose(course){
     if(!core.COURSES[course])return;
-    refresh();
+    cancelFeedbackTimer();refresh();
     // Course question bank uses Standard text; switch only this lesson selector.
     if(course!=="free"&&currentContext.level!=="standard"){
       if(typeof currentLevel!=="undefined")currentLevel="standard";
@@ -122,6 +160,7 @@
   }
   function stage(step){
     if(!core.COURSES[currentData.course]?.steps.includes(step)&&!["theater","vocabulary"].includes(step))return;
+    cancelFeedbackTimer();
     activeLearningStep=null;activeScope=null;
     if(step==="comprehension"||step==="vocabulary"){
       quizKind=step;quiz=null;quizIndex=0;quizAnswers=[];quizTimes=[];view="quiz";paint();return;
@@ -142,6 +181,7 @@
     if(el){el.textContent=message;el.hidden=!message;}
   }
   function newQuiz(count,kind=quizKind){
+    cancelFeedbackTimer();
     if(currentContext.level!=="standard"){notice("学習コースの問題はStandard本文に対応しています。");return;}
     if(!["vocabulary","comprehension","review"].includes(kind))return;
     let questions=[],available=[];
@@ -181,9 +221,14 @@
       save();
     }
     paint();
+    if(quizKind==="vocabulary"){
+      answerTone(quizAnswers[quizIndex]===quiz[quizIndex].correct);
+      advanceVocabularyAfterFeedback();
+    }
   }
   function nextQuestion(){
     if(!quiz||quizAnswers[quizIndex]===undefined)return;
+    cancelFeedbackTimer();
     if(quizIndex===quiz.length-1){view="result";paint();return;}
     quizIndex++;questionStartedAt=clock();pausedAt=null;paint();
   }
@@ -197,18 +242,24 @@
   function partPicker(){
     if(![8,9,10].includes(currentContext.lesson))return "";
     const parts=Object.keys(typeof lessonStructure!=="undefined"?lessonStructure[currentContext.lesson]||{}:{});
-    return '<label class="po-course-part-picker">学習するPart <select aria-label="学習コースのPart" data-course-part="true">'+
-      parts.map(p=>'<option value="'+escape(p)+'"'+(Number(p)===currentContext.part?' selected':'')+'>Part '+escape(p)+'</option>').join("")+
-      '</select></label>';
+    return '<div class="po-course-part-picker" role="group" aria-label="学習するPart">'+
+      '<span class="po-course-part-label">学習するPart</span>'+
+      '<div class="po-course-part-buttons">'+parts.map(p=>
+        button("selectPart","Part "+escape(p),
+          'data-part="'+escape(p)+'" aria-pressed="'+(Number(p)===currentContext.part)+'"',
+          "po-course-part-button"+(Number(p)===currentContext.part?" is-active":""))
+      ).join("")+'</div></div>';
   }
   function selectPart(part){
     if(!Object.prototype.hasOwnProperty.call(typeof lessonStructure!=="undefined"?lessonStructure[currentContext.lesson]||{}:{},part))return;
+    if(String(currentContext.part)===String(part))return;
+    cancelFeedbackTimer();
     const input=host.document.getElementById("partSelect"),para=host.document.getElementById("paraSelect");
     if(input)input.value=part;
     if(typeof updateParaSelect==="function")updateParaSelect();
     if(para)para.value="full";
     if(typeof onScopeChange==="function")onScopeChange();
-    refresh();quiz=null;quizAnswers=[];quizTimes=[];
+    refresh();quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];
     view="choose";paint();
   }
   function chooser(){
@@ -233,23 +284,30 @@
       const detail=step==="reading"?"合格 "+reading.passed+" / "+reading.total+" scenes":
         step==="review"?"未克服 "+(currentData.pendingWrong[currentData.course]||[]).length+" 問":
         latest?latest.score+" / "+latest.total+" 正解 · 平均"+latest.averageSeconds+"秒":isDone?"検証済み":"まだ未達成";
-      return '<article class="po-course-stage'+(isDone?' is-done':'')+(recommended===step?' is-next':'')+'">'+
-        '<div class="po-course-stage-no">'+(i+1)+'</div><div class="po-course-stage-copy"><strong>'+label.icon+' '+escape(label.name)+'</strong>'+
+      const recommendedStep=!progress.finished&&recommended===step;
+      return '<article class="po-course-stage po-course-step-'+(i+1)+(isDone?' is-done':'')+(recommendedStep?' is-next':'')+'">'+
+        '<div class="po-course-stage-top"><span class="po-course-stage-no">'+(isDone?'✓':i+1)+'</span>'+
+        '<span class="po-course-stage-kicker">STEP '+String(i+1).padStart(2,"0")+'</span>'+
+        '<span class="po-course-stage-badge'+(recommendedStep?' is-next':'')+'">'+
+          (isDone?"✓ CLEAR":recommendedStep?"NEXT":"未クリア")+'</span></div>'+
+        '<div class="po-course-stage-copy"><strong>'+label.icon+' '+escape(label.name)+'</strong>'+
         '<span>'+escape(label.ja)+'</span><small>'+escape(detail)+'</small>'+
         '<div class="po-stage-meter" role="progressbar" aria-label="'+escape(label.name)+' マスター率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+state.mastery+'"><i style="width:'+state.mastery+'%"></i></div>'+
-        '<small>マスター率 '+state.mastery+'% · '+(isDone?'✓ ミッションクリア':'チャレンジ中')+'</small></div>'+
-        button("stage",step==="comprehension"?"問題に挑戦 →":step==="review"?"復習する →":"学習する →",'data-step="'+step+'"',"po-course-start")+'</article>';
+        '<small>マスター率 '+state.mastery+'%</small></div>'+
+        button("stage",isDone?"もう一度学習する →":recommendedStep?"このStepから始める →":"学習する →",
+          'data-step="'+step+'"',"po-course-start")+'</article>';
     }).join("");
     return header(conf.title,"Lesson "+c.lesson+" · Part "+c.part+" · "+c.level)+partPicker()+
-      '<div class="po-course-overview"><div><strong>マスター率 '+progress.mastery+'%</strong><span>'+(progress.finished?'🏆 コース修了！':'全ミッション達成でコース修了')+'</span></div><b>'+progress.passed+' / '+progress.total+' クリア</b></div>'+
+      '<div class="po-course-overview"><div><strong>マスター率 '+progress.mastery+'%</strong><span>'+(progress.finished?'🏆 コース修了！':''+progress.total+'つのStepを順番にマスターしよう')+'</span></div><b>'+progress.passed+' / '+progress.total+' クリア</b></div>'+
       '<div class="po-course-progress" role="progressbar" aria-label="コース総合マスター率" aria-valuenow="'+progress.mastery+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+progress.mastery+'%"></i></div>'+
-      '<div class="po-course-stage-list">'+stages+'</div>'+
+      '<div class="po-course-stage-list" aria-label="コースの学習ステップ">'+stages+'</div>'+
       '<div class="po-course-tools">'+button("choosePage","コースを変更",'',"po-course-ghost")+
        button("free","自由学習",'',"po-course-ghost")+
        button("progress","既存の学習記録を見る",'',"po-course-ghost")+'</div>'+
-      '<p class="po-course-note">マスター率 = 正解率70%＋解答速度20%＋再挑戦の安定性10%。' +
+      '<details class="po-course-step-note"><summary>マスター率の計算方法・達成条件を見る</summary>'+
+      '<p>マスター率 = 正解率70%＋解答速度20%＋再挑戦の安定性10%。' +
       '10問以上の内容理解テストは全問正解でミッションクリア。速度はマスター率に反映しますが、速さだけで不合格にはなりません。' +
-      '最高得点は記録しつつ、直近の理解度も表示します。音読は従来どおり全シーン75%以上が条件です。</p>';
+      '最高得点は記録しつつ、直近の理解度も表示します。音読は従来どおり全シーン75%以上が条件です。</p></details>';
   }
   function quizScreen(){
     if(!quiz){
@@ -271,9 +329,10 @@
         button("dashboard","← コースへ戻る",'',"po-course-ghost")+'</div><p id="po-course-message" role="status" hidden></p>';
     }
     const q=quiz[quizIndex],lang=currentData.language,locale=q[lang],answered=quizAnswers[quizIndex],done=answered!==undefined;
-    return header(quizKind==="vocabulary"?"Vocabulary Check":quizKind==="review"?"Targeted Review Quiz":"Comprehension Challenge",
+    const vocabulary=quizKind==="vocabulary";
+    return header(vocabulary?"Vocabulary Check":quizKind==="review"?"Targeted Review Quiz":"Comprehension Challenge",
       "Lesson "+currentContext.lesson+" · Part "+currentContext.part+" · Question "+(quizIndex+1)+"/"+quiz.length)+
-      '<div class="po-course-question"><div class="po-course-question-top"><span>QUESTION '+(quizIndex+1)+' / '+quiz.length+'</span>'+
+      '<div class="po-course-question'+(vocabulary?' is-vocabulary':'')+'"><div class="po-course-question-top"><span>QUESTION '+(quizIndex+1)+' / '+quiz.length+'</span>'+
       '<span>'+escape(q.difficulty)+' · '+(quizKind==="vocabulary"?"Vocabulary":"Paragraph "+q.paragraph)+'</span></div>'+
       '<div class="po-course-lang">'+button("language","English",'data-lang="en" aria-pressed="'+(lang==="en")+'"')+
       button("language","日本語",'data-lang="ja" aria-pressed="'+(lang==="ja")+'"')+'</div>'+
@@ -281,11 +340,25 @@
         button("answer",'<b>'+String.fromCharCode(65+i)+'</b><span>'+escapeContent(value)+'</span>',
           'data-index="'+i+'"'+(done?' disabled':''),'po-course-answer'+(done?(i===q.correct?' correct':i===answered?' incorrect':''):''))
       ).join('')+'</div>'+
-      (done?'<section class="po-course-feedback"><strong>'+(answered===q.correct?'✓ Correct! 正解':'✕ Incorrect · 正解 '+String.fromCharCode(65+q.correct))+'</strong>'+
+      (done&&!vocabulary?'<section class="po-course-feedback"><strong>'+(answered===q.correct?'✓ Correct! 正解':'✕ Incorrect · 正解 '+String.fromCharCode(65+q.correct))+'</strong>'+
         '<p>'+escape(q.explanation||"")+'</p><small>根拠：'+escape(q.evidence||"")+'</small>'+
         '<small>解答時間 '+quizTimes[quizIndex].toFixed(1)+'秒 · 目標目安 '+core.targetSeconds(q,lang)+'秒（時間超過は不合格にはなりません）</small></section>':"")+
-      '<div class="po-course-question-footer">'+(done?button("nextQuestion",quizIndex+1===quiz.length?"結果を見る →":"次の問題 →",'',"po-course-start"):"")+
-      button("dashboard","中断してコースへ戻る",'',"po-course-ghost")+'</div></div>';
+      '<div class="po-course-question-footer">'+(!vocabulary&&done?button("nextQuestion",quizIndex+1===quiz.length?"結果を見る →":"次の問題 →",'',"po-course-start"):"")+
+      button("dashboard","中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
+      (vocabulary&&done?
+        '<div class="po-course-feedback-backdrop" role="status" aria-live="polite">'+
+          '<section class="po-course-answer-popup '+(answered===q.correct?'is-correct':'is-incorrect')+'" aria-label="回答の説明">'+
+          '<span class="po-course-popup-icon" aria-hidden="true">'+(answered===q.correct?'✓':'!')+'</span>'+
+          '<strong>'+(answered===q.correct?'Correct! 正解':'Incorrect! 惜しい！')+'</strong>'+
+          '<p class="po-course-popup-solution">正解：<b>'+String.fromCharCode(65+q.correct)+'. '+escapeContent(locale[1][q.correct])+'</b></p>'+
+          '<p class="po-course-popup-explanation">'+escape(q.explanation||'')+'</p>'+
+          '<small>'+escape(q.evidence||'')+'</small>'+
+          '<div class="po-course-popup-actions">'+
+          (feedbackPaused?'<span>説明を確認したら次へ進んでください</span>':
+            '<span>まもなく自動で'+(quizIndex+1===quiz.length?'結果画面':'次の問題')+'へ進みます</span>')+
+          button("nextQuestion",quizIndex+1===quiz.length?"結果を見る →":"次へ →",'',"po-course-popup-next")+
+          (!feedbackPaused?button("pauseFeedback","説明を読む",'',"po-course-popup-pause"):"")+
+          '</div></section></div>':"")+'</div>';
   }
   function resultScreen(){
     const res=latestResult;if(!res)return dashboard();
@@ -331,16 +404,18 @@
     switch(action){
       case "close":close();break;
       case "choose":choose(btn.dataset.course);break;
-      case "choosePage":view="choose";paint();break;
+      case "choosePage":cancelFeedbackTimer();view="choose";paint();break;
       case "dashboard":openDashboard();break;
       case "free":choose("free");break;
       case "stage":stage(btn.dataset.step);break;
+      case "selectPart":selectPart(String(btn.dataset.part));break;
       case "language":setLanguage(btn.dataset.lang);break;
       case "newQuiz":newQuiz(Number(btn.dataset.count),quizKind);break;
       case "answer":answer(Number(btn.dataset.index));break;
       case "nextQuestion":nextQuestion();break;
+      case "pauseFeedback":pauseFeedback();break;
       case "retry":newQuiz(quizKind==="vocabulary"?10:currentData.count,quizKind);break;
-      case "review":view="review";paint();break;
+      case "review":cancelFeedbackTimer();view="review";paint();break;
       case "reviewQuiz":newQuiz(20,"review");break;
       case "progress":hide();floatButton(true);host.PowerOnPractice?.open?.("progress");break;
     }
@@ -358,7 +433,7 @@
   function scopeChanged(){
     if(!currentContext)return;
     if(context().storageKey!==currentContext.storageKey){
-      quiz=null;quizAnswers=[];quizTimes=[];activeLearningStep=null;activeScope=null;
+      cancelFeedbackTimer();quiz=null;quizAnswers=[];quizTimes=[];activeLearningStep=null;activeScope=null;
       refresh();
       if(host.document.getElementById("po-course-overlay")){
         view="choose";paint();

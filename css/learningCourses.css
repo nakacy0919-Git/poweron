@@ -93,3 +93,109 @@ body.po-course-guided:not(.po-course-free-mode) .po-course-launch button {min-he
 .po-course-feedback small{display:block;margin-top:7px}
 @media(prefers-reduced-motion:reduce){.po-stage-meter i{transition:none}}
 @media(max-width:600px){.po-course-score-breakdown span{font-size:11px;padding:6px 9px}}
+
+
+/* Course navigation refresh — Part buttons, compact 2×2 learning path. */
+.po-course-inner{gap:12px}
+.po-course-part-picker{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:11px;
+  padding:8px 12px;border:1px solid #7995b180;border-radius:14px;background:#263c54;
+  color:#f7fbff;width:max-content;max-width:100%;margin:0 auto}
+.po-course-part-label{font-size:13px;font-weight:850;white-space:nowrap}
+.po-course-part-buttons{display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:7px}
+.po-course-part-buttons .po-course-part-button{color:#d5e6fa;background:#14273e;
+  border:1px solid #67819d;min-height:43px;padding:7px 12px;font-size:14px;white-space:nowrap}
+.po-course-part-buttons .po-course-part-button[aria-pressed="true"]{color:#102f51;background:#cdeeff;
+  border:2px solid #8dcfff;font-weight:900;box-shadow:0 0 0 2px #63b9ec25}
+.po-course-part-buttons .po-course-part-button:hover:not([aria-pressed="true"]){background:#325577}
+.po-course-overview{padding:12px 17px}
+.po-course-stage-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+.po-course-stage{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:9px;
+  min-width:0;min-height:172px;padding:13px 16px 12px;border-radius:15px;
+  background:linear-gradient(150deg,#2d4460,#21364e);border:1px solid #7593b37a}
+.po-course-stage.is-next{border:2px solid #efc785;background:linear-gradient(150deg,#364963,#27405b);box-shadow:0 0 0 2px #edca8620}
+.po-course-stage.is-done{background:linear-gradient(150deg,#244b4b,#253d49);border-color:#60b89e}
+.po-course-stage-top{display:flex;align-items:center;gap:9px;min-width:0}
+.po-course-stage-no{width:31px;height:31px;flex:none;display:grid;place-items:center;border-radius:50%;background:#4a709c;font-size:15px;font-weight:900}
+.po-course-stage.is-done .po-course-stage-no{background:#13806a}
+.po-course-stage-kicker{font-size:11px;letter-spacing:1.4px;font-weight:850;color:#b9d7ef}
+.po-course-stage-badge{margin-left:auto;padding:5px 9px;border-radius:99px;background:#203247;
+  font-size:10px;letter-spacing:.2px;font-weight:850;color:#c4d3e5;white-space:nowrap}
+.po-course-stage-badge.is-next{background:#f0ce88;color:#1c2c40}
+.po-course-stage.is-done .po-course-stage-badge{background:#c9f5df;color:#155c4a}
+.po-course-stage-copy{display:grid;gap:4px;min-width:0;grid-column:auto;grid-row:auto}
+.po-course-stage-copy strong{font-size:clamp(14px,1.5vw,18px);line-height:1.24}
+.po-course-stage-copy>span{font-size:12px;color:#dfebf8}
+.po-course-stage-copy small{font-size:10.5px;color:#b8d2e8}
+.po-course-stage-copy .po-stage-meter{height:7px;margin:4px 0 2px}
+.po-course-stage .po-course-start{grid-column:auto;grid-row:auto;align-self:flex-end;margin-top:auto;
+  min-height:39px;padding:7px 13px;font-size:12px}
+.po-course-stage-list .po-course-stage:nth-child(1)::after,
+.po-course-stage-list .po-course-stage:nth-child(3):not(:last-child)::after{
+  content:"→";position:absolute;top:42%;right:-21px;font-size:23px;font-weight:900;
+  color:#f0c682;z-index:1;text-shadow:0 2px 6px #172335;pointer-events:none}
+.po-course-stage-list .po-course-stage:nth-child(2)::after{
+  content:"↙";position:absolute;bottom:-26px;left:0;font-size:25px;font-weight:900;
+  color:#f0c682;z-index:1;pointer-events:none}
+.po-course-step-note{border-top:1px solid #46627d;padding:10px 2px 2px;color:#b4cce3}
+.po-course-step-note summary{font-size:12px;cursor:pointer;outline-offset:4px}
+.po-course-step-note p{font-size:12px;line-height:1.7;margin:10px 0}
+.po-course-tools{margin-top:0}
+
+/* Vocabulary choices: intentionally compact 2 columns, 2 rows on tablets/desktop. */
+.po-course-question.is-vocabulary{max-width:880px;gap:12px;padding:18px 21px}
+.po-course-question.is-vocabulary h3{margin:4px 0 8px}
+.po-course-question.is-vocabulary .po-course-answer-grid{display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.po-course-question.is-vocabulary .po-course-answer{min-height:66px;
+  padding:13px 16px;justify-content:flex-start;align-items:center;min-width:0}
+.po-course-question.is-vocabulary .po-course-answer span{overflow-wrap:anywhere}
+.po-course-question.is-vocabulary .po-course-question-footer{margin:2px 0 0}
+
+/* Immediate explanation, fixed in the viewport: no scrolling to feedback. */
+.po-course-feedback-backdrop{position:fixed;inset:0;z-index:25;
+  background:#080f1dbb;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top))
+  max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom))
+  max(14px,env(safe-area-inset-left));overflow:auto}
+.po-course-answer-popup{width:min(92vw,500px);max-height:min(84dvh,620px);overflow:auto;
+  display:flex;flex-direction:column;gap:9px;align-items:center;text-align:center;
+  background:linear-gradient(155deg,#1a3445,#16263b);color:#f7fbff;
+  border:2px solid #5fd1a9;border-radius:19px;padding:22px 24px;
+  box-shadow:0 18px 65px #000a;animation:po-answer-in .2s ease-out}
+.po-course-answer-popup.is-incorrect{border-color:#f3ae88;background:linear-gradient(155deg,#382d3e,#1e283d)}
+.po-course-answer-popup strong{font-size:22px;color:#b8ffe1}
+.po-course-answer-popup.is-incorrect strong{color:#ffd2b6}
+.po-course-popup-icon{display:grid;place-items:center;width:49px;height:49px;border-radius:50%;
+  background:#14644f;font-size:29px;font-weight:900;color:white}
+.po-course-answer-popup.is-incorrect .po-course-popup-icon{background:#986146}
+.po-course-answer-popup p{margin:0;line-height:1.55}
+.po-course-popup-solution{font-size:15px}
+.po-course-popup-explanation{font-size:14px}
+.po-course-answer-popup>small{font-size:11px;color:#bed0e6;line-height:1.5}
+.po-course-popup-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:8px}
+.po-course-popup-actions>span{width:100%;font-size:11px;color:#cbd9ea}
+.po-course-popup-next{padding:8px 19px;border:1px solid #87e5c0;background:#19725c;color:white}
+.po-course-popup-pause{padding:8px 13px;background:#2d405a;color:#e9f3ff;border:1px solid #809ab3}
+@keyframes po-answer-in{from{opacity:.3;transform:translateY(9px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:900px){
+ .po-course-stage-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .po-course-stage{padding:11px;min-height:165px}
+ .po-course-stage-copy strong{font-size:14px}
+ .po-course-stage-copy>span{font-size:11px}
+}
+@media(max-width:620px){
+ .po-course-part-picker{width:100%;gap:7px}
+ .po-course-part-buttons{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .po-course-stage-list{grid-template-columns:1fr;gap:9px}
+ .po-course-stage{min-height:140px}
+ .po-course-stage-list .po-course-stage::after{display:none!important}
+ .po-course-question.is-vocabulary{padding:12px}
+ .po-course-question.is-vocabulary .po-course-answer-grid{gap:8px}
+ .po-course-question.is-vocabulary .po-course-answer{min-height:58px;padding:9px 10px;font-size:13px;gap:8px}
+ .po-course-question.is-vocabulary .po-course-answer b{width:26px;height:26px;font-size:12px}
+ .po-course-answer-popup{padding:17px 14px}
+}
+@media(max-width:355px){
+ .po-course-question.is-vocabulary .po-course-answer-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.po-course-answer-popup{animation:none}}
