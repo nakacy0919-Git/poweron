@@ -1,0 +1,52 @@
+/* Cinema layout: a widescreen projection, atmospheric curtains and readable subtitles. */
+.story-theater{position:fixed;inset:0;z-index:30000;box-sizing:border-box;isolation:isolate;background:#100d13;color:#f3f7ff;display:flex;flex-direction:column;gap:8px;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));outline:0;overflow:auto;font-family:inherit}
+body.po-theater-active{overflow:hidden}
+.theater-auditorium{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 50% 43%,#72758338 0%,#30243055 52%,transparent 76%),linear-gradient(180deg,#0e0a11,#1d1017 65%,#08070b)}
+.theater-curtain{position:absolute;top:0;bottom:8%;width:15%;background:linear-gradient(180deg,#08070dbb,transparent 20%,transparent 65%,#08070de8),repeating-linear-gradient(90deg,#2b101b 0%,#4f1d2b 6%,#592130 9%,#270e16 15%,#170b12 20%);box-shadow:inset -18px 0 45px #08070dba;opacity:.9}
+.theater-curtain.left{left:0}.theater-curtain.right{right:0;transform:scaleX(-1)}
+.theater-wall-light{position:absolute;width:8%;height:3%;top:18%;border-radius:40%;background:radial-gradient(ellipse,#ffc99065,transparent 70%);filter:blur(9px)}
+.theater-wall-light.left{left:1%}.theater-wall-light.right{right:1%}
+.theater-seats{position:absolute;bottom:-7px;left:0;width:100%;height:clamp(64px,14vh,135px);opacity:.8}
+.theater-header{flex:none;display:flex;align-items:center;gap:12px;justify-content:space-between;text-shadow:0 1px 8px #000}
+.theater-header>div{display:grid;gap:3px}
+.theater-header>div>span{font-size:10px;letter-spacing:2px;font-weight:800;color:#e6c6a7}
+.theater-header strong{font-size:clamp(14px,2vw,20px)}
+.theater-header output{margin-left:auto;font-size:14px;font-weight:700;white-space:nowrap;color:#f2e4d7}
+.story-theater button,.story-theater select{font:inherit;font-size:13px;min-height:42px;padding:8px 13px;border:1px solid #51434b;border-radius:10px;background:#211b25ec;color:#f4f8ff;cursor:pointer;font-weight:750;white-space:nowrap;touch-action:manipulation}
+.story-theater button:disabled,.story-theater select:disabled{opacity:.4;cursor:default}
+.story-theater button:focus-visible,.story-theater select:focus-visible,.theater-caption:focus-visible{outline:3px solid #f3c786;outline-offset:3px}
+.story-theater .theater-close{font-size:24px;line-height:1;min-width:44px}
+.theater-progress{height:3px;background:#45343b;border-radius:10px;flex:none;overflow:hidden}
+.theater-progress i{display:block;height:100%;background:#efbf82;transition:width .3s}
+.theater-stage{position:relative;flex:1 1 0;min-height:150px;min-width:0;display:grid;place-items:center;overflow:hidden}
+.theater-picture{position:relative;box-sizing:border-box;width:min(100%,calc((100vh - 140px)*1.77778));aspect-ratio:16/9;max-height:100%;min-height:0;min-width:0;overflow:hidden;border-radius:5px;border:1px solid #a8a4a677;background:#100f14;box-shadow:0 0 0 4px #09070b,0 0 35px #aeb9d64a,0 22px 45px #0008;animation:theater-in .4s ease both;container-type:inline-size}
+@supports (width: 1cqw){.theater-stage{container-type:size}.theater-picture{width:min(98cqw,calc(96cqh * 1.777778));height:min(96cqh,calc(98cqw / 1.777778));aspect-ratio:16/9}}
+.theater-picture>img{display:block;position:absolute;inset:0;width:100%;height:100%}
+.theater-picture>.theater-image-fill{object-fit:cover;filter:blur(24px) brightness(.63) saturate(.85);transform:scale(1.09)}
+.theater-picture>.theater-artwork{object-fit:contain}
+.theater-caption{position:absolute;inset:auto 0 0;max-height:62%;overflow-y:auto;overscroll-behavior:contain;padding:clamp(12px,2.1vw,28px) 4% clamp(10px,1.5vw,20px);background:linear-gradient(180deg,transparent 0%,#08090bb0 27%,#08090bea 100%);color:white;text-align:center;box-sizing:border-box;text-shadow:0 2px 5px #000,0 0 14px #000}
+.theater-caption p{margin:0;font-size:clamp(19px,2.45vw,36px);font-weight:650;line-height:1.27;overflow-wrap:anywhere;text-wrap:balance}
+.theater-caption p.theater-ja{font-size:clamp(14px,1.3vw,20px);font-weight:500;line-height:1.4;color:#f3f0e9;margin-top:6px;text-wrap:pretty}
+@supports(font-size:1cqw){.theater-caption .theater-en{font-size:clamp(19px,2.7cqw,36px)}.theater-caption p.theater-ja{font-size:clamp(13px,1.6cqw,21px)}}
+.theater-controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;flex:none;position:relative;background:#100d14d6;border:1px solid #4d343f88;border-radius:13px;padding:5px 8px}
+.theater-controls>div{display:flex;align-items:center;gap:6px}
+.story-theater .theater-auto{background:#8d542e;border-color:#b98452}
+.story-theater .theater-finish{background:#126b59;border-color:#4db79d}
+.theater-message{flex:none;text-align:center;color:#c5ecdc;font-size:13px;margin:0}
+.theater-message[role=alert]{color:#ffd4ac}
+@keyframes theater-in{from{opacity:.35}to{opacity:1}}
+@media(max-width:600px){.story-theater{gap:6px}.theater-controls{gap:5px}.story-theater button,.story-theater select{font-size:12px;padding:7px 9px}.theater-caption{max-height:86%;padding-top:9px}.theater-curtain{width:11%}}
+@media(max-height:520px){.theater-header>div>span{display:none}.theater-caption{padding:7px 3%}.theater-caption p{font-size:clamp(16px,2.4vw,28px)}.theater-seats{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.theater-picture{animation:none}.theater-progress i{transition:none}}
+
+/* PowerOn global overlay styles must not change the cinema geometry. */
+.story-theater,.story-theater *{box-sizing:border-box}
+.story-theater .theater-picture img{max-width:none;max-height:none;margin:0}
+.story-theater .theater-caption p{margin:0;color:#fff}
+.story-theater .theater-caption p.theater-ja{margin-top:6px;color:#f3f0e9}
+.story-theater .theater-caption .theater-ja-label{font-size:11px;font-weight:600;color:#f4d3a6;display:block;margin-top:5px}
+.story-theater [hidden]{display:none!important}
+.story-theater .theater-cover-note{position:absolute;top:10px;left:12px;background:#120c16b5;padding:5px 9px;border-radius:6px;font-size:11px;color:#f2e4d7}
+
+.theater-picture.theater-transition{animation:theater-in .4s ease both}
+@media(prefers-reduced-motion:reduce){.theater-picture.theater-transition{animation:none}}
