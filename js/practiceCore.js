@@ -27,6 +27,10 @@
             let end = i + 1;
             while (end < source.length && /["'”’)\]]/.test(source[end])) end++;
             if (end < source.length && !/\s/.test(source[end])) continue;
+            // A quoted ! or ? followed by a lowercase reporting clause is not
+            // the end of the enclosing sentence: "I googled you!" would be ...
+            if (end > i + 1 && /["”’]/.test(source.slice(i + 1, end)) &&
+                /^[a-z]/.test(source.slice(end).trimStart())) continue;
             items.push(source.slice(start, end).trim());
             start = end;
             i = end - 1;
@@ -51,9 +55,18 @@
     // Lesson 9 Part 1: seven illustrated scenes (2 in paragraph 1, 5 in paragraph 2).
     const LESSON9_SCENE_SIZES = Object.freeze({
         L09_P1_p1: Object.freeze([2, 1]),
-        L09_P1_p2: Object.freeze([1, 1, 2, 1, 2])
+        L09_P1_p2: Object.freeze([1, 1, 2, 1, 2]),
+        // Keep existing eight illustrated Part 2 scenes while grouping full phrases.
+        L09_P2_p4: Object.freeze([3, 1, 1, 2, 2]),
+        // Part 4: keep "I googled you!" + reporting clause together, nylon together.
+        L09_P4_p7: Object.freeze([2, 1, 2, 1, 1])
     });
     const CURATED_SCENE_SIZES = Object.freeze({...LESSON8_SCENE_SIZES, ...LESSON9_SCENE_SIZES});
+    // Scene IDs already referenced by media filenames are stable across boundary fixes.
+    const LEGACY_SCENE_STARTS = Object.freeze({
+        L09_P2_p4: Object.freeze([1, 3, 5, 7, 9]),
+        L09_P4_p7: Object.freeze([1, 3, 5, 7, 8])
+    });
 
     function buildScenes(paragraphs, split, sceneSizes) {
         const result = [];
@@ -66,11 +79,13 @@
             while (offset < sentences.length) {
                 const first = sentences[offset], second = sentences[offset + 1];
                 // Keep long sentences by themselves, and never span paragraph boundaries.
+                const sceneOrdinal = group;
                 const size = fixed ? fixed[group++] : (second && (first + ' ' + second).trim().split(/\s+/).length <= 32 ? 2 : 1);
                 const selected = sentences.slice(offset, offset + size);
                 const index = offset + 1;
+                const stableIndex = fixed ? (LEGACY_SCENE_STARTS[paragraph.key]?.[sceneOrdinal] ?? index) : index;
                 result.push({
-                    id: paragraph.key + '_s' + String(index).padStart(2, '0'),
+                    id: paragraph.key + '_s' + String(stableIndex).padStart(2, '0'),
                     paragraphKey: paragraph.key, paragraph: paragraph.number,
                     firstSentence: index, lastSentence: index + size - 1,
                     sentences: selected, english: selected.join(' '),
