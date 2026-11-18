@@ -6,7 +6,7 @@
   else root.PowerOnGrammarVisualizer=api;
 })(typeof window!=='undefined'?window:globalThis,function(host){
   'use strict';
-  const relations=host.PowerOnGrammarRelations||{
+  const relations=host.PowerOnGrammarRelations||(typeof require==='function'?require('./grammarRelations.js'):null)||{
     pieces:(text)=>[{text,start:0,end:text.length,space:false,focus:false,target:false,keyword:false}],
     classify:()=>({kind:'relation',title:'語句のつながり',focusLabel:'注目する表現',targetLabel:'関連する語句',lineLabel:'関連'}),
     touchingNotes:()=>[],layout:()=>null,keyword:()=>''};
