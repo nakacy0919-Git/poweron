@@ -258,7 +258,7 @@
             update:paint,finish:()=>{remove();config.onFinish();},back:()=>{remove();config.onBack();}
         });
         function remove(){
-            if(removed)return;removed=true;session.close();observer?.disconnect();host.removeEventListener('resize',fit);root.remove();doc.body.classList.remove('po-theater-active');
+            if(removed)return;removed=true;session.close();grammar?.destroy?.();observer?.disconnect();host.removeEventListener('resize',fit);root.remove();doc.body.classList.remove('po-theater-active');
             for(const [child,value] of previousInert)child.inert=value;
             if(active?.session===session)active=null;
             if(old?.isConnected)old.focus();
@@ -269,7 +269,8 @@
             grammar=host.PowerOnGrammarVisualizer?.mount?.({
                 root,stage:q('.theater-stage'),button:button('grammar'),
                 lesson:Number(config.lesson),splitSentences:config.splitSentences,
-                getScene:()=>session.snapshot().scene,onOpen:()=>session.pause()
+                getScene:()=>session.snapshot().scene,onOpen:()=>session.pause(),
+                onVisibilityChange:visible=>{q('.theater-header strong').textContent=visible?'✦ Grammar Visualizer · 英文構造':'Step 1　本文を読む・聞く';}
             })||null;
             button('grammar').hidden=!grammar;
         }else button('grammar').hidden=true;
@@ -278,10 +279,18 @@
         q('select').addEventListener('change',e=>session.changeRate(e.target.value));
         root.addEventListener('keydown',e=>{
             if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(!grammar?.close?.())session.close('back');}
+            else if(grammar?.isOpen()&&e.key==='ArrowLeft'){e.preventDefault();grammar.previousSentence();}
+            else if(grammar?.isOpen()&&e.key==='ArrowRight'){e.preventDefault();grammar.nextSentence();}
             else if(e.target===root&&e.key==='ArrowLeft')session.navigate(-1);
             else if(e.target===root&&e.key==='ArrowRight')session.navigate(1);
             else if(e.key==='Tab'){
-                const controls=[...root.querySelectorAll('button:not(:disabled),select:not(:disabled),[tabindex="0"]')];
+                // Focus stays in the active overlay: do not tab into hidden
+                // captions or narration controls behind the grammar panel.
+                const query=grammar?.isOpen()
+                    ? '.po-grammar-overlay button:not(:disabled)'
+                    : 'button:not(:disabled),select:not(:disabled),[tabindex="0"]';
+                const controls=[...root.querySelectorAll(query)].filter(el=>
+                    !el.closest('[hidden]')&&el.getClientRects().length);
                 if(!controls.length)return;
                 const first=controls[0],last=controls[controls.length-1];
                 if(e.shiftKey&&(doc.activeElement===first||doc.activeElement===root)){e.preventDefault();last.focus();}
