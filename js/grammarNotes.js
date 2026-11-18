@@ -13,7 +13,9 @@
     "match": "The city is close to the world-famous Niagara Falls",
     "focus": "which stretches along the border between the U.S. and Canada",
     "target": "Niagara Falls",
-    "explain": "which 以下が Niagara Falls を後ろから説明。「国境に沿って広がるナイアガラの滝」というまとまりです。"
+    "explain": "which 以下が Niagara Falls を後ろから説明。「国境に沿って広がるナイアガラの滝」というまとまりです。",
+    "focusAnchor": "which",
+    "targetAnchor": "Falls"
   },
   {
     "lesson": 8,
@@ -21,7 +23,9 @@
     "match": "Long before the American Civil War started",
     "focus": "before the American Civil War started",
     "target": "many slaves in the South tried to escape",
-    "explain": "before 以下は出来事の時を示す従属節。後ろの tried to escape が主節の中心です。"
+    "explain": "before 以下は出来事の時を示す従属節。後ろの tried to escape が主節の中心です。",
+    "focusAnchor": "before",
+    "targetAnchor": "tried"
   },
   {
     "lesson": 8,
@@ -37,7 +41,9 @@
     "match": "Quakers living in Philadelphia helped them",
     "focus": "living in Philadelphia",
     "target": "Quakers",
-    "explain": "living in Philadelphia が Quakers を後ろから説明。who lived in Philadelphia と言い換えられます。"
+    "explain": "living in Philadelphia が Quakers を後ろから説明。who lived in Philadelphia と言い換えられます。",
+    "focusAnchor": "living",
+    "targetAnchor": "Quakers"
   },
   {
     "lesson": 8,
@@ -61,7 +67,9 @@
     "match": "so that escaping slaves could find them",
     "focus": "so that escaping slaves could find them",
     "target": "put a lamp in the window",
-    "explain": "so that + 主語 + could は「〜できるように」。ランプを置いた目的です。"
+    "explain": "so that + 主語 + could は「〜できるように」。ランプを置いた目的です。",
+    "focusAnchor": "so that",
+    "targetAnchor": "put"
   },
   {
     "lesson": 8,
@@ -69,7 +77,9 @@
     "match": "escaping slaves could find them",
     "focus": "escaping",
     "target": "slaves",
-    "explain": "escaping は名詞 slaves を修飾する現在分詞で、「逃亡中の奴隷」を示します。"
+    "explain": "escaping は名詞 slaves を修飾する現在分詞で、「逃亡中の奴隷」を示します。",
+    "focusAnchor": "escaping",
+    "targetAnchor": "slaves"
   },
   {
     "lesson": 8,
@@ -101,7 +111,9 @@
     "match": "songs known as Negro spirituals",
     "focus": "known as Negro spirituals",
     "target": "songs",
-    "explain": "known as ... は songs を後ろから修飾し、「〜として知られる歌」となります。"
+    "explain": "known as ... は songs を後ろから修飾し、「〜として知られる歌」となります。",
+    "focusAnchor": "known",
+    "targetAnchor": "songs"
   },
   {
     "lesson": 8,
@@ -109,7 +121,9 @@
     "match": "who saved more than 300 slaves",
     "focus": "who saved more than 300 slaves",
     "target": "conductor",
-    "explain": "who 以下が人を表す conductor を説明します。"
+    "explain": "who 以下が人を表す conductor を説明します。",
+    "focusAnchor": "who",
+    "targetAnchor": "conductor"
   },
   {
     "lesson": 8,
@@ -125,7 +139,9 @@
     "match": "When she was in her early twenties",
     "focus": "When she was in her early twenties",
     "target": "Harriet married",
-    "explain": "when 節は「20代前半だったとき」という時を示します。"
+    "explain": "when 節は「20代前半だったとき」という時を示します。",
+    "focusAnchor": "When",
+    "targetAnchor": "married"
   },
   {
     "lesson": 8,
@@ -133,7 +149,9 @@
     "match": "a cheerful man named Tubman",
     "focus": "named Tubman",
     "target": "a cheerful man",
-    "explain": "named Tubman が man を後ろから説明。「タブマンという名の男性」です。"
+    "explain": "named Tubman が man を後ろから説明。「タブマンという名の男性」です。",
+    "focusAnchor": "named",
+    "targetAnchor": "man"
   },
   {
     "lesson": 8,
@@ -149,7 +167,9 @@
     "match": "so that the dogs could not follow them",
     "focus": "so that the dogs could not follow them",
     "target": "crossed a river",
-    "explain": "「犬に追跡されないように」川を渡った、という目的の関係です。"
+    "explain": "「犬に追跡されないように」川を渡った、という目的の関係です。",
+    "focusAnchor": "so that",
+    "targetAnchor": "crossed"
   },
   {
     "lesson": 8,
@@ -207,7 +227,9 @@
     "match": "which prohibited anyone from helping escaping slaves",
     "focus": "which prohibited anyone from helping escaping slaves",
     "target": "The Fugitive Slave Law of 1850",
-    "explain": "カンマで区切られた which 節が法律について補足説明しています。"
+    "explain": "カンマで区切られた which 節が法律について補足説明しています。",
+    "focusAnchor": "which",
+    "targetAnchor": "Law"
   },
   {
     "lesson": 8,
@@ -249,7 +271,9 @@
     "match": "where they would be safe and free",
     "focus": "where they would be safe and free",
     "target": "Canada",
-    "explain": "where 以下が Canada を説明し、「そこで安全かつ自由になれる」を表します。"
+    "explain": "where 以下が Canada を説明し、「そこで安全かつ自由になれる」を表します。",
+    "focusAnchor": "where",
+    "targetAnchor": "Canada"
   },
   {
     "lesson": 8,
@@ -273,7 +297,9 @@
     "match": "the freedom she had desperately worked for",
     "focus": "she had desperately worked for",
     "target": "the freedom",
-    "explain": "the freedom と she の間に目的格の関係代名詞 that／which を補えます。"
+    "explain": "the freedom と she の間に目的格の関係代名詞 that／which を補えます。",
+    "focusAnchor": "she",
+    "targetAnchor": "freedom"
   },
   {
     "lesson": 8,
@@ -293,11 +319,21 @@
   },
   {
     "lesson": 8,
-    "tag": "受動態＋目的の不定詞",
+    "tag": "受動態 be unveiled",
     "match": "a plaque was unveiled in the chapel",
     "focus": "was unveiled",
     "target": "a plaque",
-    "explain": "銘板が「披露された」ので受動態。to honor 以下は披露した目的です。"
+    "explain": "a plaque が主語、was unveiled が受動態。「銘板が披露された」という意味です。後ろの to honor は目的を表す不定詞です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "目的を表す不定詞",
+    "match": "a plaque was unveiled in the chapel",
+    "focus": "to honor Harriet Tubman as a National Historic Person",
+    "target": "was unveiled",
+    "focusAnchor": "to honor",
+    "targetAnchor": "unveiled",
+    "explain": "to honor ... は銘板が披露された目的を表します。「ハリエット・タブマンを国家的な歴史的人物としてたたえるために」という意味です。"
   },
   {
     "lesson": 9,
@@ -387,7 +423,9 @@
     "match": "This was because French-speaking people",
     "focus": "because French-speaking people, the Normans, had come to control England",
     "target": "This was",
-    "explain": "This was because ～ は「それは〜だったから」。理由の節が続きます。"
+    "explain": "This was because ～ は「それは〜だったから」。理由の節が続きます。",
+    "focusAnchor": "because",
+    "targetAnchor": "was"
   },
   {
     "lesson": 9,
@@ -403,7 +441,9 @@
     "match": "French words that came into English increased greatly",
     "focus": "that came into English",
     "target": "French words",
-    "explain": "that 以下は French words を後ろから説明します。"
+    "explain": "that 以下は French words を後ろから説明します。",
+    "focusAnchor": "that",
+    "targetAnchor": "words"
   },
   {
     "lesson": 9,
@@ -419,7 +459,9 @@
     "match": "words concerned with science and technology",
     "focus": "concerned with science and technology",
     "target": "words",
-    "explain": "concerned with ... は words を後ろから修飾します。"
+    "explain": "concerned with ... は words を後ろから修飾します。",
+    "focusAnchor": "concerned",
+    "targetAnchor": "words"
   },
   {
     "lesson": 9,
@@ -435,7 +477,9 @@
     "match": "There are many ways that new words are created",
     "focus": "that new words are created in English today",
     "target": "many ways",
-    "explain": "There are ～ で存在を示し、that 以下が ways を説明します。"
+    "explain": "There are ～ で存在を示し、that 以下が ways を説明します。",
+    "focusAnchor": "that",
+    "targetAnchor": "ways"
   },
   {
     "lesson": 9,
@@ -459,7 +503,9 @@
     "match": "a word that already exists",
     "focus": "that already exists",
     "target": "a word",
-    "explain": "that 以下が a word を説明。「すでに存在する語」です。"
+    "explain": "that 以下が a word を説明。「すでに存在する語」です。",
+    "focusAnchor": "that",
+    "targetAnchor": "word"
   },
   {
     "lesson": 9,
@@ -467,7 +513,9 @@
     "match": "a sentence we might hear on a street",
     "focus": "we might hear on a street in New York City",
     "target": "a sentence",
-    "explain": "a sentence の後に目的格 that／which が省略されています。"
+    "explain": "a sentence の後に目的格 that／which が省略されています。",
+    "focusAnchor": "we",
+    "targetAnchor": "sentence"
   },
   {
     "lesson": 9,
@@ -483,7 +531,9 @@
     "match": "When you give a speech, you might use",
     "focus": "When you give a speech",
     "target": "you might use a mike",
-    "explain": "when 節は行為の時・場面。might は可能性を表します。"
+    "explain": "when 節は行為の時・場面。might は可能性を表します。",
+    "focusAnchor": "When",
+    "targetAnchor": "use"
   },
   {
     "lesson": 9,
@@ -491,7 +541,9 @@
     "match": "an exam next week, which is short for examination",
     "focus": "which is short for examination",
     "target": "an exam",
-    "explain": "カンマ＋which は exam への補足説明。「examination の短縮形」です。"
+    "explain": "カンマ＋which は exam への補足説明。「examination の短縮形」です。",
+    "focusAnchor": "which",
+    "targetAnchor": "exam"
   },
   {
     "lesson": 9,
@@ -545,7 +597,9 @@
     "match": "laser is an acronym meaning Light Amplification",
     "focus": "meaning Light Amplification by Stimulated Emission of Radiation",
     "target": "an acronym",
-    "explain": "meaning ～ は an acronym を後ろから説明します。"
+    "explain": "meaning ～ は an acronym を後ろから説明します。",
+    "focusAnchor": "meaning",
+    "targetAnchor": "acronym"
   },
   {
     "lesson": 9,
@@ -553,7 +607,9 @@
     "match": "new words are added to English when existing words",
     "focus": "when existing words are put together, or blended",
     "target": "new words are added to English",
-    "explain": "主節の are added と従属節の are put はどちらも受動態です。"
+    "explain": "主節の are added と従属節の are put はどちらも受動態です。",
+    "focusAnchor": "when",
+    "targetAnchor": "added"
   },
   {
     "lesson": 9,
@@ -561,7 +617,9 @@
     "match": "Breakfast and lunch are put together to form brunch",
     "focus": "to form brunch",
     "target": "are put together",
-    "explain": "to form brunch は「brunch を作るために」という目的です。"
+    "explain": "to form brunch は「brunch を作るために」という目的です。",
+    "focusAnchor": "to form",
+    "targetAnchor": "put"
   },
   {
     "lesson": 9,
@@ -569,7 +627,9 @@
     "match": "Cellular and telephone are combined to make",
     "focus": "to make the word cellphone",
     "target": "are combined",
-    "explain": "to make ... は副詞的用法の不定詞で、目的を表します。"
+    "explain": "to make ... は副詞的用法の不定詞で、目的を表します。",
+    "focusAnchor": "to make",
+    "targetAnchor": "combined"
   },
   {
     "lesson": 9,
@@ -577,7 +637,9 @@
     "match": "a coinage based on the modern technology",
     "focus": "based on the modern technology of the Internet",
     "target": "a coinage",
-    "explain": "based on ～ は a coinage を後ろから説明します。"
+    "explain": "based on ～ は a coinage を後ろから説明します。",
+    "focusAnchor": "based",
+    "targetAnchor": "coinage"
   },
   {
     "lesson": 9,
@@ -585,7 +647,9 @@
     "match": "The name was created when the material was invented",
     "focus": "when the material was invented by an American scientist",
     "target": "The name was created",
-    "explain": "was created と was invented はどちらも過去の受動態です。"
+    "explain": "was created と was invented はどちらも過去の受動態です。",
+    "focusAnchor": "when",
+    "targetAnchor": "created"
   },
   {
     "lesson": 9,
@@ -593,7 +657,9 @@
     "match": "a device that we use with computers to move the cursor",
     "focus": "that we use with computers to move the cursor",
     "target": "a device",
-    "explain": "that 節は a device を修飾し、to move は「動かすために」という目的です。"
+    "explain": "that 節は a device を修飾し、to move は「動かすために」という目的です。",
+    "focusAnchor": "that",
+    "targetAnchor": "device"
   },
   {
     "lesson": 9,
@@ -601,7 +667,9 @@
     "match": "new words that came into English recently",
     "focus": "that came into English recently thanks to Japanese",
     "target": "new words",
-    "explain": "that 以下が new words を後ろから説明します。"
+    "explain": "that 以下が new words を後ろから説明します。",
+    "focusAnchor": "that",
+    "targetAnchor": "words"
   },
   {
     "lesson": 9,
@@ -627,7 +695,9 @@
         "role": "主節",
         "text": "it might be growing and changing faster than other languages"
       }
-    ]
+    ],
+    "focusAnchor": "Because",
+    "targetAnchor": "growing"
   },
   {
     "lesson": 8,
@@ -687,7 +757,9 @@
     "match": "These white people helped the slaves because",
     "focus": "because they did not support slavery",
     "target": "helped the slaves",
-    "explain": "because 以下が白人たちが助けた理由です。"
+    "explain": "because 以下が白人たちが助けた理由です。",
+    "focusAnchor": "because",
+    "targetAnchor": "helped"
   },
   {
     "lesson": 8,
@@ -965,7 +1037,9 @@
     "match": "when Abraham Lincoln signed the Emancipation Proclamation",
     "focus": "when Abraham Lincoln signed the Emancipation Proclamation in 1863",
     "target": "Harriet was over forty years old",
-    "explain": "when 以下はリンカーンが宣言に署名した時を示します。"
+    "explain": "when 以下はリンカーンが宣言に署名した時を示します。",
+    "focusAnchor": "when",
+    "targetAnchor": "was"
   },
   {
     "lesson": 8,
