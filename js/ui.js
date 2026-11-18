@@ -311,6 +311,18 @@ function showVocab(event, displayWord, dictWord) {
         vocabData = currentVocab[dictWord] || currentVocab[dictWord.toLowerCase()];
     }
 
+    // Reuse entries from other Parts before showing the pronunciation-only fallback.
+    if(!vocabData && safeVocab && typeof safeVocab==='object'){
+        const needle=String(dictWord||'').toLowerCase();
+        for(const entries of Object.values(safeVocab)){
+            if(Array.isArray(entries)){
+                vocabData=entries.find(entry=>entry?.word?.toLowerCase()===needle) || null;
+            }else if(entries && typeof entries==='object'){
+                vocabData=entries[dictWord]||entries[needle]||null;
+            }
+            if(vocabData)break;
+        }
+    }
     if (!vocabData) vocabData={meaning:'この単語の意味は教材辞書に未登録です。',pronunciation:''};
     
     document.getElementById('popupWord').innerText = displayWord;
