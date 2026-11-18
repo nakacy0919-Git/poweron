@@ -1,0 +1,754 @@
+/* Grammar Visualizer — responsive overlay on existing scene artwork. */
+.story-theater.po-grammar-on .theater-picture>.theater-artwork{
+  filter:brightness(.40) saturate(.68) blur(2px);
+  transition:filter .25s ease;
+}
+.story-theater.po-grammar-on .theater-caption{
+  opacity:0;pointer-events:none;
+}
+.story-theater .po-grammar-overlay{
+  position:absolute;inset:2% 3%;width:min(94%,1080px);margin:auto;z-index:8;
+  display:flex;flex-direction:column;min-height:0;max-height:96%;
+  padding:clamp(10px,1.8vw,24px);
+  color:#f8fbff;background:linear-gradient(142deg,#07111ce8 0%,#101d32dc 56%,#12243ce8 100%);
+  border:1px solid #7ba6d755;box-shadow:0 18px 50px #000b,inset 0 1px #ffffff24;
+  border-radius:clamp(12px,1.8vw,22px);backdrop-filter:blur(7px);
+  font-family:inherit;box-sizing:border-box;
+  animation:po-grammar-appear .2s ease both;
+}
+.story-theater .po-grammar-overlay[hidden]{display:none!important}
+.story-theater .po-grammar-top{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;
+}
+.story-theater .po-grammar-top>div{min-width:0}
+.story-theater .po-grammar-kicker{
+  display:block;color:#82d9ff;font-weight:850;letter-spacing:.14em;
+  font-size:clamp(8px,1vw,12px)
+}
+.story-theater .po-grammar-top h2{
+  font-size:clamp(13px,1.65vw,22px);line-height:1.2;margin:2px 0;font-weight:800;color:#fff;
+}
+.story-theater .po-grammar-overlay button{
+  padding:6px 12px;min-height:34px;flex-shrink:0;
+  background:#1b324ce6;border:1px solid #6d9ac366;color:#eff7ff;
+  font-size:clamp(10px,1vw,13px);white-space:normal;line-height:1.25;
+}
+.story-theater .po-grammar-overlay button:focus-visible{
+  outline:3px solid #ffda82;outline-offset:2px;
+}
+.story-theater .po-grammar-overlay button:disabled{opacity:.28;cursor:default}
+.story-theater .po-grammar-overlay [data-grammar="close"]{
+  width:38px;min-width:38px;min-height:38px;border-radius:50%;padding:0;font-size:24px;
+}
+.story-theater .po-grammar-nav{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:clamp(5px,1vh,12px) 0 2px;flex:none;
+}
+.story-theater .po-grammar-counter{
+  color:#d5e9fa;text-align:center;min-width:140px;font-size:clamp(10px,1vw,13px);font-weight:750;
+  font-variant-numeric:tabular-nums;
+}
+.story-theater .po-grammar-center{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:clamp(5px,1.2vh,16px);
+  overflow-y:auto;overscroll-behavior:contain;padding:6px 7px;
+}
+.story-theater .po-grammar-sentence{
+  color:#fff;font-size:clamp(20px,2.8vw,39px);font-weight:750;
+  line-height:1.4;margin:0;text-align:center;text-wrap:balance;
+  overflow-wrap:anywhere;text-shadow:0 3px 10px #050a13;
+}
+.story-theater .po-grammar-highlight{
+  color:#fff;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+  padding:0 .1em;transition:background .2s ease;
+}
+.story-theater .po-grammar-highlight.is-focus{
+  background:#f0a73565;border-bottom:3px solid #ffc26e;
+}
+.story-theater .po-grammar-highlight.is-target{
+  background:#2d9bb57d;border-bottom:3px solid #8ceaff;
+}
+.story-theater .po-grammar-relation{
+  display:flex;justify-content:center;align-items:stretch;gap:clamp(7px,1.3vw,20px);
+  width:min(96%,860px);max-width:100%;
+}
+.story-theater .po-grammar-node{
+  display:flex;flex:1 1 0;flex-direction:column;gap:2px;align-items:center;justify-content:center;
+  min-width:0;padding:clamp(6px,1vw,12px);border-radius:10px;
+  background:#16263ec7;border:1px solid #eac18587;
+}
+.story-theater .po-grammar-node-target{border-color:#8ceaff8a;background:#102c3dd9}
+.story-theater .po-grammar-node small{
+  font-weight:800;font-size:clamp(9px,.8vw,12px);color:#f5cc92;letter-spacing:.05em;
+}
+.story-theater .po-grammar-node-target small{color:#86e5ff}
+.story-theater .po-grammar-node strong{
+  display:block;color:#fff;font-size:clamp(11px,1.1vw,15px);font-weight:750;
+  line-height:1.4;text-align:center;overflow-wrap:anywhere;
+}
+.story-theater .po-grammar-arrow{
+  display:grid;place-items:center;flex:0 0 auto;color:#ffe2a6;
+  font-size:clamp(21px,3vw,42px);text-shadow:0 0 14px #f7bf7eaa;
+}
+.story-theater .po-grammar-comment{
+  width:min(96%,860px);padding:clamp(8px,1vw,14px);
+  border-radius:12px;background:#07111ecc;border:1px solid #99b6d33f;
+  box-sizing:border-box;
+}
+.story-theater .po-grammar-kind{
+  display:inline-block;margin-bottom:4px;padding:3px 9px;border-radius:100px;
+  color:#132034;background:#ffd188;font-weight:850;font-size:clamp(10px,.9vw,12px);
+}
+.story-theater .po-grammar-explain{
+  margin:0;font-size:clamp(12px,1.18vw,17px);line-height:1.55;font-weight:620;color:#f5f8ff;
+}
+.story-theater .po-grammar-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;min-height:42px;margin-top:6px;flex:none;border-top:1px solid #ffffff24;padding-top:8px;
+}
+.story-theater .po-grammar-steps{
+  display:flex;gap:5px;align-items:center;flex-wrap:wrap;min-width:0;
+}
+.story-theater .po-grammar-overlay .po-grammar-step{
+  min-height:29px;padding:4px 9px;background:transparent;border-color:#829fc066;
+  color:#c4d8ef;font-size:clamp(10px,.9vw,12px);
+}
+.story-theater .po-grammar-overlay .po-grammar-step.is-selected{
+  background:#fff0cd;border-color:#fff0cd;color:#1b2837;font-weight:850;
+}
+.story-theater .po-grammar-overlay .po-grammar-reveal{
+  background:#e7ad54;border-color:#f2ce84;color:#122136;font-weight:850;
+}
+.story-theater .theater-controls [data-action="grammar"]{
+  border-color:#70b1d0;background:#193d57;
+}
+.story-theater .theater-controls [data-action="grammar"][aria-pressed="true"]{
+  background:#efd2a2;color:#1d2330;border-color:#fff2cc;
+}
+@keyframes po-grammar-appear{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:scale(1)}}
+@media(max-width:620px){
+  .story-theater .po-grammar-overlay{inset:1% 2%;width:96%;padding:8px;border-radius:12px}
+  .story-theater .po-grammar-top h2{display:none}
+  .story-theater .po-grammar-nav{margin:2px 0}
+  .story-theater .po-grammar-center{gap:5px;padding:2px}
+  .story-theater .po-grammar-sentence{font-size:clamp(17px,4.4vw,25px);line-height:1.23}
+  .story-theater .po-grammar-relation{gap:5px}
+  .story-theater .po-grammar-node{padding:4px}
+  .story-theater .po-grammar-node strong{font-size:10px;line-height:1.25}
+  .story-theater .po-grammar-node small{font-size:9px}
+  .story-theater .po-grammar-arrow{font-size:18px}
+  .story-theater .po-grammar-comment{padding:6px}
+  .story-theater .po-grammar-explain{font-size:11px;line-height:1.4}
+  .story-theater .po-grammar-bottom{padding-top:4px;margin-top:3px;min-height:33px}
+  .story-theater .po-grammar-steps{max-width:65%;max-height:36px;overflow:auto}
+  .story-theater .po-grammar-overlay button{min-height:30px;padding:4px 7px}
+}
+@media(max-height:570px){
+  .story-theater .po-grammar-overlay{padding:8px}
+  .story-theater .po-grammar-nav{margin:0}
+  .story-theater .po-grammar-center{gap:4px}
+  .story-theater .po-grammar-sentence{font-size:clamp(16px,2vw,25px);line-height:1.24}
+  .story-theater .po-grammar-node{padding:5px}
+  .story-theater .po-grammar-comment{padding:5px 8px}
+  .story-theater .po-grammar-explain{font-size:clamp(11px,1vw,13px);line-height:1.4}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-theater .po-grammar-overlay{animation:none}
+  .story-theater.po-grammar-on .theater-picture>.theater-artwork{transition:none}
+}
+
+
+/* Reviewed S/V/O/C or clause-role breakdowns, when available. */
+.story-theater .po-grammar-pattern{
+  display:flex;align-items:stretch;justify-content:center;gap:6px;
+  max-width:100%;overflow-x:auto;flex:0 1 auto;scrollbar-width:thin;padding:3px;
+}
+.story-theater .po-grammar-pattern-chip{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-width:65px;max-width:250px;padding:7px 11px;border-radius:10px;
+  border:1px solid #87bee080;background:#103147dd;
+}
+.story-theater .po-grammar-pattern-chip small{
+  font-size:clamp(10px,.92vw,13px);font-weight:900;color:#88daff;
+}
+.story-theater .po-grammar-pattern-chip strong{
+  font-size:clamp(11px,1.1vw,15px);font-weight:730;color:#fff;
+  overflow-wrap:anywhere;text-align:center;line-height:1.35;
+}
+.story-theater .po-grammar-pattern-arrow{
+  align-self:center;color:#eec57d;font-size:clamp(17px,2.5vw,27px);
+}
+@media(max-width:620px),(max-height:570px){
+ .story-theater .po-grammar-pattern{gap:3px}
+ .story-theater .po-grammar-pattern-chip{min-width:48px;padding:3px 5px}
+ .story-theater .po-grammar-pattern-chip strong{font-size:10px}
+ .story-theater .po-grammar-pattern-arrow{font-size:15px}
+}
+
+
+/* One-screen classroom presentation: preserve scene controls, reclaim height from
+   narration-only controls when grammar is open (iPad portrait/landscape and phones). */
+.story-theater.po-grammar-on{
+  height:100dvh;
+  max-height:100dvh;
+  overflow:hidden;
+}
+.story-theater.po-grammar-on .theater-stage{
+  min-height:0;
+}
+.story-theater.po-grammar-on .theater-controls{
+  flex-wrap:nowrap;
+  min-height:42px;
+  padding:3px 7px;
+  gap:6px;
+}
+.story-theater.po-grammar-on .theater-controls>div:nth-child(2),
+.story-theater.po-grammar-on .theater-controls [data-action="jp"],
+.story-theater.po-grammar-on .theater-controls select,
+.story-theater.po-grammar-on .theater-controls .theater-finish{
+  display:none;
+}
+.story-theater.po-grammar-on .theater-header{
+  min-height:36px;
+}
+.story-theater.po-grammar-on .theater-picture .theater-caption{
+  visibility:hidden;
+}
+.story-theater .po-grammar-overlay{
+  height:96%;
+  min-width:0;
+  overflow:hidden;
+}
+.story-theater .po-grammar-center{
+  min-width:0;
+  scrollbar-width:thin;
+  scrollbar-color:#8bb6d3b0 transparent;
+}
+.story-theater .po-grammar-bottom{
+  min-width:0;
+  flex-wrap:nowrap;
+}
+.story-theater .po-grammar-steps{
+  flex:1 1 auto;
+  overflow-x:auto;
+  overflow-y:hidden;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+  padding-bottom:2px;
+  scrollbar-width:thin;
+  max-width:none;
+}
+.story-theater .po-grammar-toggle-explain{
+  background:#17364a;
+  border-color:#79b5d0;
+  flex:0 0 auto;
+}
+.story-theater .po-grammar-overlay .po-grammar-reveal{
+  flex:0 0 auto;
+}
+.story-theater .po-grammar-pattern{
+  flex-wrap:wrap;
+  overflow:visible;
+}
+.story-theater .po-grammar-pattern-arrow{
+  font-size:clamp(14px,1.5vw,25px);
+}
+.story-theater .po-grammar-overlay.is-compact{
+  padding:clamp(5px,1.2vw,10px);
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-nav{
+  margin:0;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-center{
+  gap:4px;
+  padding:2px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-sentence{
+  font-size:clamp(15px,2.7vw,26px);
+  line-height:1.26;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-relation,
+.story-theater .po-grammar-overlay.is-compact .po-grammar-pattern{
+  gap:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-node{
+  padding:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-node strong{
+  font-size:clamp(10px,1vw,13px);
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-comment{
+  padding:5px 8px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-explain{
+  font-size:clamp(11px,1.05vw,13px);
+  line-height:1.34;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-bottom{
+  min-height:31px;
+  margin-top:3px;
+  padding-top:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-kicker{
+  font-size:9px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-top h2{
+  display:none;
+}
+.story-theater .po-grammar-overlay.is-compact button{
+  min-height:29px;
+  padding:4px 7px;
+}
+.story-theater .po-grammar-sentence.is-long{
+  font-size:clamp(18px,2.2vw,29px);
+  line-height:1.32;
+}
+.story-theater .po-grammar-sentence.is-very-long{
+  font-size:clamp(16px,1.7vw,23px);
+  line-height:1.26;
+}
+@media(max-width:620px){
+  .story-theater .po-grammar-sentence.is-long{font-size:clamp(16px,3.7vw,22px)}
+  .story-theater .po-grammar-sentence.is-very-long{font-size:clamp(15px,3.2vw,19px)}
+  .story-theater .po-grammar-bottom{gap:3px}
+  .story-theater .po-grammar-steps{max-width:100%;max-height:none}
+  .story-theater .po-grammar-overlay .po-grammar-reveal,
+  .story-theater .po-grammar-overlay .po-grammar-toggle-explain{
+    font-size:10px;
+    padding:4px 6px;
+  }
+}
+@media(max-height:430px){
+  .story-theater.po-grammar-on{gap:3px;padding:4px max(7px,env(safe-area-inset-right)) 4px max(7px,env(safe-area-inset-left))}
+  .story-theater.po-grammar-on .theater-header{min-height:28px}
+  .story-theater.po-grammar-on .theater-header>div>span{display:none}
+  .story-theater.po-grammar-on .theater-header strong{font-size:12px}
+  .story-theater.po-grammar-on .theater-header output{font-size:11px}
+  .story-theater.po-grammar-on .theater-controls{min-height:32px}
+  .story-theater.po-grammar-on .theater-controls button{min-height:30px;padding:4px 8px}
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-sentence{
+    font-size:clamp(14px,2.6vw,20px);
+  }
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-pattern-chip strong{
+    font-size:9px;
+  }
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-explain{
+    font-size:10px;
+  }
+}
+
+
+/* High-quality classroom projection: carry the subdued theater artwork behind
+   the entire available stage, including tall iPad portrait layouts. */
+.story-theater.po-grammar-on .theater-picture{
+  width:100%;
+  height:100%;
+  max-height:100%;
+  aspect-ratio:auto;
+  border:0;
+  border-radius:9px;
+  box-shadow:none;
+}
+.story-theater.po-grammar-on .theater-picture>.theater-image-fill{
+  filter:blur(20px) brightness(.52) saturate(.8);
+}
+.story-theater.po-grammar-on .theater-picture>.theater-artwork{
+  filter:brightness(.34) saturate(.67) blur(1.4px);
+}
+.story-theater.po-grammar-on .po-grammar-overlay{
+  background:linear-gradient(145deg,#07111cd2 0%,#101d32c9 55%,#10223bdf 100%);
+  width:min(96%,1200px);
+  min-width:0;
+}
+/* The content must start at its real top when it overflows; normal center
+   alignment would otherwise clip the beginning of a long English sentence. */
+.story-theater .po-grammar-center{
+  justify-content:safe center;
+  overscroll-behavior:contain;
+}
+.story-theater .po-grammar-highlight.is-both{
+  background:linear-gradient(155deg,#f1a746b0 0%,#b89a63aa 45%,#319dc8a6 100%);
+  border-bottom:3px solid #ffe29b;
+}
+.story-theater .po-grammar-comment.is-collapsed{
+  padding:5px 10px;
+}
+.story-theater .po-grammar-comment.is-collapsed .po-grammar-kind{
+  margin:0;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-center{
+  gap:4px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-sentence{
+  line-height:1.2;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-relation{
+  gap:5px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-node{
+  padding:4px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-pattern-chip{
+  padding:4px 7px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-comment{
+  padding:5px 9px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-explain{
+  font-size:clamp(11px,1vw,14px);
+  line-height:1.4;
+}
+/* Touch targets and footer controls must not fall outside narrow portrait
+   viewports; point chips stay reachable via the Next Point button. */
+@media(max-width:460px){
+  .story-theater .po-grammar-bottom{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:4px;
+  }
+  .story-theater .po-grammar-steps{display:none}
+  .story-theater .po-grammar-toggle-explain{
+    justify-self:start;
+    min-width:0;
+    white-space:nowrap;
+  }
+  .story-theater .po-grammar-overlay .po-grammar-reveal{
+    justify-self:end;
+    white-space:nowrap;
+  }
+  .story-theater .po-grammar-counter{
+    min-width:0;
+    flex:1;
+  }
+  .story-theater .po-grammar-nav{gap:4px}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-theater .po-grammar-highlight{transition:none}
+}
+
+
+/* ===== Grammar Visualizer 3 — sentence-anchored dependency theater =====
+   The principal evidence is the sentence itself: arrows join actual DOM
+   words, NOT arbitrary labels or generic cards. No additional background art.
+*/
+.story-theater .po-grammar-overlay{
+  --po-amber:#ffc978;
+  --po-cyan:#87ecff;
+  --po-ink:#e8f5ff;
+  --po-glass:#101a2cc9;
+  border:1px solid #a6cae77c;
+  background:linear-gradient(134deg,#071322e7 3%,#101b30d9 53%,#061827eb 100%);
+  box-shadow:0 0 0 1px #ffffff18,0 24px 84px #020814c9,inset 0 1px #cdeeff32;
+}
+.story-theater .po-grammar-top{
+  padding-bottom:5px;
+  border-bottom:1px solid #a7defe22;
+}
+.story-theater .po-grammar-top h2{
+  letter-spacing:.035em;
+}
+.story-theater .po-grammar-kicker{
+  color:#91def7;
+}
+.story-theater .po-grammar-center{
+  justify-content:safe center;
+  gap:clamp(6px,1.1vh,16px);
+}
+.story-theater .po-grammar-sentence-map{
+  position:relative;
+  display:block;
+  width:min(100%,1060px);
+  padding:clamp(31px,4.6vh,48px) clamp(6px,1vw,14px) 4px;
+  margin:0 auto;
+  isolation:isolate;
+  min-height:0;
+  flex:0 0 auto;
+}
+.story-theater .po-grammar-sentence-map .po-grammar-sentence{
+  position:relative;
+  z-index:2;
+  font-weight:790;
+  letter-spacing:.012em;
+  line-height:1.46;
+  text-wrap:pretty;
+  text-shadow:0 4px 14px #000e;
+}
+.story-theater .po-grammar-links{
+  display:block;
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  overflow:visible;
+  z-index:1;
+}
+.story-theater .po-grammar-links[hidden]{display:none!important}
+.story-theater .po-grammar-link-path{
+  fill:none;
+  stroke:var(--po-amber);
+  stroke-width:3.1;
+  stroke-linecap:round;
+  opacity:.96;
+  filter:drop-shadow(0 1px 3px #06111cb5);
+}
+.story-theater .po-grammar-link-from{
+  fill:#ffc978;
+  stroke:#091522;
+  stroke-width:2;
+}
+.story-theater .po-grammar-link-to{
+  fill:#89e9fb;
+  stroke:#091522;
+  stroke-width:2;
+}
+.story-theater .po-grammar-link-caption{
+  font-family:inherit;
+  font-size:13px;
+  font-weight:850;
+  fill:#ffe2ab;
+  stroke:#06111c;
+  stroke-width:4.5px;
+  paint-order:stroke;
+  letter-spacing:.08em;
+}
+.story-theater .po-grammar-highlight{
+  display:inline;
+  position:relative;
+  border-radius:5px;
+  padding:0 .085em;
+  cursor:pointer;
+  color:#fff;
+  font-weight:850;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+  transition:background .18s ease,box-shadow .18s ease;
+  scroll-margin:100px;
+}
+.story-theater .po-grammar-highlight.is-focus{
+  background:linear-gradient(180deg,#f6b45a53,#f6b45ab0);
+  box-shadow:inset 0 -3px 0 #f3bb70;
+}
+.story-theater .po-grammar-highlight.is-target{
+  background:linear-gradient(180deg,#299ebb50,#1f9bd7aa);
+  box-shadow:inset 0 -3px 0 #9becff;
+}
+.story-theater .po-grammar-highlight.is-both{
+  background:linear-gradient(145deg,#f1b25abb,#269ac5ae);
+  box-shadow:inset 0 -3px 0 #fff3cc;
+}
+.story-theater .po-grammar-highlight.is-keyword{
+  background:#ffe29d;
+  color:#162335;
+  box-shadow:0 0 0 2px #ffe29d49,0 0 20px #ffd18b57;
+  border-radius:7px;
+  font-weight:900;
+}
+.story-theater .po-grammar-highlight:hover{
+  filter:brightness(1.18);
+  box-shadow:0 0 0 2px #ffffff8a,inset 0 -3px 0 #fff9e6;
+}
+.story-theater .po-grammar-highlight:focus-visible{
+  outline:3px solid white;
+  outline-offset:3px;
+}
+.story-theater .po-grammar-word-lens{
+  max-width:min(95%,780px);
+  background:#082233e6;
+  color:#d5f8ff;
+  border:1px solid #6fc7e262;
+  padding:5px 12px;
+  border-radius:100px;
+  font-weight:730;
+  font-size:clamp(11px,1vw,13px);
+  line-height:1.4;
+  text-align:center;
+  margin:0;
+}
+.story-theater .po-grammar-relation{
+  width:min(96%,880px);
+  gap:clamp(8px,1.8vw,22px);
+  align-items:stretch;
+}
+.story-theater .po-grammar-node{
+  border-color:#f9c87378;
+  background:linear-gradient(150deg,#31291cbb,#1b2530e8);
+  box-shadow:inset 0 1px #ffffff22,0 8px 25px #020a1552;
+}
+.story-theater .po-grammar-node-target{
+  border-color:#87e7ff87;
+  background:linear-gradient(150deg,#113949e2,#172739df);
+}
+.story-theater .po-grammar-node small{
+  color:#ffe1ab;
+}
+.story-theater .po-grammar-node-target small{color:#9eedff}
+.story-theater .po-grammar-node strong{
+  font-size:clamp(12px,1.18vw,17px);
+  font-weight:800;
+}
+.story-theater .po-grammar-tagline{
+  display:flex;
+  gap:7px 10px;
+  align-items:center;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+  margin-bottom:5px;
+}
+.story-theater .po-grammar-kind{
+  margin:0;
+  box-shadow:0 0 14px #ffc36c36;
+}
+.story-theater .po-grammar-relation-title{
+  color:#a6e7fb;
+  font-weight:850;
+  font-size:clamp(11px,1.02vw,14px);
+}
+.story-theater .po-grammar-keyword{
+  padding:3px 9px;
+  border:1px solid #ffdc936e;
+  border-radius:100px;
+  background:#ffcb8140;
+  color:#ffe9bb;
+  font-size:clamp(10px,.95vw,12px);
+  font-weight:880;
+}
+.story-theater .po-grammar-comment{
+  background:linear-gradient(135deg,#081b2aef,#111b29f0);
+  border-color:#8fbad556;
+  box-shadow:inset 3px 0 #e7b66b;
+}
+.story-theater .po-grammar-explain{
+  color:#ebf4ff;
+  letter-spacing:.015em;
+}
+.story-theater .po-grammar-pattern-chip{
+  border-color:#8ecde5a6;
+  background:linear-gradient(170deg,#12394d,#122436);
+}
+.story-theater .po-grammar-pattern-chip small{
+  color:#b0f0ff;
+}
+.story-theater .po-grammar-overlay .po-grammar-step.is-selected{
+  box-shadow:0 0 14px #f6cb8559;
+}
+.story-theater .po-grammar-overlay .po-grammar-reveal{
+  background:linear-gradient(130deg,#ffd794,#dca657);
+  border-color:#ffe0ac;
+  box-shadow:0 4px 15px #edb86e40;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-sentence-map{
+  padding-top:clamp(18px,3vh,26px);
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-sentence-map{
+  padding-top:18px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-sentence{
+  line-height:1.28;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-link-caption,
+.story-theater .po-grammar-overlay.is-dense .po-grammar-link-caption{font-size:11px}
+@media(max-width:620px){
+  .story-theater .po-grammar-sentence-map{
+    padding-top:clamp(19px,3.8vh,32px);
+  }
+  .story-theater .po-grammar-sentence-map .po-grammar-sentence{
+    line-height:1.34;
+  }
+  .story-theater .po-grammar-node strong{font-size:11px}
+  .story-theater .po-grammar-tagline{gap:3px 7px}
+  .story-theater .po-grammar-relation-title{font-size:11px}
+  .story-theater .po-grammar-link-path{stroke-width:2.4}
+}
+@media(max-height:450px){
+  .story-theater .po-grammar-overlay .po-grammar-sentence-map{
+    padding-top:16px;
+  }
+  .story-theater .po-grammar-link-caption{font-size:10px}
+  .story-theater .po-grammar-overlay .po-grammar-node strong{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-theater .po-grammar-highlight{transition:none}
+  .story-theater .po-grammar-link-path{animation:none;transition:none}
+}
+
+/* Long linked phrases wrap cleanly in compact classroom viewports. */
+.story-theater .po-grammar-word-lens{overflow-wrap:anywhere;border-radius:16px}
+
+
+/* ===== Teaching sequence: readable even on iPad landscape ===== */
+.story-theater .po-grammar-teachbar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(5px,1.1vw,12px);
+  min-width:0;
+  min-height:32px;
+  flex:none;
+  padding:3px 0 2px;
+  border-bottom:1px solid #9bc4e530;
+}
+.story-theater .po-grammar-teachbar [data-grammar="toggleReveal"]{
+  flex:none;
+  min-height:29px;
+  font-size:clamp(10px,.95vw,12px);
+  padding:4px 10px;
+  color:#eafaff;
+  border-color:#8bcbe866;
+  background:#12364dd5;
+}
+.story-theater .po-grammar-teachbar [data-grammar="toggleReveal"][aria-pressed="true"]{
+  border-color:#ffc978cc;
+  background:#ffd18c;
+  color:#112638;
+  box-shadow:0 0 18px #ffc97842;
+}
+.story-theater .po-grammar-reveal-progress{
+  flex:1;
+  text-align:center;
+  color:#caefff;
+  font-weight:850;
+  font-size:clamp(10px,.95vw,13px);
+  letter-spacing:.02em;
+  min-width:0;
+}
+.story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{
+  flex:none;
+  min-height:29px;
+  padding:4px 10px;
+  font-weight:850;
+  font-size:clamp(10px,.95vw,12px);
+  color:#17273a;
+  border-color:#ffe0a6;
+  background:#f6ca7c;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="0"] .po-grammar-steps{
+  visibility:hidden;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="0"] .po-grammar-sentence-map .po-grammar-sentence{
+  font-weight:760;
+  color:#fff;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="1"] .po-grammar-highlight{
+  box-shadow:inset 0 -4px 0 #eec179;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="1"] .po-grammar-highlight.is-target{
+  box-shadow:inset 0 -4px 0 #88e5ff;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="2"] .po-grammar-link-path{
+  stroke-width:3.6;
+}
+@media(max-width:620px){
+  .story-theater .po-grammar-teachbar{min-height:27px;gap:3px;padding:1px 0}
+  .story-theater .po-grammar-reveal-progress{font-size:10px}
+  .story-theater .po-grammar-teachbar [data-grammar="toggleReveal"],
+  .story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{
+    min-height:27px;
+    font-size:10px;
+    padding:3px 6px;
+  }
+}
+@media(max-height:430px){
+  .story-theater .po-grammar-teachbar{min-height:25px}
+  .story-theater .po-grammar-teachbar [data-grammar="toggleReveal"],
+  .story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{min-height:25px}
+}

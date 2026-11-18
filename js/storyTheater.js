@@ -187,7 +187,7 @@
     const markup='<div class="theater-auditorium" aria-hidden="true"><div class="theater-curtain left"></div><div class="theater-curtain right"></div><div class="theater-wall-light left"></div><div class="theater-wall-light right"></div><svg class="theater-seats" viewBox="0 0 1200 190" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="poCinemaSeat" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#49232a"/><stop offset=".45" stop-color="#24141a"/><stop offset="1" stop-color="#08070c"/></linearGradient></defs>'+seats+'</svg></div>'+
         '<header class="theater-header"><div><span data-title></span><strong>Step 1　本文を読む・聞く</strong></div><output aria-live="polite" data-count></output><button type="button" class="theater-close" data-action="close" aria-label="紙芝居を閉じる">×</button></header>'+
         '<div class="theater-progress" aria-hidden="true"><i></i></div><div class="theater-stage"><div class="theater-picture"><img class="theater-image-fill" alt="" aria-hidden="true"><img class="theater-artwork" alt=""><span class="theater-cover-note" hidden>Lessonカバー · 場面画像は未登録</span><div class="theater-caption" tabindex="0"><p class="theater-en"></p><small class="theater-ja-label" hidden></small><p class="theater-ja" hidden></p></div></div></div>'+
-        '<p class="theater-message" role="status" hidden></p><footer class="theater-controls"><div><button type="button" data-action="prev" aria-label="前のシーン">◀</button><button type="button" data-action="next" aria-label="次のシーン">▶</button></div><div><button type="button" class="theater-manual" data-action="manual">🔊 このシーン</button><button type="button" class="theater-auto" data-action="auto">▶ 自動再生</button></div><div><button type="button" data-action="jp" aria-pressed="false">和訳 OFF</button><select aria-label="紙芝居の音声速度"><option value="0.65">0.65×</option><option value="0.85">0.85×</option><option value="1">1×</option></select></div><button type="button" class="theater-finish" data-action="finish">⏭ スキップして音読へ進む</button></footer>';
+        '<p class="theater-message" role="status" hidden></p><footer class="theater-controls"><div><button type="button" data-action="prev" aria-label="前のシーン">◀</button><button type="button" data-action="next" aria-label="次のシーン">▶</button></div><div><button type="button" class="theater-manual" data-action="manual">🔊 このシーン</button><button type="button" class="theater-auto" data-action="auto">▶ 自動再生</button></div><div><button type="button" data-action="jp" aria-pressed="false">和訳 OFF</button><button type="button" data-action="grammar" aria-pressed="false">✦ 文法解説</button><select aria-label="紙芝居の音声速度"><option value="0.65">0.65×</option><option value="0.85">0.85×</option><option value="1">1×</option></select></div><button type="button" class="theater-finish" data-action="finish">⏭ スキップして音読へ進む</button></footer>';
     function open(config){
         dismiss();if(!config.scenes?.length)return;
         const doc=host.document,old=doc.activeElement,root=doc.createElement('section');
@@ -197,7 +197,7 @@
         for(const child of doc.body.children){if('inert' in child){previousInert.set(child,child.inert);child.inert=true;}}
         doc.body.appendChild(root);doc.body.classList.add('po-theater-active');
         q('[data-title]').textContent=config.title+' · STORY THEATER';
-        let observer=null,last=-1,showJa=false,removed=false,recordedHandle=null;
+        let observer=null,last=-1,showJa=false,removed=false,recordedHandle=null,grammar=null;
         const stopRecorded=()=>{recordedHandle?.stop();recordedHandle=null;};
         const sceneClips=createSceneClipPlayer(host);
         function fit(){
@@ -227,6 +227,7 @@
             showJa=s.japanese;q('.theater-ja').hidden=!showJa;q('.theater-ja-label').hidden=!showJa;
             q('[data-count]').textContent='Scene '+(s.index+1)+' / '+s.total;
             q('.theater-progress i').style.width=((s.index+1)/s.total*100)+'%';
+            grammar?.update(s.scene);
             button('prev').disabled=s.index===0;button('next').disabled=s.index===s.total-1;
             button('manual').disabled=s.playing&&s.auto;
             button('manual').textContent=s.playing&&!s.auto?'■ 停止':'🔊 このシーン';
@@ -257,21 +258,39 @@
             update:paint,finish:()=>{remove();config.onFinish();},back:()=>{remove();config.onBack();}
         });
         function remove(){
-            if(removed)return;removed=true;session.close();observer?.disconnect();host.removeEventListener('resize',fit);root.remove();doc.body.classList.remove('po-theater-active');
+            if(removed)return;removed=true;session.close();grammar?.destroy?.();observer?.disconnect();host.removeEventListener('resize',fit);root.remove();doc.body.classList.remove('po-theater-active');
             for(const [child,value] of previousInert)child.inert=value;
             if(active?.session===session)active=null;
             if(old?.isConnected)old.focus();
         }
         active={session,remove};
+        // Optional Lesson 8/9 grammar layer: never changes audio/progress/session data.
+        if([8,9].includes(Number(config.lesson))&&config.grammarEnabled===true){
+            grammar=host.PowerOnGrammarVisualizer?.mount?.({
+                root,stage:q('.theater-stage'),button:button('grammar'),
+                lesson:Number(config.lesson),splitSentences:config.splitSentences,
+                getScene:()=>session.snapshot().scene,onOpen:()=>session.pause(),
+                onVisibilityChange:visible=>{q('.theater-header strong').textContent=visible?'✦ Grammar Visualizer · 英文構造':'Step 1　本文を読む・聞く';}
+            })||null;
+            button('grammar').hidden=!grammar;
+        }else button('grammar').hidden=true;
         const actions={prev:()=>session.navigate(-1),next:()=>session.navigate(1),manual:session.manual,auto:session.autoplay,jp:session.toggleJapanese,finish:()=>session.close('finish'),close:()=>session.close('back')};
         Object.keys(actions).forEach(name=>button(name).addEventListener('click',actions[name]));
         q('select').addEventListener('change',e=>session.changeRate(e.target.value));
         root.addEventListener('keydown',e=>{
-            if(e.key==='Escape'){e.preventDefault();e.stopPropagation();session.close('back');}
+            if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(!grammar?.close?.())session.close('back');}
+            else if(grammar?.isOpen()&&e.key==='ArrowLeft'){e.preventDefault();grammar.previousSentence();}
+            else if(grammar?.isOpen()&&e.key==='ArrowRight'){e.preventDefault();grammar.nextSentence();}
             else if(e.target===root&&e.key==='ArrowLeft')session.navigate(-1);
             else if(e.target===root&&e.key==='ArrowRight')session.navigate(1);
             else if(e.key==='Tab'){
-                const controls=[...root.querySelectorAll('button:not(:disabled),select:not(:disabled),[tabindex="0"]')];
+                // Focus stays in the active overlay: do not tab into hidden
+                // captions or narration controls behind the grammar panel.
+                const query=grammar?.isOpen()
+                    ? '.po-grammar-overlay button:not(:disabled)'
+                    : 'button:not(:disabled),select:not(:disabled),[tabindex="0"]';
+                const controls=[...root.querySelectorAll(query)].filter(el=>
+                    !el.closest('[hidden]')&&el.getClientRects().length);
                 if(!controls.length)return;
                 const first=controls[0],last=controls[controls.length-1];
                 if(e.shiftKey&&(doc.activeElement===first||doc.activeElement===root)){e.preventDefault();last.focus();}
