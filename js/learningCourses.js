@@ -117,6 +117,7 @@
   }
 
   function launchChallenge(){
+    if(typeof resetAppMode==="function")resetAppMode();
     cancelFeedbackTimer();refresh();
     if(currentContext.level!=="standard"){
       if(typeof currentLevel!=="undefined")currentLevel="standard";
