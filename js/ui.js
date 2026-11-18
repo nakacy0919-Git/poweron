@@ -111,11 +111,18 @@ function getVocabMatches(collection) {
 // pronunciation popup as a registered vocabulary word. Matched phrases stay intact.
 function scriptWordButtons(raw) {
     const text=String(raw||'');
-    return text.replace(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g, word=>
-        '<span class="po-tap-word" tabindex="0" role="button" data-word="'+encodeURIComponent(word)+
-        '" onclick="showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))"'+
-        ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))}">'+
-        escapeTextHtml(word)+'</span>');
+    const re=/[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
+    let out='',pos=0;
+    for(const match of text.matchAll(re)){
+        const word=match[0],i=match.index;
+        out+=escapeTextHtml(text.slice(pos,i));
+        out+='<span class="po-tap-word" tabindex="0" role="button" data-word="'+encodeURIComponent(word)+
+          '" onclick="showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))"'+
+          ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))}">'+
+          escapeTextHtml(word)+'</span>';
+        pos=i+word.length;
+    }
+    return out+escapeTextHtml(text.slice(pos));
 }
 function highlightVocabText(rawText, collection, clickAll=false) {
     const text = String(rawText);
