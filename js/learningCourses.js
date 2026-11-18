@@ -91,6 +91,7 @@
     host.document.body.classList.add("po-course-open");
     return root;
   }
+  function dismissChooser(){if(host.document.getElementById("po-course-overlay"))hide();}
   function hide(){
     host.document.getElementById("po-course-overlay")?.remove();
     host.document.body.classList.remove("po-course-open");
@@ -474,7 +475,7 @@
       }
     }
   }
-  host.PowerOnCourses={open,openDashboard,close,choose,context,launchStep:stage,
+  host.PowerOnCourses={open,openDashboard,close,dismissChooser,choose,context,launchStep:stage,
     lessonChanged,scopeChanged,theaterCompleted,
     _test:{pool:()=>{refresh();return pool();},reading:checkReading,
       getData:()=>{refresh();return currentData;},status:()=>{refresh();return status();},
