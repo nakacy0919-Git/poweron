@@ -134,8 +134,8 @@ test("Vocabulary progresses through Japanese 10 questions, English 10 questions,
     }
     assert.equal(questions[i].phase,i<10?"ja":"en");
     f.tick(4000);f.click("answer",{index:String(questions[i].correct)});
-    assert.equal(f.timers.size,1);
-    f.nextScheduled();
+    assert.equal(f.timers.size,0);
+    f.click("nextQuestion");
   }
   assert.equal(f.course._test.getView(),"result");
   assert.ok(f.html().includes("日本語"));
@@ -158,7 +158,7 @@ test("Japanese-first questions have Japanese choices; English stage has English-
 });
 test("Comprehension uses 10 Japanese questions then 10 English questions, with independent totals",()=>{
   const f=fixture();f.course.open();f.course.choose("speed");f.course.launchStep("comprehension");
-  assert.ok(f.html().includes("10問 × 2言語 = 20問"));
+  assert.ok(f.html().includes("10問 × 日本語・英語 = 20問"));
   f.click("newQuiz",{count:"10"});
   const questions=f.course._test.getQuiz();assert.equal(questions.length,20);
   for(let i=0;i<20;i++){
