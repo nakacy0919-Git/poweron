@@ -88,7 +88,7 @@
     }
     // Use the selected Lesson illustration, not an opaque navy page background.
     root.style.backgroundImage="linear-gradient(rgba(250,253,255,.85),rgba(250,253,255,.89)),url('img/L"+(currentContext?.lesson||1)+".webp')";
-    root.classList.toggle("po-challenge-mode",challengeActive);
+    root.className=challengeActive?"po-course-overlay po-challenge-mode":"po-course-overlay";
     host.document.body.classList.add("po-course-open");
     return root;
   }
