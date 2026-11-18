@@ -17,6 +17,9 @@
   function classify(note){
     if(!note)return {kind:'none',title:'構造を確認',focusLabel:'注目する表現',targetLabel:'つながる語句',lineLabel:''};
     const tag=String(note.tag||'');
+    if(/関係代名詞の省略/.test(tag)){
+      return {kind:'relative',title:'省略された関係詞節が先行詞を説明',focusLabel:'関係詞が省略された節',targetLabel:'先行詞',lineLabel:'修飾先'};
+    }
     if(/関係(代名詞|副詞)|関係詞/.test(tag)){
       return {kind:'relative',title:'関係詞が先行詞を説明',focusLabel:'関係詞節（説明する部分）',targetLabel:'先行詞（説明される語）',lineLabel:'修飾先'};
     }
@@ -29,10 +32,10 @@
     if(/because|時を表す|when 節|時・年齢を表す修飾語/.test(tag)){
       return {kind:'context',title:'主節に補足情報を加える',focusLabel:'理由・時を示す表現',targetLabel:'説明される中心部分',lineLabel:'補足'};
     }
-    if(/関係代名詞の省略/.test(tag)){
-      return {kind:'relative',title:'省略された関係代名詞を考える',focusLabel:'省略後の修飾節',targetLabel:'先行詞',lineLabel:'修飾先'};
+    if(Array.isArray(note.blocks)&&note.blocks.length){
+      return {kind:'structure',title:'S / V / O / C などの文の骨格',focusLabel:'注目する表現',targetLabel:'対応する語句',lineLabel:''};
     }
-    return {kind:'relation',title:'語句のつながりを確認',focusLabel:'注目する表現',targetLabel:'関連する語句',lineLabel:'関連'};
+    return {kind:'relation',title:'語句のつながりを確認',focusLabel:'注目する表現',targetLabel:'対応する語句',lineLabel:''};
   }
   function keyword(note){
     if(!note)return '';
