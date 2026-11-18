@@ -517,7 +517,18 @@
         if(app.mode!=='storyHub')open('storyHub');
         if(!app.slides.length||!window.PowerOnStoryTheater){open('sceneReading');return;}
         stopSpeech();
-        const scenes=app.slides.map(scene=>{const media=sceneMedia(scene);return {english:scene.english,japanese:String(scene.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,''),paragraph:scene.paragraph,image:media.image||'img/L'+Number(currentLesson)+'.webp',isCover:!media.image,audio:media.audio};});
+        const scenes=app.slides.map(scene=>{
+            const media=sceneMedia(scene);
+            // Show only the translation aligned with the visible English scene.
+            // A missing alignment must NOT fall back to the whole paragraph.
+            const japanese=window.PowerOnSceneTranslations?.forScene?.(
+                scene,app.paragraphs,core.splitSentences);
+            return {english:scene.english,
+                japanese:japanese||'この英文の和訳は準備中です。',
+                paragraph:scene.paragraph,
+                image:media.image||'img/L'+Number(currentLesson)+'.webp',
+                isCover:!media.image,audio:media.audio};
+        });
         window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
             onComplete:()=>{

@@ -50,3 +50,7 @@ body.po-theater-active{overflow:hidden}
 
 .theater-picture.theater-transition{animation:theater-in .4s ease both}
 @media(prefers-reduced-motion:reduce){.theater-picture.theater-transition{animation:none}}
+
+/* Japanese captions are sentence/scene-aligned; preserve readability without paragraph overflow. */
+.story-theater .theater-ja-label{font-size:12px;color:#ffe2b0;margin-bottom:4px}
+.story-theater .theater-caption p.theater-ja{line-height:1.5;font-weight:600}

@@ -219,7 +219,7 @@
                 q('.theater-cover-note').hidden=!s.scene.isCover;
                 q('.theater-en').textContent=s.scene.english;
                 q('.theater-ja').textContent=s.scene.japanese;
-                q('.theater-ja-label').textContent='Paragraph '+s.scene.paragraph+' の和訳（段落全体）';
+                q('.theater-ja-label').textContent='表示中の英文の和訳';
                 q('.theater-caption').scrollTop=0;
                 frame.classList.remove('theater-transition');void frame.offsetWidth;frame.classList.add('theater-transition');
                 const next=config.scenes[s.index+1];if(next&&host.Image){const preload=new host.Image();preload.src=next.image;}
