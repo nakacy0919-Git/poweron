@@ -8,7 +8,7 @@
     try { storage = window.localStorage; } catch (_) {}
     const PROFILE_KEY = 'poweron_study_learner_v1';
     function readProfile(){try {const x=JSON.parse(storage.getItem(PROFILE_KEY));return x&&typeof x.name==='string'&&typeof x.class==='string'&&typeof x.number==='string'&&x.name.trim()&&x.class.trim()&&x.number.trim()?x:null;}catch(_){return null;}}
-    let learner=readProfile(), editing=false;
+    let learner=readProfile(), editing=false, teacherChallenge=false;
     function learnerStore(){return core.createProgressStore(storage,learner?'poweron_study_progress_v1:'+JSON.stringify([learner.class,learner.number,learner.name]):undefined);}
     let store=learnerStore();
     // Local classroom PIN is a UI guard, not server-side authentication. Do not
@@ -45,19 +45,23 @@
             if(msg)msg.textContent='この端末では保存できません。';
             return;
         }
-        stopSpeech();learner=next;store=learnerStore();editing=false;render();
+        stopSpeech();learner=next;store=learnerStore();editing=false;teacherChallenge=false;render();
     }
     function switchLearner(){
         if(app.mode!=='progress'||!learner)return;
-        const answer=window.prompt?.('氏名や登録情報の変更には先生の確認コードが必要です。');
-        if(answer===null||answer===undefined)return;
-        if(String(answer).trim()!=='9999'){
-            const label=document.getElementById('po-register-error');
+        teacherChallenge=!teacherChallenge;
+        render();
+    }
+    function unlockLearner(event){
+        event.preventDefault();
+        if(app.mode!=='progress'||!learner||!teacherChallenge)return;
+        const code=String(event.currentTarget?.elements?.namedItem('code')?.value||'');
+        if(code!=='9999'){
+            const label=document.getElementById('po-unlock-error');
             if(label)label.textContent='確認コードが違います。先生に確認してください。';
-            else window.alert?.('確認コードが違います。先生に確認してください。');
             return;
         }
-        editing=true;render();
+        editing=true;teacherChallenge=false;render();
     }
     function anonymous(){return false;} // No learner reset without teacher approval.
     const games=window.PowerOnStoryGameCore,readingTools=window.PowerOnReadingScore;
@@ -784,10 +788,16 @@
             fields('name','氏名',editing?learner?.name:'',50)+
             '<button type="submit">'+(editing?'保存する':'登録して記録を開始')+'</button><small id="po-register-error" role="alert"></small></form>':
             '<p id="po-register-error" class="th-profile-message" role="alert"></p>';
+        const teacherForm=(learner&&teacherChallenge&&!editing)?
+            '<form class="th-teacher-unlock" onsubmit="PowerOnPractice.unlockLearner(event)" aria-label="先生用編集コード">'+
+            '<label>先生用コード <input type="password" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="4" required autofocus aria-label="先生用4桁コード"></label>'+
+            '<button type="submit">編集を解除</button>'+
+            '<button type="button" onclick="PowerOnPractice.switchLearner()">キャンセル</button>'+
+            '<span id="po-unlock-error" role="alert"></span></form>':'';
         return '<section class="th-lesson-progress">'+
             '<header class="th-lesson-progress-hero"><div><span class="th-analytics-kicker">LEARNING PROGRESS · LESSON '+currentLesson+'</span>'+
             '<h2>Lesson '+currentLesson+' の学習記録</h2><p>全 '+progress.results.length+' Partの学習達成度を集計しています。</p>'+
-            profile+'</div>'+ring(progress.overall,true)+'</header>'+form+
+            profile+'</div>'+ring(progress.overall,true)+'</header>'+teacherForm+form+
             '<div class="th-lesson-sections">'+progress.groups.map((g,i)=>
                 '<article class="th-lesson-section" data-tone="'+g.tone+'">'+
                 '<div><strong>'+g.name+'</strong><small>Lesson 全体</small></div>'+ring(progress.groupTotals[i])+'</article>'
@@ -975,6 +985,6 @@
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV, exportBackup:exportBackup,
-        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect,toggleMicStyle:toggleMicStyle, getProgress:function () {return store.snapshot();}
+        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,unlockLearner:unlockLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect,toggleMicStyle:toggleMicStyle, getProgress:function () {return store.snapshot();}
     };
 })();
