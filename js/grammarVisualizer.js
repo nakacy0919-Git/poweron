@@ -87,6 +87,7 @@
         const label=(part.focus&&part.target?'関連する両方の語句':part.focus?role.focusLabel:role.targetLabel);
         mark.setAttribute('aria-label',part.text+' · '+label+'。押すとこの語句の関係を確認します');
         mark.title=label+'｜タップすると語句に注目';
+        mark.setAttribute('data-grammar-offset',String(part.start));
         if(part.focus)spanElements.focus.push(mark);
         if(part.target)spanElements.target.push(mark);
         const activate=()=>{
@@ -98,6 +99,8 @@
           }
           wordFocus={text:part.text.replace(/\s+/g,' ').trim(),label,offset:part.start};
           paint();
+          const current=[...spanElements.focus,...spanElements.target].find(el=>el.getAttribute?.('data-grammar-offset')===String(part.start));
+          current?.focus?.();
         };
         mark.addEventListener('click',activate);
         mark.addEventListener('keydown',event=>{
@@ -113,6 +116,13 @@
     function drawArc(expected){
       if(!showing||disposed||expected!==paintGeneration)return;
       const svg=q('.po-grammar-links'),map=q('.po-grammar-sentence-map');
+      const selected=notesFor(sentences()[sentenceIndex]||'')[pointIndex];
+      const descriptor=relations.classify(selected);
+      // Never draw a directional dependency for SVOC or an unlabeled
+      // association. Those grammar forms use their own role diagram instead.
+      if(!['relative','modifier','purpose','context'].includes(descriptor.kind)){
+        hideArc();return;
+      }
       if(!svg||!map||typeof map.getBoundingClientRect!=='function'){hideArc();return;}
       const focusRects=spanElements.focus.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
       const targetRects=spanElements.target.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
@@ -126,7 +136,6 @@
       const start=q('.po-grammar-link-from'),end=q('.po-grammar-link-to');
       start?.setAttribute('cx',curve.from.x);start?.setAttribute('cy',curve.from.y);
       end?.setAttribute('cx',curve.to.x);end?.setAttribute('cy',curve.to.y);
-      const descriptor=relations.classify(notesFor(sentences()[sentenceIndex]||'')[pointIndex]);
       const caption=q('.po-grammar-link-caption');
       if(caption){
         caption.textContent=descriptor.lineLabel;
