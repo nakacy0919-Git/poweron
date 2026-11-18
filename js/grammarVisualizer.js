@@ -21,7 +21,8 @@
     '<div class="po-grammar-node po-grammar-node-target"><small>つながる語句</small><strong data-grammar-field="target"></strong></div></div>'+
     '<article class="po-grammar-comment" aria-live="polite"><span class="po-grammar-kind"></span>'+
     '<p class="po-grammar-explain"></p></article></div>'+
-    '<footer class="po-grammar-bottom"><div class="po-grammar-steps" aria-label="文法ポイントの切り替え"></div>'+
+    '<footer class="po-grammar-bottom"><div class="po-grammar-steps" aria-label="文法ポイントの切り替え"></div>'+ 
+    '<button type="button" class="po-grammar-toggle-explain" data-grammar="toggleExplain" aria-pressed="true">解説を隠す</button>'+
     '<button type="button" class="po-grammar-reveal" data-grammar="nextPoint">次のポイント →</button></footer>';
   function mount({root,stage,button,lesson,splitSentences,getScene,onOpen}){
     if(!root||!stage||!button||typeof getScene!=='function')return null;
@@ -32,6 +33,27 @@
     panel.innerHTML=staticMarkup;stage.appendChild(panel);
     const q=s=>panel.querySelector(s),b=n=>q('[data-grammar="'+n+'"]');
     let showing=false,scene=null,sentenceIndex=0,pointIndex=0;
+    let explanationVisible=true,explanationOverridden=false,compact=false;
+    let observer=null,disposed=false;
+    function adapt(){
+      if(disposed)return;
+      const bounds=typeof stage.getBoundingClientRect==='function'?stage.getBoundingClientRect():null;
+      const height=bounds?.height||stage.clientHeight||0;
+      const width=bounds?.width||stage.clientWidth||0;
+      compact=Boolean((height&&height<380)||(width&&width<460));
+      panel.classList.toggle('is-compact',compact);
+      root.classList.toggle('po-grammar-compact',showing&&compact);
+      if(!explanationOverridden)explanationVisible=!(height&&height<320);
+      updateExplanationButton();
+    }
+    function updateExplanationButton(){
+      panel.classList.toggle('is-explanation-visible',explanationVisible);
+      const control=panel.querySelector('[data-grammar="toggleExplain"]');
+      if(!control)return;
+      control.textContent=explanationVisible?'解説を隠す':'解説を見る';
+      control.setAttribute('aria-pressed',String(explanationVisible));
+      panel.querySelector('.po-grammar-comment').hidden=!explanationVisible;
+    }
     const sentences=()=>Array.isArray(scene?.sentences)&&scene.sentences.length?scene.sentences:
       (typeof splitSentences==='function'?splitSentences(scene?.english||''):[trim(scene?.english||'')]).filter(Boolean);
     const notesFor=s=>host.PowerOnGrammarNotes?.forSentence?.(lesson,s)||[];
@@ -126,14 +148,15 @@
       else if(sentenceIndex+1<ss.length)changeSentence(1);
     }
     function open(){
-      if(showing)return;
+      if(showing||disposed)return;
       onOpen?.();
-      showing=true;updateButtons();paint();
+      showing=true;updateButtons();adapt();paint();
       b('close').focus();
     }
     function close(){
       if(!showing)return false;
-      showing=false;updateButtons();button.focus();
+      showing=false;updateButtons();root.classList.remove('po-grammar-compact');
+      button.focus();
       return true;
     }
     function toggle(){if(showing)close();else open();}
@@ -142,11 +165,27 @@
     b('prevSentence').addEventListener('click',()=>changeSentence(-1));
     b('nextSentence').addEventListener('click',()=>changeSentence(1));
     b('nextPoint').addEventListener('click',nextPoint);
-    updateButtons();
+    b('toggleExplain').addEventListener('click',()=>{
+      explanationOverridden=true;explanationVisible=!explanationVisible;
+      updateExplanationButton();
+    });
+    if(typeof host.ResizeObserver==='function'&&typeof stage.getBoundingClientRect==='function'){
+      observer=new host.ResizeObserver(()=>{if(showing)adapt();});
+      observer.observe(stage);
+    }
+    updateButtons();updateExplanationButton();
     return {
       update(next){if(next!==scene){scene=next;sentenceIndex=0;pointIndex=0;}paint();},
       toggle,close,isOpen:()=>showing,open,
-      getState:()=>({showing,sentenceIndex,pointIndex,sentences:sentences().length})
+      previousSentence:()=>changeSentence(-1),nextSentence:()=>changeSentence(1),
+      destroy(){
+        if(disposed)return;
+        close();disposed=true;observer?.disconnect();
+        root.classList.remove('po-grammar-compact');
+        button.removeEventListener?.('click',toggle);
+        panel.remove();
+      },
+      getState:()=>({showing,sentenceIndex,pointIndex,compact,explanationVisible,sentences:sentences().length})
     };
   }
   return {mount};
