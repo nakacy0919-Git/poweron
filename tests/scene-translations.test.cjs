@@ -56,14 +56,17 @@ test('Unknown or changed translation alignment never falls back to the full Japa
   assert.equal(translations.forScene(scene,[{...p,japanese:'未翻訳の短い訳。'}],core.splitSentences),null);
   assert.equal(translations.forScene(scene,[],core.splitSentences),null);
 });
-test('Story Theater loads scene translations and updates its label without touching scoring code',()=>{
+test('Story Theater loads scene translations without a redundant heading or scoring changes',()=>{
   const practice=fs.readFileSync(path.join(__dirname,'../js/practice.js'),'utf8');
   const theater=fs.readFileSync(path.join(__dirname,'../js/storyTheater.js'),'utf8');
   const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
   assert.ok(practice.includes('PowerOnSceneTranslations?.forScene?.'));
   assert.ok(practice.includes('この英文の和訳は準備中です。'));
-  assert.ok(theater.includes('表示中の英文の和訳'));
-  assert.ok(!theater.includes('の和訳（段落全体）'));
+  assert.ok(!theater.includes('theater-ja-label'));
+  assert.ok(!theater.includes('表示中の英文の和訳'));
+  assert.ok(theater.includes('class="theater-ja" hidden'));
+  assert.ok(theater.includes("q('.theater-ja').hidden=!showJa"));
+  assert.ok(html.includes('js/storyTheater.js?v=6'));
   assert.ok(html.includes('js/sceneTranslations.js?v=1'));
   assert.ok(html.indexOf('js/sceneTranslations.js?v=1')<html.indexOf('js/practice.js?v='));
 });
