@@ -17,7 +17,8 @@
     '<button type="button" data-grammar="close" aria-label="文法解説を閉じる">×</button></div>'+
     '<div class="po-grammar-nav"><button type="button" data-grammar="prevSentence" aria-label="前の英文">‹ 前の文</button>'+
     '<span class="po-grammar-counter" aria-live="polite"></span>'+
-    '<button type="button" data-grammar="nextSentence" aria-label="次の英文">次の文 ›</button></div>'+
+    '<button type="button" data-grammar="nextSentence" aria-label="次の英文">次の文 ›</button></div>'+ 
+    '<div class="po-grammar-teachbar"><button type="button" data-grammar="toggleReveal" aria-pressed="false">◈ 段階表示</button><span class="po-grammar-reveal-progress" aria-live="polite" hidden></span><button type="button" data-grammar="advanceReveal" hidden>次の段階 →</button></div>'+
     '<div class="po-grammar-center"><div class="po-grammar-sentence-map"><svg class="po-grammar-links" aria-hidden="true" focusable="false" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><marker id="poGrammarArrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#f9bb6b"/></marker></defs><path class="po-grammar-link-path" marker-end="url(#poGrammarArrowhead)"></path><circle class="po-grammar-link-from" r="4"></circle><circle class="po-grammar-link-to" r="4"></circle><text class="po-grammar-link-caption" text-anchor="middle"></text></svg><p class="po-grammar-sentence" aria-label="解析する英文"></p></div><p class="po-grammar-word-lens" role="status" hidden></p>'+ 
     '<div class="po-grammar-pattern" aria-label="文型・句の構造" hidden></div>'+
     '<div class="po-grammar-relation" hidden><div class="po-grammar-node po-grammar-node-focus"><small>注目する表現</small><strong data-grammar-field="focus"></strong></div>'+
@@ -38,7 +39,9 @@
     const q=s=>panel.querySelector(s),b=n=>q('[data-grammar="'+n+'"]');
     let showing=false,scene=null,sentenceIndex=0,pointIndex=0;
     let explanationVisible=true,explanationOverridden=false,compact=false;
-    let observer=null,disposed=false,paintGeneration=0,spanElements={focus:[],target:[]},wordFocus=null;
+    let observer=null,disposed=false,paintGeneration=0,spanElements={focus:[],target:[],focusAnchors:[],targetAnchors:[]},wordFocus=null;
+    let revealMode=false,revealStep=3;
+    const revealLabels=['原文から発見','注目語句を確認','修飾関係を確認','解説で理解'];
     const prefersReducedMotion=()=>host.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches===true;
     function adapt(){
       if(disposed)return;
@@ -71,8 +74,12 @@
     const notesFor=s=>host.PowerOnGrammarNotes?.forSentence?.(lesson,s)||[];
     function sentenceText(node,text,note,points){
       const segments=relations.pieces(text,note);
+      const anchors=relations.anchorRanges?.(text,note);
       node.replaceChildren();
-      spanElements={focus:[],target:[]};
+      spanElements={focus:[],target:[],focusAnchors:[],targetAnchors:[]};
+      if(revealMode&&revealStep===0){
+        node.appendChild(doc.createTextNode(text));return;
+      }
       for(const part of segments){
         if(part.space||(!part.focus&&!part.target)){
           node.appendChild(doc.createTextNode(part.text));
@@ -88,15 +95,22 @@
         mark.setAttribute('aria-label',part.text+' · '+label+'。押すとこの語句の関係を確認します');
         mark.title=label+'｜対応先を表示するにはタップ';
         mark.setAttribute('data-grammar-offset',String(part.start));
+        mark.setAttribute('data-grammar-end',String(part.end));
         if(part.focus)spanElements.focus.push(mark);
         if(part.target)spanElements.target.push(mark);
+        if(anchors?.focus&&relations.overlaps?.(part,anchors.focus))spanElements.focusAnchors.push(mark);
+        if(anchors?.target&&relations.overlaps?.(part,anchors.target))spanElements.targetAnchors.push(mark);
         const activate=()=>{
           const current=relations.touchingNotes(text,points,part.start);
           if(current.length){
-            const next=current.find(n=>n!==points[pointIndex])||current[0];
+            // Keep the point the learner is investigating; never switch
+            // to an unrelated note because its phrase overlaps.
+            const selectedPoint=points[pointIndex];
+            const next=current.includes(selectedPoint)?selectedPoint:current[0];
             const selectedIndex=points.indexOf(next);
             if(selectedIndex>=0)pointIndex=selectedIndex;
           }
+          if(revealMode&&revealStep<2)revealStep=2;
           const active=points[pointIndex]||note;
           const partner=part.focus?active?.target:active?.focus;
           wordFocus={text:part.text.replace(/\s+/g,' ').trim(),label,offset:part.start,partner:String(partner||'')};
@@ -122,12 +136,14 @@
       const descriptor=relations.classify(selected);
       // Never draw a directional dependency for SVOC or an unlabeled
       // association. Those grammar forms use their own role diagram instead.
-      if(!['relative','modifier','purpose','context'].includes(descriptor.kind)){
+      if((revealMode&&revealStep<2)||!['relative','modifier','purpose','context'].includes(descriptor.kind)){
         hideArc();return;
       }
       if(!svg||!map||typeof map.getBoundingClientRect!=='function'){hideArc();return;}
-      const focusRects=spanElements.focus.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
-      const targetRects=spanElements.target.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
+      const focusElements=spanElements.focusAnchors.length?spanElements.focusAnchors:spanElements.focus;
+      const targetElements=spanElements.targetAnchors.length?spanElements.targetAnchors:spanElements.target;
+      const focusRects=focusElements.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
+      const targetRects=targetElements.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
       const bounds=map.getBoundingClientRect();
       const curve=relations.layout(focusRects,targetRects,bounds);
       if(!curve||bounds.width<=0||bounds.height<=0){hideArc();return;}
@@ -159,6 +175,19 @@
       const generation=++paintGeneration;
       if(host.requestAnimationFrame)host.requestAnimationFrame(()=>drawArc(generation));
       else drawArc(generation);
+    }
+    function updateRevealUi(){
+      const active=revealMode;
+      panel.classList?.toggle?.('is-reveal',active);
+      panel.setAttribute('data-reveal-step',String(active?revealStep:3));
+      const toggle=b('toggleReveal'),advance=b('advanceReveal'),progress=q('.po-grammar-reveal-progress');
+      toggle.setAttribute('aria-pressed',String(active));
+      toggle.textContent=active?'一括表示に戻す':'◈ 段階表示';
+      advance.hidden=!active;
+      advance.disabled=!active||revealStep>=3;
+      advance.textContent=revealStep>=3?'全段階を表示中':'次の段階 →';
+      progress.hidden=!active;
+      if(active)progress.textContent=(revealStep+1)+' / 4  '+revealLabels[revealStep];
     }
     function updateButtons(){
       button.setAttribute('aria-pressed',String(showing));
@@ -207,6 +236,7 @@
       const points=notesFor(sentence);
       pointIndex=Math.max(0,Math.min(points.length-1,pointIndex));
       const selected=points[pointIndex];
+      updateRevealUi();
       q('.po-grammar-counter').textContent='LESSON '+lesson+'  ·  文 '+(sentenceIndex+1)+' / '+ss.length;
       b('prevSentence').disabled=sentenceIndex===0;
       b('nextSentence').disabled=sentenceIndex>=ss.length-1;
@@ -218,7 +248,7 @@
       panel.setAttribute('data-grammar-relation',relationType.kind);
       const wordLens=q('.po-grammar-word-lens');
       if(wordLens){
-        wordLens.hidden=!wordFocus;
+        wordLens.hidden=!wordFocus||(revealMode&&revealStep<2);
         if(wordFocus)wordLens.textContent='語句に注目：'+wordFocus.text+'　｜　'+wordFocus.label+(wordFocus.partner?'　⇄　'+shorten(wordFocus.partner,80):'');
       }
       const linkCaption=q('.po-grammar-link-caption');
@@ -227,7 +257,7 @@
       q('.po-grammar-center').scrollTop=0;
       const pattern=q('.po-grammar-pattern');
       pattern.replaceChildren();
-      pattern.hidden=!selected?.blocks?.length;
+      pattern.hidden=!selected?.blocks?.length||(revealMode&&revealStep<2);
       if(selected?.blocks?.length){
         selected.blocks.forEach((block,i)=>{
           if(i){
@@ -244,7 +274,7 @@
         });
       }
       const relation=q('.po-grammar-relation');
-      relation.hidden=!selected||!!selected?.blocks?.length;
+      relation.hidden=!selected||!!selected?.blocks?.length||(revealMode&&revealStep<2);
       q('.po-grammar-relation-title').textContent=selected?relationType.title:'';
       const keyword=q('.po-grammar-keyword');
       const keywordText=relations.keyword(selected);
@@ -263,6 +293,7 @@
         q('.po-grammar-kind').textContent='解説準備中';
         q('.po-grammar-explain').textContent='この英文の構文は現在確認中です。文法の役割を推測で表示せず、授業用の正確な解説ができ次第追加します。';
       }
+      q('.po-grammar-comment').hidden=revealMode&&revealStep<3;
       const steps=q('.po-grammar-steps');steps.replaceChildren();
       points.forEach((item,i)=>{
         const control=doc.createElement('button');control.type='button';
@@ -270,7 +301,7 @@
         control.textContent=(i+1)+' · '+item.tag;
         control.title=item.tag;
         control.setAttribute('aria-pressed',String(i===pointIndex));
-        control.addEventListener('click',()=>{pointIndex=i;paint();});
+        control.addEventListener('click',()=>{pointIndex=i;wordFocus=null;if(revealMode)revealStep=0;paint();});
         steps.appendChild(control);
       });
       b('nextPoint').disabled=!points.length||(pointIndex===points.length-1&&sentenceIndex===ss.length-1);
@@ -278,10 +309,10 @@
       fitContent();
       scheduleArc();
     }
-    function changeSentence(delta){const ss=sentences();sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex+delta));pointIndex=0;wordFocus=null;paint();}
+    function changeSentence(delta){const ss=sentences();sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex+delta));pointIndex=0;wordFocus=null;if(revealMode)revealStep=0;paint();}
     function nextPoint(){
       const ss=sentences(),points=notesFor(ss[sentenceIndex]||'');
-      if(pointIndex+1<points.length){pointIndex++;wordFocus=null;paint();}
+      if(pointIndex+1<points.length){pointIndex++;wordFocus=null;if(revealMode)revealStep=0;paint();}
       else if(sentenceIndex+1<ss.length)changeSentence(1);
     }
     function open(){
@@ -299,6 +330,17 @@
     function toggle(){if(showing)close();else open();}
     button.addEventListener('click',toggle);
     b('close').addEventListener('click',close);
+    b('toggleReveal').addEventListener('click',()=>{
+      revealMode=!revealMode;
+      revealStep=revealMode?0:3;
+      wordFocus=null;
+      paint();
+    });
+    b('advanceReveal').addEventListener('click',()=>{
+      if(!revealMode||revealStep>=3)return;
+      revealStep++;
+      paint();
+    });
     b('prevSentence').addEventListener('click',()=>changeSentence(-1));
     b('nextSentence').addEventListener('click',()=>changeSentence(1));
     b('nextPoint').addEventListener('click',nextPoint);
@@ -313,7 +355,7 @@
     }
     updateButtons();updateExplanationButton();
     return {
-      update(next){if(next!==scene){scene=next;sentenceIndex=0;pointIndex=0;wordFocus=null;}paint();},
+      update(next){if(next!==scene){scene=next;sentenceIndex=0;pointIndex=0;wordFocus=null;if(revealMode)revealStep=0;}paint();},
       toggle,close,isOpen:()=>showing,open,
       previousSentence:()=>changeSentence(-1),nextSentence:()=>changeSentence(1),
       destroy(){
@@ -323,7 +365,7 @@
         button.removeEventListener?.('click',toggle);
         panel.remove();
       },
-      getState:()=>({showing,sentenceIndex,pointIndex,compact,explanationVisible,sentences:sentences().length,wordFocus})
+      getState:()=>({showing,sentenceIndex,pointIndex,compact,explanationVisible,sentences:sentences().length,wordFocus,revealMode,revealStep})
     };
   }
   return {mount};
