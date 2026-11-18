@@ -1,7 +1,7 @@
 {
   "version": 1,
   "level": "standard",
-  "grouping": "One or two sentences, no paragraph crossing; a pair has at most 32 whitespace-delimited words. Lesson 8 Part 1 standard uses eight curated groups matched to the supplied illustrations. Lesson 8 Part 2 standard uses twelve curated groups, including one three-sentence scene for the decision to escape. Lesson 8 Parts 3 and 4 use eight and four curated scene groups, respectively. Lesson 9 Part 1 uses seven curated image scenes. Lesson 9 Part 2 and Part 4 have quote-safe boundaries with stable scene IDs.",
+  "grouping": "Mostly one or two sentences, with curated three-sentence scenes; no paragraph crossing; automatic pairs have at most 32 whitespace-delimited words. Lesson 8 Part 1 standard uses eight curated groups matched to the supplied illustrations. Lesson 8 Part 2 standard uses twelve curated groups, including one three-sentence scene for the decision to escape. Lesson 8 Parts 3 and 4 use eight and four curated scene groups, respectively. Lesson 9 Part 1 uses seven curated image scenes. Lesson 9 Part 2 and Part 4 have quote-safe boundaries with stable scene IDs.",
   "status": "Lesson 8 Parts 1–4: 32 WebP images included; Lesson 9 Part 1: 7 WebP images included; Lesson 9 Part 2: 8 WebP images included. Other lesson illustrations pending.",
   "scenes": [
     {
@@ -1567,7 +1567,7 @@
       "paragraph": 4,
       "firstSentence": 6,
       "lastSentence": 7,
-      "image": "lessons/lesson9/part2/images/L09_P2_07.webp",
+      "image": "lessons/lesson9/part2/images/L09_P2_07_speech_exam.svg",
       "audio": "lessons/lesson9/part2/scenes/L09_P2_p4_s07.mp3"
     },
     {
