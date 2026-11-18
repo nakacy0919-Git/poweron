@@ -70,30 +70,31 @@ test("Mastery dashboard is a compact four-card path and speed has three cards",(
   assert.equal((h.match(/class="po-course-stage po-course-step-/g)||[]).length,3);
   assert.ok(h.includes("3つのStep"));
 });
-test("Vocabulary shows fixed explanation and auto-advances without scrolling",()=>{
+test("Vocabulary explanation remains visible until learner chooses Next",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");
   f.click("newQuiz",{count:"10"});
   const q=f.course._test.getQuiz();assert.equal(q.length,20);
   let h=f.html();assert.ok(h.includes('po-course-question is-vocabulary'));
-  assert.ok(h.includes('po-course-answer-grid'));
   f.tick(5000);f.click("answer",{index:String(q[0].correct)});
   h=f.html();assert.ok(h.includes('po-course-answer-popup is-correct'));
   assert.ok(h.includes('Correct! 正解'));assert.ok(h.includes("正解："));
-  assert.equal(f.timers.size,1);const ms=f.nextScheduled();assert.equal(ms,1500);
+  assert.ok(h.includes("次の問題"));assert.ok(!h.includes('説明を読む'));
+  assert.equal(f.timers.size,0);
+  f.click("nextQuestion");
   h=f.html();assert.ok(h.includes("QUESTION 2 / 10"));assert.ok(!h.includes("po-course-feedback-backdrop"));
   assert.equal(f.dom.get("po-course-overlay").scrollTop,0);
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
 });
-test("Wrong answer popup can be held for reading or advanced manually, never double advances",()=>{
+test("Wrong-answer explanation has one clear Next action and no auto advancement",()=>{
   const f=fixture();f.course.open();f.course.choose("mastery");f.course.launchStep("vocabulary");f.click("newQuiz",{count:"10"});
   const q=f.course._test.getQuiz();
   f.tick(8000);f.click("answer",{index:String((q[0].correct+1)%4)});
   assert.ok(f.html().includes("Incorrect! 惜しい！"));
-  assert.equal([...f.timers.values()][0].ms,2600);
-  f.click("pauseFeedback");assert.equal(f.timers.size,0);assert.ok(f.html().includes("説明を確認したら次へ"));
+  assert.ok(f.html().includes("解説を確認したら次へ進んでください"));
+  assert.equal(f.timers.size,0);
   f.click("nextQuestion");assert.ok(f.html().includes("QUESTION 2 / 10"));assert.equal(f.timers.size,0);
   f.tick(1000);f.click("answer",{index:String(q[1].correct)});
-  assert.equal(f.timers.size,1);
+  assert.equal(f.timers.size,0);
   f.click("dashboard");assert.equal(f.timers.size,0);
   assert.ok(f.html().includes("STEP 01"));
 });
