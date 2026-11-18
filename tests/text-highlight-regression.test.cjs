@@ -94,3 +94,21 @@ test('Lesson 8 text still appears when an unpopulated advanced level is selected
     a.run('renderDualText()');
     assert.match(englishPanel(a.nodes.targetTextDisplay.innerHTML),/>St\. Catharines<\/span>/);
 });
+
+test('Script makes ordinary words tappable without changing textbook text or injecting HTML',()=>{
+    const a=createApp();
+    a.run('renderDualText()');
+    const html=englishPanel(a.nodes.targetTextDisplay.innerHTML);
+    assert.match(html,/class="po-tap-word"/);
+    assert.ok(a.nodes.targetTextDisplay.innerHTML.includes('id="btnScriptAudio"'));
+    const dangerous=a.run('highlightVocabText("<img src=x onerror=alert(1)>",[],true)');
+    assert.ok(!dangerous.includes('<img'));
+    assert.match(dangerous,/&lt;/);
+});
+test('unregistered words still open an honest pronunciation-only popup',()=>{
+    const a=createApp();
+    a.run("showVocab({stopPropagation(){},pageX:25,pageY:30},'madeupword','madeupword')");
+    assert.equal(a.nodes.popupWord.innerText,'madeupword');
+    assert.match(a.nodes.popupMean.innerText,/未登録/);
+    assert.deepEqual(a.speech,['madeupword']);
+});
