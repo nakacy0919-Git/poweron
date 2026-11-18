@@ -189,6 +189,7 @@
         if(QUESTION_MODES.includes(mode))startKnowledgeRun(mode);
     }
     function open(mode) {
+        if(mode==='puzzle')return; // Retire standalone Listening Puzzle; preserve historical scores.
         window.PowerOnCourses?.dismissChooser?.();
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
         if(GAME_MODES.includes(mode)&&!games)return;
