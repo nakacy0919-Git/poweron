@@ -53,3 +53,13 @@ The viewer uses `textContent` for textbook and notes, never injected HTML. Unrec
 
 ## Deployment
 **Development branch only.** Do not merge into `main` or trigger production deployment as part of this pilot.
+
+## Classroom viewport & regression improvements (2026-11-19)
+- Full-stage faded theater imagery now sits behind the grammar overlay, including portrait iPad layouts.
+- Viewport measurement uses the actual grammar panel when available; compact layout and long-sentence font-fitting respond to real content height.
+- Overlapping grammar spans are segmented safely so neither grammatical relationship silently disappears.
+- The grammar category remains visible when students collapse the longer Japanese explanation. Manual reveal remains possible.
+- The stage remains fixed to dynamic viewport height with internal fallback scrolling for exceptionally long passages; this avoids scrolling the entire theater page.
+- Small-portrait footer prioritizes essential navigation buttons. Scene controls and original MP3 playback remain intact when returning from Grammar mode.
+- Runtime-independent tests cover 104/104 sentence notes, compact view, focus/target overlaps, constrained-height fallback and Story Theater narration/session logic.
+- **Remaining QA before merge:** run real desktop and iPad Safari/Chrome visual checks at 1024×768, 768×1024, 1366×768, 390×844, 844×390; run all Node regression tests in a local checkout. No live browser was launched by these tests.
