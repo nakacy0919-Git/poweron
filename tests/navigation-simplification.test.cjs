@@ -36,7 +36,8 @@ test('Learning Progress is aggregated across Lesson parts, not fixed at selected
 test('Registered learner cannot edit without local teacher PIN and old records are copied on authorized rename',()=>{
   const practice=read('js/practice.js');
   assert.match(practice,/\(learner&&!editing\)\)return/);
-  assert.match(practice,/String\(answer\)\.trim\(\)!=='9999'/);
+  assert.match(practice,/if\(code!=='9999'\)/);
+  assert.match(practice,/type="password" name="code"/);
   assert.match(practice,/storage\.setItem\(nextStoreKey,JSON\.stringify\(store\.snapshot\(\)\)\)/);
   assert.match(practice,/function anonymous\(\)\{return false;\}/);
 });
