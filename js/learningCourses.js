@@ -115,6 +115,81 @@
     host.document.body.classList.remove("po-course-free-mode");
     paint();overlay().focus();
   }
+
+  function launchChallenge(){
+    cancelFeedbackTimer();refresh();
+    if(currentContext.level!=="standard"){
+      if(typeof currentLevel!=="undefined")currentLevel="standard";
+      const level=host.document.getElementById("levelSelect");if(level)level.value="standard";
+      if(typeof onScopeChange==="function")onScopeChange();
+      refresh();
+    }
+    challengeActive=true;challengeRun=null;currentData.course="mastery";save();
+    quiz=null;view="challengeIntro";floatButton(false);paint();overlay().focus?.();
+  }
+  function challengeAvailable(){
+    const vocabulary=core.createVocabularyQuiz(currentContext.lesson,currentContext.part,
+      typeof lessonVocab!=="undefined"?lessonVocab:{},Math.random,host.PowerOnCourseVocabGlosses||{}).length;
+    const comprehension=pool().length;
+    return {vocabulary,comprehension,ready:vocabulary>=10&&comprehension>=10};
+  }
+  function beginChallenge(){
+    if(!challengeActive||!challengeAvailable().ready)return;
+    challengeRun={vocabulary:null,comprehension:null};
+    currentData.course="mastery";save();newQuiz(10,"vocabulary");
+  }
+  function challengeIntro(){
+    const a=challengeAvailable(),saved=currentData.challenge||{};
+    return header("Check Understanding","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel">'+partPicker()+
+      '<span class="po-challenge-tag">MISSION · 3 STAGES</span><h3>全問正解でステージクリア！</h3>'+
+      '<p>まず語彙に挑戦し、そのあと日本語・英語の順に本文理解を確認します。</p>'+
+      '<div class="po-challenge-steps"><article><b>01</b><strong>Vocabulary</strong><small>語彙 10問 × 2言語</small></article>'+
+      '<article><b>02</b><strong>First Stage</strong><small>日本語の内容理解 10問</small></article>'+
+      '<article><b>03</b><strong>Second Stage</strong><small>English · 10 questions</small></article></div>'+
+      '<p class="po-challenge-rule">合計40問。1問でも間違えると今回はステージクリアになりません。</p>'+
+      (saved.clear?'<p class="po-challenge-saved">✓ このPartの過去のノーミス達成記録があります</p>':'')+
+      (a.ready?button("beginChallenge","▶ 40問のチャレンジを始める",'',"po-challenge-start"):
+        '<p class="po-course-warning">問題準備中：語彙 '+a.vocabulary+'/10、内容理解 '+a.comprehension+'/10</p>')+
+      button("close","✕ 閉じる",'',"po-course-ghost")+'</section>';
+  }
+  function challengeGap(){
+    const v=challengeRun?.vocabulary;
+    if(!v)return challengeIntro();
+    return header("Vocabulary Complete","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel"><span class="po-challenge-tag">VOCABULARY FINISHED</span>'+
+      '<h3>語彙 '+v.score+' / '+v.total+' 正解</h3>'+
+      '<p>'+(v.clear?'✓ 語彙ステージはノーミス！':'ミスがありました。最後まで練習できますが、今回の全ステージクリアにはなりません。')+'</p>'+
+      '<div class="po-challenge-steps"><article><b>02</b><strong>First Stage</strong><small>日本語 10問</small></article>'+
+      '<article><b>03</b><strong>Second Stage</strong><small>English 10 questions</small></article></div>'+
+      button("nextChallengeStage","▶ First Stage 日本語を開始",'',"po-challenge-start")+
+      button("retryChallenge","最初からやり直す",'',"po-course-ghost")+'</section>';
+  }
+  function finishChallenge(){
+    const v=challengeRun?.vocabulary,c=challengeRun?.comprehension;
+    if(!v||!c)return;
+    const score=v.score+c.score,total=v.total+c.total,percent=Math.round(score*100/Math.max(1,total));
+    const perfect=v.clear&&c.clear&&v.total===20&&c.total===20&&score===40;
+    const old=currentData.challenge||{};
+    currentData.challenge={...old,attempts:(old.attempts||0)+1,clear:!!(old.clear||perfect),
+      lastClear:perfect,lastScore:score,lastTotal:total,lastPercent:percent,
+      bestPercent:Math.max(old.bestPercent||0,percent),
+      stages:{vocabulary:{score:v.score,total:v.total},japanese:c.sections?.ja||{score:0,total:10},
+        english:c.sections?.en||{score:0,total:10}}};
+    save();
+  }
+  function challengeResult(){
+    const d=currentData.challenge||{},st=d.stages||{};
+    const line=(title,s)=>'<div><span>'+title+'</span><strong>'+(s?.score||0)+' / '+(s?.total||0)+'</strong></div>';
+    return header("Check Understanding · Result","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel po-challenge-result"><h3>'+(d.lastClear?'✓ ALL CLEAR!':'↻ もう一度挑戦しよう')+'</h3>'+
+      '<p>今回 '+(d.lastScore||0)+' / '+(d.lastTotal||40)+' 正解。40問すべて正解した場合だけステージクリアです。</p>'+
+      '<div class="po-challenge-score">'+line("Vocabulary",st.vocabulary)+line("First Stage 日本語",st.japanese)+line("Second Stage English",st.english)+'</div>'+
+      button("retryChallenge","↻ もう一度挑戦",'',"po-challenge-start")+
+      button("progress","◉ My Progress",'',"po-course-ghost")+
+      button("close","✕ 終了",'',"po-course-ghost")+'</section>';
+  }
+
   function openDashboard(){
     cancelFeedbackTimer();refresh();view=currentData.course&&currentData.course!=="free"?"dashboard":"choose";
     if(view==="dashboard"&&currentData.lastQuizByCourse?.[currentData.course])latestResult=currentData.lastQuizByCourse[currentData.course];
