@@ -14,7 +14,8 @@
     '<div class="po-grammar-nav"><button type="button" data-grammar="prevSentence" aria-label="前の英文">‹ 前の文</button>'+
     '<span class="po-grammar-counter" aria-live="polite"></span>'+
     '<button type="button" data-grammar="nextSentence" aria-label="次の英文">次の文 ›</button></div>'+
-    '<div class="po-grammar-center"><p class="po-grammar-sentence" aria-label="解析する英文"></p>'+
+    '<div class="po-grammar-center"><p class="po-grammar-sentence" aria-label="解析する英文"></p>'+ 
+    '<div class="po-grammar-pattern" aria-label="文型・句の構造" hidden></div>'+
     '<div class="po-grammar-relation" hidden><div class="po-grammar-node po-grammar-node-focus"><small>注目する表現</small><strong data-grammar-field="focus"></strong></div>'+
     '<span class="po-grammar-arrow" aria-hidden="true">→</span>'+
     '<div class="po-grammar-node po-grammar-node-target"><small>つながる語句</small><strong data-grammar-field="target"></strong></div></div>'+
@@ -74,8 +75,26 @@
       b('prevSentence').disabled=sentenceIndex===0;
       b('nextSentence').disabled=sentenceIndex>=ss.length-1;
       sentenceText(q('.po-grammar-sentence'),sentence,selected);
+      const pattern=q('.po-grammar-pattern');
+      pattern.replaceChildren();
+      pattern.hidden=!selected?.blocks?.length;
+      if(selected?.blocks?.length){
+        selected.blocks.forEach((block,i)=>{
+          if(i){
+            const arrow=doc.createElement('span');
+            arrow.className='po-grammar-pattern-arrow';
+            arrow.textContent='→';
+            arrow.setAttribute('aria-hidden','true');
+            pattern.appendChild(arrow);
+          }
+          const chip=doc.createElement('div');chip.className='po-grammar-pattern-chip';
+          const role=doc.createElement('small');role.textContent=block.role;
+          const value=doc.createElement('strong');value.textContent=block.text;
+          chip.appendChild(role);chip.appendChild(value);pattern.appendChild(chip);
+        });
+      }
       const relation=q('.po-grammar-relation');
-      relation.hidden=!selected;
+      relation.hidden=!selected||!!selected.blocks?.length;
       if(selected){
         q('[data-grammar-field="focus"]').textContent=shorten(selected.focus);
         q('[data-grammar-field="focus"]').title=selected.focus;
