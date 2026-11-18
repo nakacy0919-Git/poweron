@@ -24,7 +24,7 @@
     '<footer class="po-grammar-bottom"><div class="po-grammar-steps" aria-label="文法ポイントの切り替え"></div>'+ 
     '<button type="button" class="po-grammar-toggle-explain" data-grammar="toggleExplain" aria-pressed="true">解説を隠す</button>'+
     '<button type="button" class="po-grammar-reveal" data-grammar="nextPoint">次のポイント →</button></footer>';
-  function mount({root,stage,button,lesson,splitSentences,getScene,onOpen}){
+  function mount({root,stage,button,lesson,splitSentences,getScene,onOpen,onVisibilityChange}){
     if(!root||!stage||!button||typeof getScene!=='function')return null;
     const doc=root.ownerDocument||host.document;
     const panel=doc.createElement('section');
@@ -86,6 +86,7 @@
       button.textContent=showing?'✦ 文法 ON':'✦ 文法解説';
       root.classList.toggle('po-grammar-on',showing);
       panel.hidden=!showing;
+      onVisibilityChange?.(showing);
       // The original caption remains visually available when the grammar
       // layer is closed but never receives hidden keyboard focus.
       const caption=root.querySelector?.('.theater-caption');
