@@ -63,3 +63,15 @@ The viewer uses `textContent` for textbook and notes, never injected HTML. Unrec
 - Small-portrait footer prioritizes essential navigation buttons. Scene controls and original MP3 playback remain intact when returning from Grammar mode.
 - Runtime-independent tests cover 104/104 sentence notes, compact view, focus/target overlaps, constrained-height fallback and Story Theater narration/session logic.
 - **Remaining QA before merge:** run real desktop and iPad Safari/Chrome visual checks at 1024×768, 768×1024, 1366×768, 390×844, 844×390; run all Node regression tests in a local checkout. No live browser was launched by these tests.
+
+
+## Sentence-anchored dependency visualization (quality phase)
+- `js/grammarRelations.js` matches exact source phrase offsets, preserves punctuation and identifies relation types.
+- Original sentence words are the evidence: amber highlights explanatory phrases, cyan highlights antecedents/targets, and relative pronouns such as who/which/that/where receive stronger focus.
+- For genuine modifier, relative, purpose and time/reason relations, an SVG curve connects measured word positions and updates after wrapping or resizing.
+- **SVOC and generic associations do NOT receive modification arrows**: instead, they use S/V/O/C role blocks. This avoids inaccurate visual grammar.
+- Clicking or keyboard-activating a highlighted word reveals its precise linked phrase; keyboard focus is restored after re-render.
+- DOM text is rendered using textContent and safe elements; connectors ignore pointer input, and reduced-motion preferences suppress animated drawing.
+- Long text retains an internal scroll fallback; compact screens preserve grammar label visibility.
+- **Teacher editorial approval is pending.** Real browser/iPad QA and full repository Node test suite remain required before a merge.
+- Development-branch verification: 19 focused tests passed, including grammar relation geometry, nested spans, responsive behavior, media session regressions and 104/104 sentence coverage.
