@@ -530,7 +530,7 @@
                 image:media.image||'img/L'+Number(currentLesson)+'.webp',
                 isCover:!media.image,audio:media.audio};
         });
-        window.PowerOnStoryTheater.open({scenes,lesson:Number(currentLesson),splitSentences:core.splitSentences,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
+        window.PowerOnStoryTheater.open({scenes,lesson:Number(currentLesson),grammarEnabled:currentLevel==='standard',splitSentences:core.splitSentences,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
             onComplete:()=>{
                 // Credit only after the full Part audio has actually completed.
