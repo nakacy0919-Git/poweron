@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Speech with a microphone and an exam</title>
+<desc id="desc">A student gives a speech with a microphone. Microphone shortens to mike, and examination shortens to exam.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" x2="1" y2="1"><stop stop-color="#091b3a"/><stop offset=".55" stop-color="#164b79"/><stop offset="1" stop-color="#0f3257"/></linearGradient>
+ <linearGradient id="spot" x1="0" x2=".6" y2="1"><stop stop-color="#fef7c2" stop-opacity=".58"/><stop offset="1" stop-color="#e3f7ff" stop-opacity="0"/></linearGradient>
+ <linearGradient id="panel" x1="0" x2="1" y2="1"><stop stop-color="#edf8ff"/><stop offset="1" stop-color="#cfe6fb"/></linearGradient>
+ <linearGradient id="jacket" x1="0" x2="1" y2="1"><stop stop-color="#243f67"/><stop offset="1" stop-color="#132643"/></linearGradient>
+ <linearGradient id="desk" x1="0" x2=".1" y2="1"><stop stop-color="#b37b52"/><stop offset="1" stop-color="#764c36"/></linearGradient>
+ <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#05142a" flood-opacity=".42"/></filter>
+ <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="26"/></filter>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+<!-- Theatre architecture and subtle spotlight -->
+<path d="M0 0H1020L840 680H170Z" fill="url(#spot)"/>
+<path d="M0 0H126L340 640H0Z" fill="#0c1836" opacity=".62"/>
+<path d="M0 80Q330 -35 650 80" fill="none" stroke="#b2d1f1" stroke-width="8" opacity=".23"/>
+<path d="M30 155Q360 35 710 155" fill="none" stroke="#b2d1f1" stroke-width="5" opacity=".16"/>
+<circle cx="350" cy="70" r="48" fill="#ffefbd" opacity=".9"/><circle cx="350" cy="70" r="85" fill="#fff1ba" opacity=".22" filter="url(#glow)"/>
+<circle cx="770" cy="110" r="26" fill="#ffebb1" opacity=".7"/><circle cx="770" cy="110" r="70" fill="#fff1ba" opacity=".2" filter="url(#glow)"/>
+<!-- Audience silhouettes subdued -->
+<path d="M0 724Q60 645 130 710T265 718T425 710T565 714T725 709T900 723V900H0Z" fill="#0b1b36" opacity=".85"/>
+<g opacity=".62" fill="#08162d"><circle cx="70" cy="722" r="36"/><circle cx="198" cy="720" r="42"/><circle cx="328" cy="719" r="38"/><circle cx="485" cy="728" r="43"/><circle cx="635" cy="715" r="36"/><circle cx="803" cy="724" r="42"/></g>
+<!-- Speaker with microphone -->
+<g filter="url(#shadow)">
+ <ellipse cx="475" cy="314" rx="128" ry="146" fill="#e6aa84"/>
+ <path d="M350 306Q332 183 410 146Q503 85 576 175Q607 205 582 298Q564 247 533 235Q457 205 402 270Z" fill="#252334"/>
+ <path d="M375 234Q438 135 544 218" fill="none" stroke="#3c3141" stroke-width="37" stroke-linecap="round"/>
+ <path d="M355 351Q311 345 312 304Q320 270 352 295" fill="#d79372"/>
+ <path d="M402 336Q421 321 437 337" fill="none" stroke="#704736" stroke-width="5" stroke-linecap="round"/>
+ <path d="M503 333Q521 322 537 331" fill="none" stroke="#704736" stroke-width="5" stroke-linecap="round"/>
+ <path d="M455 384Q474 397 497 380" fill="none" stroke="#ad6856" stroke-width="6" stroke-linecap="round"/>
+ <path d="M433 419L436 471L491 500L537 464L521 416Z" fill="#dc9e7e"/>
+ <path d="M292 530Q346 448 435 445L475 493L532 445Q630 465 675 554L722 834H242Z" fill="url(#jacket)"/>
+ <path d="M422 445L475 496L525 449L528 721L423 721Z" fill="#f4f8ff"/>
+ <path d="M470 495L490 495L501 720H453Z" fill="#c96a46"/>
+ <path d="M302 581Q271 546 256 583L208 738Q200 760 224 768L310 786Q341 778 331 751L291 722Z" fill="#243d61"/>
+ <path d="M642 558Q688 563 703 610L724 739Q717 765 692 760L635 731Z" fill="#223858"/>
+ <!-- Holding mic -->
+ <path d="M597 487Q623 464 638 449" stroke="#e0a17d" stroke-width="31" stroke-linecap="round"/>
+ <path d="M630 456L673 369" stroke="#242c40" stroke-width="22" stroke-linecap="round"/>
+ <rect x="659" y="298" width="38" height="104" rx="18" fill="#e0e8f3" transform="rotate(25 678 350)"/>
+ <rect x="667" y="304" width="22" height="78" rx="9" fill="#697e95" transform="rotate(25 678 350)"/>
+ <path d="M641 451Q680 443 687 474" stroke="#e7aa84" stroke-width="21" stroke-linecap="round"/>
+</g>
+<!-- Stage podium -->
+<g filter="url(#shadow)"><path d="M250 565L741 569L680 844H318Z" fill="url(#desk)"/><path d="M247 560L749 560L737 595H255Z" fill="#e5ac78"/><path d="M343 615H658L612 811H390Z" fill="#815640" opacity=".65"/></g>
+<!-- Speech sound waves -->
+<path d="M711 323Q760 359 716 407" fill="none" stroke="#ffd46a" stroke-width="12" stroke-linecap="round"/>
+<path d="M738 290Q810 363 745 433" fill="none" stroke="#ffd46a" stroke-width="8" stroke-linecap="round" opacity=".65"/>
+<!-- Word formation panels -->
+<g filter="url(#shadow)">
+ <rect x="866" y="86" width="652" height="299" rx="35" fill="url(#panel)"/>
+ <rect x="866" y="411" width="652" height="298" rx="35" fill="url(#panel)"/>
+</g>
+<rect x="896" y="113" width="592" height="66" rx="20" fill="#163859"/>
+<rect x="896" y="438" width="592" height="66" rx="20" fill="#163859"/>
+<text x="1193" y="157" fill="#fff" text-anchor="middle" font-size="37" font-weight="700" font-family="Arial, sans-serif">SPEECH</text>
+<text x="1193" y="482" fill="#fff" text-anchor="middle" font-size="37" font-weight="700" font-family="Arial, sans-serif">TEST</text>
+<text x="931" y="256" font-size="45" fill="#284a66" font-family="Arial,sans-serif" font-weight="600">microphone</text>
+<path d="M1238 240H1301M1285 221L1304 240L1285 259" stroke="#e5a11c" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<rect x="1330" y="207" width="151" height="85" rx="23" fill="#f0b736"/>
+<text x="1405" y="264" fill="#132e53" font-size="59" text-anchor="middle" font-weight="800" font-family="Arial,sans-serif">mike</text>
+<text x="919" y="584" font-size="43" fill="#284a66" font-family="Arial,sans-serif" font-weight="600">examination</text>
+<path d="M1230 567H1280M1265 549L1283 567L1265 586" stroke="#e5a11c" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<rect x="1303" y="529" width="177" height="85" rx="23" fill="#f0b736"/>
+<text x="1391" y="585" fill="#132e53" font-size="57" text-anchor="middle" font-weight="800" font-family="Arial,sans-serif">exam</text>
+<!-- Decorative test sheet -->
+<g transform="translate(936 619)"><rect x="0" y="0" width="278" height="64" rx="9" fill="#fff" stroke="#b6cfe0" stroke-width="2"/><circle cx="26" cy="32" r="9" fill="none" stroke="#6986a0" stroke-width="3"/><path d="M47 31H108M128 31H190M209 31H252" stroke="#8da9bf" stroke-width="5" stroke-linecap="round"/></g>
+</svg>
