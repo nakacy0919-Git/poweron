@@ -94,7 +94,7 @@
         });
       }
       const relation=q('.po-grammar-relation');
-      relation.hidden=!selected||!!selected.blocks?.length;
+      relation.hidden=!selected||!!selected?.blocks?.length;
       if(selected){
         q('[data-grammar-field="focus"]').textContent=shorten(selected.focus);
         q('[data-grammar-field="focus"]').title=selected.focus;
