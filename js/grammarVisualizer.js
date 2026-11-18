@@ -86,7 +86,7 @@
         const role=relations.classify(note);
         const label=(part.focus&&part.target?'関連する両方の語句':part.focus?role.focusLabel:role.targetLabel);
         mark.setAttribute('aria-label',part.text+' · '+label+'。押すとこの語句の関係を確認します');
-        mark.title=label+'｜タップすると語句に注目';
+        mark.title=label+'｜対応先を表示するにはタップ';
         mark.setAttribute('data-grammar-offset',String(part.start));
         if(part.focus)spanElements.focus.push(mark);
         if(part.target)spanElements.target.push(mark);
@@ -97,10 +97,12 @@
             const selectedIndex=points.indexOf(next);
             if(selectedIndex>=0)pointIndex=selectedIndex;
           }
-          wordFocus={text:part.text.replace(/\s+/g,' ').trim(),label,offset:part.start};
+          const active=points[pointIndex]||note;
+          const partner=part.focus?active?.target:active?.focus;
+          wordFocus={text:part.text.replace(/\s+/g,' ').trim(),label,offset:part.start,partner:String(partner||'')};
           paint();
-          const current=[...spanElements.focus,...spanElements.target].find(el=>el.getAttribute?.('data-grammar-offset')===String(part.start));
-          current?.focus?.();
+          const nextWord=[...spanElements.focus,...spanElements.target].find(el=>el.getAttribute?.('data-grammar-offset')===String(part.start));
+          nextWord?.focus?.();
         };
         mark.addEventListener('click',activate);
         mark.addEventListener('keydown',event=>{
@@ -217,7 +219,7 @@
       const wordLens=q('.po-grammar-word-lens');
       if(wordLens){
         wordLens.hidden=!wordFocus;
-        if(wordFocus)wordLens.textContent='語句に注目：'+wordFocus.text+'　｜　'+wordFocus.label;
+        if(wordFocus)wordLens.textContent='語句に注目：'+wordFocus.text+'　｜　'+wordFocus.label+(wordFocus.partner?'　⇄　'+shorten(wordFocus.partner,80):'');
       }
       const linkCaption=q('.po-grammar-link-caption');
       if(linkCaption)linkCaption.textContent=relationType.lineLabel;
