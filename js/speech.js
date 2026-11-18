@@ -203,6 +203,7 @@ function beginSpeechRecording() {
 }
 
 function openSpeechOverlay(mode) {
+    if(mode==='shadowing')return; // Shadowing was retired from the four-step student interface.
     if (typeof resetAppMode === 'function') resetAppMode();
     currentMode = mode;
     document.body.classList.add('speech-active');
