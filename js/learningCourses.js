@@ -48,7 +48,7 @@
     if(host.document.hidden){if(quiz&&view==="quiz"&&quizAnswers[quizIndex]===undefined)pausedAt=clock();}
     else if(pausedAt!==null){questionStartedAt+=Math.max(0,clock()-pausedAt);pausedAt=null;}
   });
-  let activeKey=null,currentData=null,currentContext=null;
+  let activeKey=null,currentData=null,currentContext=null,challengeActive=false,challengeRun=null;
   const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function context(){
     const lesson=typeof currentLesson!=="undefined"?Number(currentLesson):1;
@@ -87,7 +87,8 @@
       (host.document.getElementById("mainScreen")||host.document.body).appendChild(root);
     }
     // Use the selected Lesson illustration, not an opaque navy page background.
-    root.style.backgroundImage="linear-gradient(rgba(242,248,255,.18),rgba(242,248,255,.30)),url('img/L"+(currentContext?.lesson||1)+".webp')";
+    root.style.backgroundImage="linear-gradient(rgba(250,253,255,.85),rgba(250,253,255,.89)),url('img/L"+(currentContext?.lesson||1)+".webp')";
+    root.classList.toggle("po-challenge-mode",challengeActive);
     host.document.body.classList.add("po-course-open");
     return root;
   }
@@ -107,9 +108,9 @@
       host.document.body.appendChild(b);
     }
   }
-  function close(){cancelFeedbackTimer();hide();floatButton(false);activeLearningStep=null;activeScope=null;}
+  function close(){cancelFeedbackTimer();hide();floatButton(false);activeLearningStep=null;activeScope=null;challengeActive=false;challengeRun=null;}
   function open(){
-    cancelFeedbackTimer();refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
+    challengeActive=false;challengeRun=null;cancelFeedbackTimer();refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
     host.document.body.classList.toggle("po-course-guided",[8,9,10].includes(currentContext.lesson));
     host.document.body.classList.remove("po-course-free-mode");
     paint();overlay().focus();
@@ -261,7 +262,7 @@
     if(para)para.value="full";
     if(typeof onScopeChange==="function")onScopeChange();
     refresh();quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];
-    view="choose";paint();
+    view=challengeActive?"challengeIntro":"choose";challengeRun=null;paint();
   }
   function chooser(){
     const c=currentContext;
