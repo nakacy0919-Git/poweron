@@ -41,13 +41,13 @@
       const height=bounds?.height||stage.clientHeight||0;
       const width=bounds?.width||stage.clientWidth||0;
       compact=Boolean((height&&height<380)||(width&&width<460));
-      panel.classList.toggle('is-compact',compact);
+      panel.classList?.toggle?.('is-compact',compact);
       root.classList.toggle('po-grammar-compact',showing&&compact);
       if(!explanationOverridden)explanationVisible=!(height&&height<320);
       updateExplanationButton();
     }
     function updateExplanationButton(){
-      panel.classList.toggle('is-explanation-visible',explanationVisible);
+      panel.classList?.toggle?.('is-explanation-visible',explanationVisible);
       const control=panel.querySelector('[data-grammar="toggleExplain"]');
       if(!control)return;
       control.textContent=explanationVisible?'解説を隠す':'解説を見る';
@@ -155,7 +155,7 @@
     }
     function close(){
       if(!showing)return false;
-      showing=false;updateButtons();root.classList.remove('po-grammar-compact');
+      showing=false;updateButtons();root.classList.toggle('po-grammar-compact',false);
       button.focus();
       return true;
     }
@@ -181,7 +181,7 @@
       destroy(){
         if(disposed)return;
         close();disposed=true;observer?.disconnect();
-        root.classList.remove('po-grammar-compact');
+        root.classList.toggle('po-grammar-compact',false);
         button.removeEventListener?.('click',toggle);
         panel.remove();
       },
