@@ -673,3 +673,82 @@
 
 /* Long linked phrases wrap cleanly in compact classroom viewports. */
 .story-theater .po-grammar-word-lens{overflow-wrap:anywhere;border-radius:16px}
+
+
+/* ===== Teaching sequence: readable even on iPad landscape ===== */
+.story-theater .po-grammar-teachbar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(5px,1.1vw,12px);
+  min-width:0;
+  min-height:32px;
+  flex:none;
+  padding:3px 0 2px;
+  border-bottom:1px solid #9bc4e530;
+}
+.story-theater .po-grammar-teachbar [data-grammar="toggleReveal"]{
+  flex:none;
+  min-height:29px;
+  font-size:clamp(10px,.95vw,12px);
+  padding:4px 10px;
+  color:#eafaff;
+  border-color:#8bcbe866;
+  background:#12364dd5;
+}
+.story-theater .po-grammar-teachbar [data-grammar="toggleReveal"][aria-pressed="true"]{
+  border-color:#ffc978cc;
+  background:#ffd18c;
+  color:#112638;
+  box-shadow:0 0 18px #ffc97842;
+}
+.story-theater .po-grammar-reveal-progress{
+  flex:1;
+  text-align:center;
+  color:#caefff;
+  font-weight:850;
+  font-size:clamp(10px,.95vw,13px);
+  letter-spacing:.02em;
+  min-width:0;
+}
+.story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{
+  flex:none;
+  min-height:29px;
+  padding:4px 10px;
+  font-weight:850;
+  font-size:clamp(10px,.95vw,12px);
+  color:#17273a;
+  border-color:#ffe0a6;
+  background:#f6ca7c;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="0"] .po-grammar-steps{
+  visibility:hidden;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="0"] .po-grammar-sentence-map .po-grammar-sentence{
+  font-weight:760;
+  color:#fff;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="1"] .po-grammar-highlight{
+  box-shadow:inset 0 -4px 0 #eec179;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="1"] .po-grammar-highlight.is-target{
+  box-shadow:inset 0 -4px 0 #88e5ff;
+}
+.story-theater .po-grammar-overlay.is-reveal[data-reveal-step="2"] .po-grammar-link-path{
+  stroke-width:3.6;
+}
+@media(max-width:620px){
+  .story-theater .po-grammar-teachbar{min-height:27px;gap:3px;padding:1px 0}
+  .story-theater .po-grammar-reveal-progress{font-size:10px}
+  .story-theater .po-grammar-teachbar [data-grammar="toggleReveal"],
+  .story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{
+    min-height:27px;
+    font-size:10px;
+    padding:3px 6px;
+  }
+}
+@media(max-height:430px){
+  .story-theater .po-grammar-teachbar{min-height:25px}
+  .story-theater .po-grammar-teachbar [data-grammar="toggleReveal"],
+  .story-theater .po-grammar-teachbar [data-grammar="advanceReveal"]{min-height:25px}
+}
