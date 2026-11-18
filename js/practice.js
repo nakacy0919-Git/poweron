@@ -185,6 +185,7 @@
         if(QUESTION_MODES.includes(mode))startKnowledgeRun(mode);
     }
     function open(mode) {
+        window.PowerOnCourses?.dismissChooser?.();
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
         if(GAME_MODES.includes(mode)&&!games)return;
         if (typeof resetAppMode === 'function') resetAppMode();
