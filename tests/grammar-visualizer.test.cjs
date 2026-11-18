@@ -37,7 +37,7 @@ test('Every Lesson 8/9 sentence has a sentence-matched draft explanation',()=>{
 });
 function fakeNode(name='div'){
   return {
-    name,textContent:'',title:'',hidden:false,disabled:false,children:[],attrs:{},listeners:{},className:'',
+    name,textContent:'',title:'',hidden:false,disabled:false,children:[],attrs:{},listeners:{},className:'',style:{},
     setAttribute(k,v){this.attrs[k]=v;},
     addEventListener(k,fn){this.listeners[k]=fn;},
     appendChild(child){this.children.push(child);return child;},
@@ -112,10 +112,11 @@ test('Compact layout collapses long explanations on small viewports, then restor
     grammar.open();
     assert.equal(grammar.getState().compact,true);
     assert.equal(grammar.getState().explanationVisible,false);
-    assert.equal(selectors['.po-grammar-comment'].hidden,true);
+    assert.equal(selectors['.po-grammar-explain'].hidden,true);
+    assert.equal(selectors['.po-grammar-comment'].hidden,false,'grammatical label remains visible');
     selectors['[data-grammar="toggleExplain"]'].click();
     assert.equal(grammar.getState().explanationVisible,true);
-    assert.equal(selectors['.po-grammar-comment'].hidden,false);
+    assert.equal(selectors['.po-grammar-explain'].hidden,false);
     assert.equal(selectors['[data-grammar="toggleExplain"]'].attrs['aria-expanded'],'true');
     grammar.close();
     grammar.open();
@@ -132,4 +133,55 @@ test('Compact classroom CSS preserves a fixed viewport and accessible fallback s
   assert.match(css,/\.po-grammar-overlay\.is-compact/s);
   assert.match(theater,/grammar\?\.destroy\?\.\(\)/);
   assert.match(theater,/\.po-grammar-overlay button:not\(:disabled\)/);
+});
+
+
+test('Overlapping focus and target are both highlighted, without corrupting sentence text',()=>{
+  const old=global.PowerOnGrammarNotes;
+  global.PowerOnGrammarNotes={forSentence:()=>[{tag:'複合修飾',focus:'who plays',target:'boy who plays',explain:'語句の重なりを確認します。'}]};
+  try{
+    const selectors={},doc={createElement:name=>{
+      const node=fakeNode(name);
+      node.classList={toggle(){}};
+      node.querySelector=s=>selectors[s]||(selectors[s]=fakeNode(s));
+      return node;
+    },createTextNode:text=>({textContent:text})};
+    const root=fakeNode('root'),stage=fakeNode('stage'),button=fakeNode('button');
+    root.ownerDocument=doc;root.classList={toggle(){}};
+    const grammar=visualizer.mount({root,stage,button,lesson:8,getScene:()=>null});
+    const sentence='The boy who plays runs.';
+    grammar.update({english:sentence,sentences:[sentence]});
+    grammar.open();
+    const parts=selectors['.po-grammar-sentence'].children;
+    assert.equal(parts.map(item=>item.textContent).join(''),sentence);
+    assert.ok(parts.some(item=>item.className.includes('is-both')),'the overlapping phrase shows both relationships');
+    grammar.destroy();
+  }finally{if(old===undefined)delete global.PowerOnGrammarNotes;else global.PowerOnGrammarNotes=old;}
+});
+test('Constrained height keeps grammar label and collapses commentary before clipping',()=>{
+  const old=global.PowerOnGrammarNotes;
+  global.PowerOnGrammarNotes=notes;
+  try{
+    const selectors={},doc={createElement:name=>{
+      const node=fakeNode(name);
+      node.classList={toggle(){}};
+      node.remove=()=>{};
+      node.querySelector=s=>selectors[s]||(selectors[s]=fakeNode(s));
+      return node;
+    },createTextNode:text=>({textContent:text})};
+    const root=fakeNode('root'),stage=fakeNode('stage'),button=fakeNode('button');
+    root.ownerDocument=doc;root.classList={toggle(){}};
+    stage.getBoundingClientRect=()=>({width:1024,height:640});
+    const grammar=visualizer.mount({root,stage,button,lesson:9,getScene:()=>null});
+    grammar.update({sentences:['English has a huge vocabulary.'],english:'English has a huge vocabulary.'});
+    selectors['.po-grammar-center'].clientHeight=90;
+    selectors['.po-grammar-center'].scrollHeight=350;
+    grammar.open();
+    assert.equal(grammar.getState().explanationVisible,false);
+    assert.equal(selectors['.po-grammar-explain'].hidden,true);
+    assert.equal(selectors['.po-grammar-kind'].textContent,'SVO の文型');
+    assert.equal(selectors['.po-grammar-comment'].hidden,false);
+    assert.equal(selectors['[data-grammar="toggleExplain"]'].textContent,'解説を見る');
+    grammar.destroy();
+  }finally{if(old===undefined)delete global.PowerOnGrammarNotes;else global.PowerOnGrammarNotes=old;}
 });
