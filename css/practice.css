@@ -936,3 +936,11 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 .th-teacher-unlock button{border:0;border-radius:8px;padding:10px 13px;background:#1f668d;color:white;cursor:pointer;font-weight:800}
 .th-teacher-unlock button[type="button"]{background:#e3edf5;color:#355c78}
 .th-teacher-unlock #po-unlock-error{color:#bd3636;font-size:12px;font-weight:800}
+
+
+/* Ensure meaningful text stays readable over every Lesson cover. */
+body.po-practice-active #targetTextDisplay{background:rgba(250,253,255,.98)!important;color:#213b55!important}
+.po-practice .po-content{background:#fff;border-color:#dae6f1;color:#243d55}
+.po-practice .po-heading{background:linear-gradient(112deg,#1f456b,#47759b);color:#fff}
+.po-practice .po-note,.po-practice .po-study-meta{color:#3a5875}
+.po-practice .po-navigation,.po-practice .po-speech-controls{background:#f6fafe;border-radius:10px}
