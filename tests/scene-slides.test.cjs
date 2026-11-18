@@ -63,3 +63,22 @@ test('Lesson 8 Parts 3 and 4 preserve all sentences and curated media mappings',
   scenes.forEach((s,i)=>{const image='lessons/lesson8/part'+part+'/images/'+prefix+'_'+String(i+1).padStart(2,'0')+'.webp';assert.equal(mediaCtx.window.PowerOnSceneMedia[s.id].image,image);assert.equal(plan[i].image,image);});
  }
 });
+
+test('Lesson 9 Part 1 uses seven curated scenes and unique media references',()=>{
+ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+ const dir=path.join(__dirname,'..','lessons');
+ const ctx=vm.createContext({});
+ vm.runInContext(fs.readFileSync(path.join(dir,'lessonData.js'),'utf8')+'\n;this.__lessonScripts=lessonScripts;',ctx);
+ const paras=[1,2].map(number=>({number,key:'L09_P1_p'+number,english:ctx.__lessonScripts['L09_P1_p'+number]}));
+ const scenes=core.buildScenes(paras,core.splitSentences,core.CURATED_SCENE_SIZES);
+ assert.deepEqual(scenes.map(s=>[s.paragraph,s.firstSentence,s.lastSentence]),[[1,1,2],[1,3,3],[2,1,1],[2,2,2],[2,3,4],[2,5,5],[2,6,7]]);
+ assert.deepEqual(scenes.flatMap(s=>s.sentences),paras.flatMap(p=>core.splitSentences(p.english)));
+ const mediaCtx=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(dir,'sceneMedia.js'),'utf8'),mediaCtx);
+ const plan=JSON.parse(fs.readFileSync(path.join(dir,'scene-plan.json'),'utf8')).scenes.filter(s=>s.part==='L09_P1');
+ assert.deepEqual(plan.map(s=>s.id),scenes.map(s=>s.id));
+ scenes.forEach((s,i)=>{
+  const expected='lessons/lesson9/part1/images/L09_P1_'+String(i+1).padStart(2,'0')+'.webp';
+  assert.equal(mediaCtx.window.PowerOnSceneMedia[s.id].image,expected);
+  assert.equal(plan[i].image,expected);
+ });
+});
