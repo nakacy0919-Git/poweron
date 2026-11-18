@@ -50,16 +50,14 @@ test('Study Lab can enter all modes and stores practice independently', () => {
     assert.equal(practice.getProgress().scopes['standard:L01_P1_full'].deep.completed[0],true);
 
     practice.open('puzzle');
-    assert.match(nodes.targetTextDisplay.innerHTML,/po-puzzle-cards/);
-    ['0','1','2','3'].forEach(id=>practice.chooseCard(id));
-    practice.checkPuzzle();
-    assert.equal(practice.getProgress().scopes['standard:L01_P1_full'].puzzle.completed[0],true);
+    assert.notEqual(practice.mode(),'puzzle','standalone Listening Puzzle is retired');
 
     practice.captureLegacy('readingcheck',92);
     assert.equal(practice.getProgress().scopes['standard:L01_P1_full'].readingcheck.bestAccuracy,92);
     practice.open('progress');
-    assert.match(nodes.targetTextDisplay.innerHTML,/Lesson 10/);
-    assert.match(nodes.targetTextDisplay.innerHTML,/Reading Check/);
+    assert.match(nodes.targetTextDisplay.innerHTML,/Lesson 1 の学習記録/);
+    assert.match(nodes.targetTextDisplay.innerHTML,/① Watch & Listen/);
+    assert.match(nodes.targetTextDisplay.innerHTML,/④ Check Understanding/);
     practice.close();
     assert.equal(sandbox.currentMode,'');
 });
