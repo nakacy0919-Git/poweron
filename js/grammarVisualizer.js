@@ -38,12 +38,15 @@
     function adapt(){
       if(disposed)return;
       const bounds=typeof stage.getBoundingClientRect==='function'?stage.getBoundingClientRect():null;
-      const height=bounds?.height||stage.clientHeight||0;
-      const width=bounds?.width||stage.clientWidth||0;
-      compact=Boolean((height&&height<380)||(width&&width<460));
+      // The panel, not the outer stage, determines actual teaching space.
+      // iPad portrait can have a tall stage with a considerably shorter card.
+      const panelBounds=typeof panel.getBoundingClientRect==='function'?panel.getBoundingClientRect():null;
+      const height=panelBounds?.height||panel.clientHeight||bounds?.height||stage.clientHeight||0;
+      const width=panelBounds?.width||panel.clientWidth||bounds?.width||stage.clientWidth||0;
+      compact=Boolean((height&&height<470)||(width&&width<520));
       panel.classList?.toggle?.('is-compact',compact);
       root.classList.toggle('po-grammar-compact',showing&&compact);
-      if(!explanationOverridden)explanationVisible=!((height&&height<380)||(width&&width<520));
+      if(!explanationOverridden)explanationVisible=!((height&&height<370)||(width&&width<500));
       updateExplanationButton();
     }
     function updateExplanationButton(){
@@ -53,33 +56,37 @@
       control.textContent=explanationVisible?'解説を隠す':'解説を見る';
       control.setAttribute('aria-pressed',String(explanationVisible));
       control.setAttribute('aria-expanded',String(explanationVisible));
-      panel.querySelector('.po-grammar-comment').hidden=!explanationVisible;
+      // The grammar label must stay visible, even on compact phones.
+      // Only the lengthy Japanese explanation is toggled.
+      panel.querySelector('.po-grammar-explain').hidden=!explanationVisible;
+      panel.querySelector('.po-grammar-comment').classList?.toggle?.('is-collapsed',!explanationVisible);
     }
     const sentences=()=>Array.isArray(scene?.sentences)&&scene.sentences.length?scene.sentences:
       (typeof splitSentences==='function'?splitSentences(scene?.english||''):[trim(scene?.english||'')]).filter(Boolean);
     const notesFor=s=>host.PowerOnGrammarNotes?.forSentence?.(lesson,s)||[];
     function sentenceText(node,text,note){
-      const matches=[];
+      const ranges=[];
       if(note){
         for(const spec of [{value:note.focus,kind:'focus'},{value:note.target,kind:'target'}]){
           if(!spec.value)continue;
           const start=text.toLowerCase().indexOf(spec.value.toLowerCase());
-          if(start>=0)matches.push({start,end:start+spec.value.length,kind:spec.kind});
+          if(start>=0)ranges.push({start,end:start+spec.value.length,kind:spec.kind});
         }
       }
-      matches.sort((a,b)=>a.start-b.start||b.end-a.end);
-      const picked=[];let cursor=0;
-      for(const match of matches){if(match.start<cursor)continue;picked.push(match);cursor=match.end;}
-      node.replaceChildren();cursor=0;
-      const append=s=>{if(s)node.appendChild(doc.createTextNode(s));};
-      for(const match of picked){
-        append(text.slice(cursor,match.start));
-        const span=doc.createElement('mark');
-        span.className='po-grammar-highlight is-'+match.kind;
-        span.textContent=text.slice(match.start,match.end);
-        node.appendChild(span);cursor=match.end;
+      // Split at every boundary so overlapping modifier/dependency spans
+      // remain visible instead of one silently hiding the other.
+      const cuts=[...new Set([0,text.length,...ranges.flatMap(r=>[r.start,r.end])])].sort((a,b)=>a-b);
+      node.replaceChildren();
+      for(let i=0;i<cuts.length-1;i++){
+        const a=cuts[i],b=cuts[i+1],piece=text.slice(a,b);
+        if(!piece)continue;
+        const focus=ranges.some(r=>r.kind==='focus'&&r.start<=a&&b<=r.end);
+        const target=ranges.some(r=>r.kind==='target'&&r.start<=a&&b<=r.end);
+        if(!focus&&!target){node.appendChild(doc.createTextNode(piece));continue;}
+        const mark=doc.createElement('mark');
+        mark.className='po-grammar-highlight '+(focus&&target?'is-both':focus?'is-focus':'is-target');
+        mark.textContent=piece;node.appendChild(mark);
       }
-      append(text.slice(cursor));
     }
     function updateButtons(){
       button.setAttribute('aria-pressed',String(showing));
@@ -95,8 +102,34 @@
         caption.setAttribute('aria-hidden',String(showing));
       }
     }
+    function fitContent(){
+      if(disposed||!showing)return;
+      const center=q('.po-grammar-center');
+      const sentenceNode=q('.po-grammar-sentence');
+      if(!center||!sentenceNode)return;
+      panel.classList?.toggle?.('is-dense',false);
+      sentenceNode.style.fontSize='';
+      const overflows=()=>center.clientHeight>0&&center.scrollHeight>center.clientHeight+5;
+      if(!overflows())return;
+      panel.classList?.toggle?.('is-dense',true);
+      // Never shrink classroom text below 14px; preserve legibility.
+      if(overflows()&&typeof host.getComputedStyle==='function'){
+        let font=parseFloat(host.getComputedStyle(sentenceNode).fontSize);
+        while(Number.isFinite(font)&&font>14&&overflows()){
+          font=Math.max(14,font-1);
+          sentenceNode.style.fontSize=font+'px';
+        }
+      }
+      // If content cannot reasonably fit, keep the heading visible and
+      // offer the explanation explicitly; the center can still scroll as fallback.
+      if(overflows()&&explanationVisible&&!explanationOverridden){
+        explanationVisible=false;
+        updateExplanationButton();
+      }
+    }
     function paint(){
       if(!showing||!scene)return;
+      adapt();
       const ss=sentences(),sentence=ss[Math.min(sentenceIndex,ss.length-1)]||trim(scene.english);
       sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex));
       const points=notesFor(sentence);
@@ -154,6 +187,7 @@
       });
       b('nextPoint').disabled=!points.length||(pointIndex===points.length-1&&sentenceIndex===ss.length-1);
       b('nextPoint').textContent=points.length&&pointIndex<points.length-1?'次のポイント →':sentenceIndex<ss.length-1?'次の英文 →':'解説を確認';
+      fitContent();
     }
     function changeSentence(delta){const ss=sentences();sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex+delta));pointIndex=0;paint();}
     function nextPoint(){
@@ -164,7 +198,7 @@
     function open(){
       if(showing||disposed)return;
       onOpen?.();
-      showing=true;updateButtons();adapt();paint();
+      showing=true;updateButtons();paint();
       b('close').focus();
     }
     function close(){
@@ -182,9 +216,10 @@
     b('toggleExplain').addEventListener('click',()=>{
       explanationOverridden=true;explanationVisible=!explanationVisible;
       updateExplanationButton();
+      fitContent();
     });
     if(typeof host.ResizeObserver==='function'&&typeof stage.getBoundingClientRect==='function'){
-      observer=new host.ResizeObserver(()=>{if(showing)adapt();});
+      observer=new host.ResizeObserver(()=>{if(showing){adapt();paint();}});
       observer.observe(stage);
     }
     updateButtons();updateExplanationButton();
