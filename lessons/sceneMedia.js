@@ -47,6 +47,6 @@ window.PowerOnSceneMedia = {
     "L09_P2_p4_s01": {image:"lessons/lesson9/part2/images/L09_P2_04.webp"},
     "L09_P2_p4_s03": {image:"lessons/lesson9/part2/images/L09_P2_05.webp"},
     "L09_P2_p4_s05": {image:"lessons/lesson9/part2/images/L09_P2_06.webp"},
-    "L09_P2_p4_s07": {image:"lessons/lesson9/part2/images/L09_P2_07.webp"},
+    "L09_P2_p4_s07": {image:"lessons/lesson9/part2/images/L09_P2_07_speech_exam.svg"},
     "L09_P2_p4_s09": {image:"lessons/lesson9/part2/images/L09_P2_08.webp"}
 };

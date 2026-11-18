@@ -44,7 +44,6 @@ body.po-theater-active{overflow:hidden}
 .story-theater .theater-picture img{max-width:none;max-height:none;margin:0}
 .story-theater .theater-caption p{margin:0;color:#fff}
 .story-theater .theater-caption p.theater-ja{margin-top:6px;color:#f3f0e9}
-.story-theater .theater-caption .theater-ja-label{font-size:11px;font-weight:600;color:#f4d3a6;display:block;margin-top:5px}
 .story-theater [hidden]{display:none!important}
 .story-theater .theater-cover-note{position:absolute;top:10px;left:12px;background:#120c16b5;padding:5px 9px;border-radius:6px;font-size:11px;color:#f2e4d7}
 
@@ -52,5 +51,4 @@ body.po-theater-active{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.theater-picture.theater-transition{animation:none}}
 
 /* Japanese captions are sentence/scene-aligned; preserve readability without paragraph overflow. */
-.story-theater .theater-ja-label{font-size:12px;color:#ffe2b0;margin-bottom:4px}
 .story-theater .theater-caption p.theater-ja{line-height:1.5;font-weight:600}
