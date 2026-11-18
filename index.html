@@ -50,14 +50,6 @@
                     </select>
                 </div>
 
-                <div id="mobileAudioControls" class="mobile-audio-controls" style="display: none;">
-                    <button class="m-audio-btn play-btn" id="btnMobileMainAudio" onclick="toggleMainAudio()">▶ 再生</button>
-                    <button class="m-audio-btn" onclick="seekAudio(-5)">⏪</button>
-                    <button class="m-audio-btn" onclick="seekAudio(5)">⏩</button>
-                    <button class="m-audio-btn stop-btn" onclick="stopAudio()">⏹ 停止</button>
-                    
-                </div>
-
 <nav class="po-learning-menu po-mobile-actions" aria-label="4ステップ学習メニュー">
   <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
@@ -164,27 +156,15 @@
         <div id="drag-handle"></div>
 
         <div class="sidebar compact-sidebar" id="sidebar">
-            <div class="sidebar-group">
-                <div class="selector-container">
-                    <select id="partSelect" onchange="onScopeChange()"><option value="1">Part 1</option><option value="2">Part 2</option><option value="3">Part 3</option><option value="4">Part 4</option></select>
-                    <select id="paraSelect" onchange="onScopeChange()"><option value="full">Full Text</option><option value="p1">Paragraph 1</option><option value="p2">Paragraph 2</option><option value="p3">Paragraph 3</option></select>
-                </div>
-                <button class="btn btn-audio-main compact-main-btn" id="btnMainAudio" onclick="toggleMainAudio()">▶ Play Audio</button>
-                <div class="audio-controls compact-ctrls">
-                    <button class="ctrl-btn" onclick="seekAudio(-5)">⏪ 5s</button>
-                    <button class="ctrl-btn" onclick="stopAudio()">⏹ Stop</button>
-                    <button class="ctrl-btn" onclick="seekAudio(5)">5s ⏩</button>
-                </div>
+            <!-- Internal scope controls remain in DOM for lessons, quizzes, and audio; one user-facing Part picker lives in Script/Courses. -->
+            <div class="po-internal-selectors" aria-hidden="true">
+                <select id="partSelect" onchange="onScopeChange()" tabindex="-1"><option value="1">Part 1</option></select>
+                <select id="paraSelect" onchange="onScopeChange()" tabindex="-1"><option value="full">Full Text</option></select>
+                <select id="levelSelect" onchange="changeLevel(this.value)" tabindex="-1">
+                    <option value="standard">Standard</option><option value="pre1">準1級</option><option value="grade1">1級</option>
+                </select>
+                <button type="button" id="btnMainAudio" tabindex="-1" aria-hidden="true" onclick="toggleMainAudio()">▶ Play Audio</button>
             </div>
-            <hr style="margin: 5px 0;">
-            <div class="sidebar-group right-controls">
-                <div style="margin-bottom: 10px;">
-                    <select id="levelSelect" onchange="changeLevel(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #4facfe; font-weight: bold; color: #0288d1; background: #e1f5fe; cursor: pointer; font-size: 0.95rem;">
-                        <option value="standard">🔰 Standard (標準)</option>
-                        <option value="pre1">🎯 英検準1級レベル</option>
-                        <option value="grade1">👑 英検1級レベル</option>
-                    </select>
-                </div>
 <nav class="po-learning-menu" aria-label="4ステップ学習メニュー">
   <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
