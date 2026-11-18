@@ -45,3 +45,21 @@
 @media(min-width:769px){.po-learning-menu.po-mobile-actions{display:none!important}}
 @media(max-height:650px) and (min-width:769px){.po-step-grid{gap:4px}.po-learning-menu .po-step-primary{min-height:46px;padding-block:4px}.po-step-copy strong{font-size:11px}.po-step-copy small{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.po-step-expand svg{transition:none}}
+
+
+/* Four fixed activities. No course chooser, free-study heading or expandable rows. */
+.po-learning-menu .po-step{grid-template-columns:minmax(0,1fr);border-width:1px}
+.po-learning-menu .po-step-primary{width:100%;min-height:62px;padding:10px 12px;gap:12px}
+.po-learning-menu .po-step-primary:hover{background:#ffffff90}
+.po-learning-menu .po-step-copy strong{font-size:clamp(12px,1.1vw,15px);line-height:1.25;color:var(--tone)}
+.po-learning-menu .po-step-copy small{font-size:11px;color:#34485b}
+.po-learning-menu .po-step-num{width:28px;height:28px;flex-basis:28px;font-size:15px}
+.po-learning-menu .po-step-expand,.po-learning-menu .po-step-options,.po-learning-menu .po-course-launch{display:none!important}
+.po-learning-menu .po-quick-label{padding:10px 2px 2px}
+.po-learning-menu .po-progress-link{background:#e0f5f6!important;border-color:#7bbabf!important;font-weight:850}
+@media(max-width:768px){
+  .po-mobile-actions .po-step{grid-template-columns:minmax(0,1fr)}
+  .po-mobile-actions .po-step-primary{min-height:64px;padding:9px;gap:8px}
+  .po-mobile-actions .po-step-copy small{font-size:10px}
+  .po-learning-menu.po-mobile-actions{max-height:min(45dvh,380px)}
+}
