@@ -80,6 +80,7 @@ test('Sentence-anchored arrow is drawn from real DOM word rectangles; tapping a 
       return {
         name,textContent:'',title:'',hidden:false,disabled:false,style:{},children:[],attrs:{},listeners:{},
         setAttribute(k,v){this.attrs[k]=String(v)},
+        getAttribute(k){return this.attrs[k]??null},
         addEventListener(k,fn){this.listeners[k]=fn},
         removeEventListener(){},
         appendChild(node){this.children.push(node);return node},
@@ -115,8 +116,14 @@ test('Sentence-anchored arrow is drawn from real DOM word rectangles; tapping a 
     assert.ok(which.className.includes('is-keyword'),'key grammatical word has stronger highlight');
     which.click();
     assert.equal(grammar.getState().wordFocus?.text,'which');
+    assert.match(selected['.po-grammar-word-lens'].textContent,/Niagara Falls/,'tapping which reveals its antecedent');
+    const selectedAgain=selected['.po-grammar-sentence'].children.find(w=>w.name==='mark'&&w.textContent==='which');
+    assert.equal(selectedAgain.focused,true,'focus is restored after a reactive repaint');
     assert.match(selected['.po-grammar-word-lens'].textContent,/which/);
     assert.equal(selected['.po-grammar-word-lens'].hidden,false);
+    grammar.update({sentences:['St. Catharines is a small city along the shore of Lake Ontario.'],english:'St. Catharines is a small city along the shore of Lake Ontario.'});
+    assert.equal(selected['.po-grammar-links'].hidden,true,'SVC roles never pretend to be modification links');
+    assert.equal(selected['.po-grammar-pattern'].hidden,false);
     grammar.close();
     assert.equal(selected['.po-grammar-links'].hidden,true);
     grammar.destroy();
