@@ -17,7 +17,7 @@ function selectLesson(num, btnElement) {
 
     const mainScreen = document.getElementById('mainScreen');
     if (mainScreen) {
-        mainScreen.style.backgroundImage = `linear-gradient(rgba(255, 255, 255, 0.40), rgba(255, 255, 255, 0.40)), url('img/L${num}.webp')`;
+        mainScreen.style.backgroundImage = `linear-gradient(rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76)), url('img/L${num}.webp')`;
     }
 
     const partSelect = document.getElementById('partSelect');
