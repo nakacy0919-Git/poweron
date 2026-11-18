@@ -23,7 +23,7 @@ test('Every original paragraph in Lessons 1–10 has an aligned Japanese transla
       if(scenes.length>1)assert.notEqual(actual,p.japanese,key+' displays full paragraph');
     }
   }
-  assert.equal(checked,360);
+  assert.equal(checked,358);
 });
 test('Lesson 9 English-and-German scene shows its own one-sentence translation',()=>{
   const p=para('L09_P1_p2');
@@ -48,6 +48,48 @@ test('Curated quotation boundaries combine Japanese segments correctly, without 
   assert.ok(aligned2[0].includes('郵便配達人'));
   assert.ok(aligned2[0].includes('飼い主'));
   assert.ok(!aligned2[0].includes('そして飼い主はしばしば'));
+});
+test('Quoted exclamations followed by reporting clauses stay in their complete sentence',()=>{
+  const deli=para('L09_P2_p4'),coinage=para('L09_P4_p7');
+  const d=core.splitSentences(deli.english),c=core.splitSentences(coinage.english);
+  assert.equal(d.length,9);
+  assert.equal(c.length,7);
+  assert.equal(d[3],'"I\'m going to a deli!" is a sentence we might hear on a street in New York City.');
+  assert.equal(c[1],'"I googled you!" would be a good example.');
+  assert.equal(d[7],'"Have you seen the ad for the new smartphone?"');
+  assert.ok(!c.some(s=>/^would be/.test(s)));
+});
+test('Lesson 9 Part 2 scenes keep media IDs and align clipping, deli and speech/exam',()=>{
+  const scenes=core.buildScenes([para('L09_P2_p3'),para('L09_P2_p4')],core.splitSentences,core.CURATED_SCENE_SIZES);
+  assert.equal(scenes.length,8);
+  assert.deepEqual(scenes.map(s=>s.id),[
+    'L09_P2_p3_s01','L09_P2_p3_s03','L09_P2_p3_s04',
+    'L09_P2_p4_s01','L09_P2_p4_s03','L09_P2_p4_s05','L09_P2_p4_s07','L09_P2_p4_s09'
+  ]);
+  assert.ok(scenes[3].english.includes('Clipping means to shorten a word'));
+  assert.ok(scenes[4].english.includes('I\'m going to a deli!'));
+  assert.ok(scenes[4].english.includes('New York City.'));
+  assert.ok(scenes[5].english.includes('delicatessen'));
+  assert.ok(scenes[6].english.includes('When you give a speech'));
+  assert.ok(scenes[6].english.includes('examination'));
+  for(const scene of scenes)assert.ok(translations.forScene(scene,[para(scene.paragraphKey)],core.splitSentences));
+});
+test('Lesson 9 Part 4 scenes show complete Google quotation and keep ten existing IDs',()=>{
+  const scenes=core.buildScenes([para('L09_P4_p7'),para('L09_P4_p8'),para('L09_P4_p9')],core.splitSentences,core.CURATED_SCENE_SIZES);
+  assert.equal(scenes.length,10);
+  assert.deepEqual(scenes.slice(0,5).map(s=>s.id),['L09_P4_p7_s01','L09_P4_p7_s03','L09_P4_p7_s05','L09_P4_p7_s07','L09_P4_p7_s08']);
+  assert.ok(scenes[0].english.includes('"I googled you!" would be a good example.'));
+  assert.ok(scenes[1].english.includes('coinage based on'));
+  assert.ok(scenes[2].english.includes('Another example of coinage is nylon.'));
+  assert.ok(scenes[2].english.includes('American scientist'));
+  for(const scene of scenes)assert.ok(translations.forScene(scene,[para(scene.paragraphKey)],core.splitSentences));
+});
+test('Speech/exam scene uses its corrected illustration instead of the unrelated image',()=>{
+  const media=fs.readFileSync(path.join(__dirname,'../lessons/sceneMedia.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
+  assert.match(media,/L09_P2_p4_s07.*L09_P2_07_speech_exam\.svg/);
+  assert.match(html,/js\/practiceCore\.js\?v=12/);
+  assert.match(html,/js\/sceneTranslations\.js\?v=2/);
 });
 test('Unknown or changed translation alignment never falls back to the full Japanese paragraph',()=>{
   const p=para('L09_P1_p2');
