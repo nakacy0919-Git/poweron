@@ -189,6 +189,7 @@
         if(QUESTION_MODES.includes(mode))startKnowledgeRun(mode);
     }
     function open(mode) {
+        if(mode==='puzzle')return; // Retire standalone Listening Puzzle; preserve historical scores.
         window.PowerOnCourses?.dismissChooser?.();
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
         if(GAME_MODES.includes(mode)&&!games)return;
@@ -519,7 +520,11 @@
         const scenes=app.slides.map(scene=>{const media=sceneMedia(scene);return {english:scene.english,japanese:String(scene.japanese||'和訳未登録').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,''),paragraph:scene.paragraph,image:media.image||'img/L'+Number(currentLesson)+'.webp',isCover:!media.image,audio:media.audio};});
         window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
-            onComplete:()=>window.PowerOnCourses?.theaterCompleted?.(),
+            onComplete:()=>{
+                // Credit only after the full Part audio has actually completed.
+                store.record(app.slideScope,'theater',0,1,signature('slides'),{attempt:true,complete:true});
+                window.PowerOnCourses?.theaterCompleted?.();
+            },
             onFinish:()=>open('sceneReading'),onBack:()=>{}});
     }
     function storyScene(index){open('sceneReading');if(Number.isInteger(index)&&index>=0&&index<app.slides.length){app.index=index;render();}}
@@ -734,46 +739,59 @@
         const parts=Object.keys((typeof lessonStructure!=='undefined'&&lessonStructure[num])||{});
         const cc=window.PowerOnCourseCore;
         const groups=[
-          {name:'内容・語彙',tone:'teal',modes:['compEn','compJa','contextVocab','vocabEnJa','vocabJaEn','vocabVoice'],courses:['vocabulary','comprehension']},
-          {name:'音読・発音',tone:'sky',modes:['reading','sceneReading','readingcheck','shadowing'],courses:['reading']},
-          {name:'リスニング',tone:'sky',modes:['listening','storyListen'],courses:[]},
-          {name:'Story Match・スライド',tone:'violet',modes:['slides','storyPuzzle','storyRandom'],courses:['theater']}
+          {name:'① Watch & Listen',tone:'sky'},
+          {name:'② Read & Practice',tone:'teal'},
+          {name:'③ Story Match',tone:'violet'},
+          {name:'④ Check Understanding',tone:'amber'}
         ];
-        const scoreRow=(row,mode)=>{
+        const clamp=n=>Math.max(0,Math.min(100,Math.round(Number(n)||0)));
+        const rowScore=row=>{
             if(!row||typeof row!=='object')return 0;
             const total=Number(row.total)||0;
-            const n=Object.entries(row.completed||{}).filter(([key,yes])=>yes&&/^\d+$/.test(key)&&Number(key)<total).length;
-            let value=total?100*n/total:0;
-            if(mode==='listening'&&total){
-                value=100*Array.from({length:total},(_,i)=>Math.min(3,Number(row.counts?.[i])||0))
-                    .reduce((a,b)=>a+b,0)/(total*3);
-            }else if(Number.isFinite(row.bestAccuracy))value=Math.max(value,row.bestAccuracy);
-            return Math.max(0,Math.min(100,value));
+            const count=Object.entries(row.completed||{}).filter(([key,yes])=>yes&&/^\d+$/.test(key)&&Number(key)<total).length;
+            return clamp(total?100*count/total:row.bestAccuracy||0);
         };
-        const round=n=>Math.max(0,Math.min(100,Math.round(n||0)));
         const results=parts.map(part=>{
             const prefix='standard:L'+String(num).padStart(2,'0')+'_P'+part+'_';
             const keys=Object.keys(all).filter(key=>key.startsWith(prefix));
-            let course={};
+            const rows=mode=>keys.map(key=>all[key]?.[mode]).filter(Boolean);
+            const best=mode=>Math.max(0,...rows(mode).map(rowScore));
+            const lessonPart='L'+String(num).padStart(2,'0')+'_P'+part;
+            const sceneCount=Object.keys(window.PowerOnSceneMedia||{}).filter(id=>id.startsWith(lessonPart+'_S')).length;
+            const gameScore=mode=>{
+                return Math.max(0,...rows(mode).map(row=>{
+                    if(row.completed?.['0'])return 100;
+                    if(mode==='storyPuzzle'&&Number(row.bestSeconds)>0)return Math.min(99,clamp(3000/row.bestSeconds));
+                    if((mode==='storyRandom'||mode==='storyListen')&&Number(row.bestPoints)>0&&sceneCount>0&&games?.target){
+                        return Math.min(99,clamp(100*row.bestPoints/Math.max(1,games.target(sceneCount,mode==='storyListen'))));
+                    }
+                    return rowScore(row);
+                }));
+            };
+            let saved={},challenge={};
             if(cc&&storage){
-                const scope=cc.scope({lesson:num,part,level:'standard'});
-                const data=cc.read(storage,cc.storageKey(learner,scope));
-                course={
-                    vocabulary:data.done?.mastery?.vocabulary?100:(Number(data.latest?.mastery?.vocabulary?.mastery)||0),
-                    comprehension:data.done?.mastery?.comprehension||data.done?.speed?.comprehension?100:Math.max(Number(data.latest?.mastery?.comprehension?.mastery)||0,Number(data.latest?.speed?.comprehension?.mastery)||0),
+                const scoped=cc.scope({lesson:num,part,level:'standard'});
+                const data=cc.read(storage,cc.storageKey(learner,scoped));
+                saved={theater:data.done?.mastery?.theater?100:0,
                     reading:data.done?.mastery?.reading||data.done?.speed?.reading?100:0,
-                    theater:data.done?.mastery?.theater?100:0
-                };
+                    vocabulary:Number(data.latest?.mastery?.vocabulary?.percent)||0,
+                    comprehension:Math.max(Number(data.latest?.mastery?.comprehension?.percent)||0,
+                      Number(data.latest?.speed?.comprehension?.percent)||0)};
+                challenge=data.challenge||{};
             }
-            const metrics=groups.map(g=>{
-                const allValues=g.modes.map(mode=>keys.reduce((max,key)=>Math.max(max,scoreRow(all[key]?.[mode],mode)),0));
-                const courseValues=g.courses.map(name=>course[name]||0);
-                return round([...allValues,...courseValues].reduce((a,b)=>a+b,0)/(allValues.length+courseValues.length||1));
-            });
-            return {part,metrics,overall:round(metrics.reduce((a,b)=>a+b,0)/groups.length)};
+            const theater=clamp(Math.max(best('theater'),best('slides'),saved.theater));
+            const reading=clamp(Math.max(best('sceneReading'),best('reading'),best('readingcheck'),saved.reading));
+            const story=clamp((gameScore('storyPuzzle')+gameScore('storyRandom')+gameScore('storyListen'))/3);
+            const older=(
+                Math.max(best('compJa'),best('contextVocab'),best('vocabEnJa'),saved.vocabulary)+
+                Math.max(best('compEn'),best('vocabJaEn'),saved.comprehension)
+            )/2;
+            const check=challenge.clear?100:Math.min(99,clamp(Math.max(Number(challenge.bestPercent)||0,older)));
+            const metrics=[theater,reading,story,check];
+            return {part,metrics,clear:!!challenge.clear,overall:clamp(metrics.reduce((a,b)=>a+b,0)/groups.length)};
         });
-        const groupTotals=groups.map((group,i)=>round(results.reduce((a,p)=>a+p.metrics[i],0)/(results.length||1)));
-        const overall=round(results.reduce((a,p)=>a+p.overall,0)/(results.length||1));
+        const groupTotals=groups.map((_,i)=>clamp(results.reduce((a,p)=>a+p.metrics[i],0)/(results.length||1)));
+        const overall=clamp(results.reduce((a,p)=>a+p.overall,0)/(results.length||1));
         return {groups,results,groupTotals,overall};
     }
     function progressDashboard(){
@@ -804,7 +822,7 @@
             ).join('')+'</div>'+
             '<h3 class="th-part-heading">Part別の達成度</h3>'+
             '<div class="th-lesson-parts">'+progress.results.map(p=>
-                '<article class="th-lesson-part"><div class="th-lesson-part-head"><strong>Part '+p.part+'</strong>'+ring(p.overall)+'</div>'+
+                '<article class="th-lesson-part"><div class="th-lesson-part-head"><strong>Part '+p.part+(p.clear?' <small class="th-progress-clear">✓ 全問正解クリア</small>':'')+'</strong>'+ring(p.overall)+'</div>'+
                 '<div class="th-lesson-part-metrics">'+progress.groups.map((g,i)=>
                     '<div><span>'+g.name+'</span>'+ring(p.metrics[i])+'</div>'
                 ).join('')+'</div></article>'

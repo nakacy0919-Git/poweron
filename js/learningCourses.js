@@ -48,7 +48,7 @@
     if(host.document.hidden){if(quiz&&view==="quiz"&&quizAnswers[quizIndex]===undefined)pausedAt=clock();}
     else if(pausedAt!==null){questionStartedAt+=Math.max(0,clock()-pausedAt);pausedAt=null;}
   });
-  let activeKey=null,currentData=null,currentContext=null;
+  let activeKey=null,currentData=null,currentContext=null,challengeActive=false,challengeRun=null;
   const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function context(){
     const lesson=typeof currentLesson!=="undefined"?Number(currentLesson):1;
@@ -87,7 +87,8 @@
       (host.document.getElementById("mainScreen")||host.document.body).appendChild(root);
     }
     // Use the selected Lesson illustration, not an opaque navy page background.
-    root.style.backgroundImage="linear-gradient(rgba(242,248,255,.18),rgba(242,248,255,.30)),url('img/L"+(currentContext?.lesson||1)+".webp')";
+    root.style.backgroundImage="linear-gradient(rgba(250,253,255,.85),rgba(250,253,255,.89)),url('img/L"+(currentContext?.lesson||1)+".webp')";
+    root.className=challengeActive?"po-course-overlay po-challenge-mode":"po-course-overlay";
     host.document.body.classList.add("po-course-open");
     return root;
   }
@@ -107,13 +108,89 @@
       host.document.body.appendChild(b);
     }
   }
-  function close(){cancelFeedbackTimer();hide();floatButton(false);activeLearningStep=null;activeScope=null;}
+  function close(){cancelFeedbackTimer();hide();floatButton(false);activeLearningStep=null;activeScope=null;challengeActive=false;challengeRun=null;}
   function open(){
-    cancelFeedbackTimer();refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
+    challengeActive=false;challengeRun=null;cancelFeedbackTimer();refresh();view="choose";quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];floatButton(false);
     host.document.body.classList.toggle("po-course-guided",[8,9,10].includes(currentContext.lesson));
     host.document.body.classList.remove("po-course-free-mode");
     paint();overlay().focus();
   }
+
+  function launchChallenge(){
+    if(typeof resetAppMode==="function")resetAppMode();
+    cancelFeedbackTimer();refresh();
+    if(currentContext.level!=="standard"){
+      if(typeof currentLevel!=="undefined")currentLevel="standard";
+      const level=host.document.getElementById("levelSelect");if(level)level.value="standard";
+      if(typeof onScopeChange==="function")onScopeChange();
+      refresh();
+    }
+    challengeActive=true;challengeRun=null;currentData.course="mastery";save();
+    quiz=null;view="challengeIntro";floatButton(false);paint();overlay().focus?.();
+  }
+  function challengeAvailable(){
+    const vocabulary=core.createVocabularyQuiz(currentContext.lesson,currentContext.part,
+      typeof lessonVocab!=="undefined"?lessonVocab:{},Math.random,host.PowerOnCourseVocabGlosses||{}).length;
+    const comprehension=pool().length;
+    return {vocabulary,comprehension,ready:vocabulary>0&&comprehension>=10};
+  }
+  function beginChallenge(){
+    if(!challengeActive||!challengeAvailable().ready)return;
+    challengeRun={vocabulary:null,comprehension:null};
+    currentData.course="mastery";save();newQuiz(10,"vocabulary");
+  }
+  function challengeIntro(){
+    const a=challengeAvailable(),saved=currentData.challenge||{};
+    return header("Check Understanding","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel">'+partPicker()+
+      '<span class="po-challenge-tag">MISSION · 3 STAGES</span><h3>全問正解でステージクリア！</h3>'+
+      '<p>まず語彙に挑戦し、そのあと日本語・英語の順に本文理解を確認します。</p>'+
+      '<div class="po-challenge-steps"><article><b>01</b><strong>Vocabulary</strong><small>語彙 '+a.vocabulary+'問 × 2言語</small></article>'+
+      '<article><b>02</b><strong>First Stage</strong><small>日本語の内容理解 10問</small></article>'+
+      '<article><b>03</b><strong>Second Stage</strong><small>English · 10 questions</small></article></div>'+
+      '<p class="po-challenge-rule">合計'+(a.vocabulary*2+20)+'問。1問でも間違えると今回はステージクリアになりません。</p>'+
+      (saved.clear?'<p class="po-challenge-saved">✓ このPartの過去のノーミス達成記録があります</p>':'')+
+      (a.ready?button("beginChallenge","▶ "+(a.vocabulary*2+20)+"問のチャレンジを始める",'',"po-challenge-start"):
+        '<p class="po-course-warning">問題準備中：語彙 '+a.vocabulary+'問、内容理解 '+a.comprehension+'/10</p>')+
+      button("close","✕ 閉じる",'',"po-course-ghost")+'</section>';
+  }
+  function challengeGap(){
+    const v=challengeRun?.vocabulary;
+    if(!v)return challengeIntro();
+    return header("Vocabulary Complete","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel"><span class="po-challenge-tag">VOCABULARY FINISHED</span>'+
+      '<h3>語彙 '+v.score+' / '+v.total+' 正解</h3>'+
+      '<p>'+(v.clear?'✓ 語彙ステージはノーミス！':'ミスがありました。最後まで練習できますが、今回の全ステージクリアにはなりません。')+'</p>'+
+      '<div class="po-challenge-steps"><article><b>02</b><strong>First Stage</strong><small>日本語 10問</small></article>'+
+      '<article><b>03</b><strong>Second Stage</strong><small>English 10 questions</small></article></div>'+
+      button("nextChallengeStage","▶ First Stage 日本語を開始",'',"po-challenge-start")+
+      button("retryChallenge","最初からやり直す",'',"po-course-ghost")+'</section>';
+  }
+  function finishChallenge(){
+    const v=challengeRun?.vocabulary,c=challengeRun?.comprehension;
+    if(!v||!c)return;
+    const score=v.score+c.score,total=v.total+c.total,percent=Math.round(score*100/Math.max(1,total));
+    const perfect=v.clear&&c.clear&&v.total>=2&&c.total===20&&score===total;
+    const old=currentData.challenge||{};
+    currentData.challenge={...old,attempts:(old.attempts||0)+1,clear:!!(old.clear||perfect),
+      lastClear:perfect,lastScore:score,lastTotal:total,lastPercent:percent,
+      bestPercent:Math.max(old.bestPercent||0,percent),
+      stages:{vocabulary:{score:v.score,total:v.total},japanese:c.sections?.ja||{score:0,total:10},
+        english:c.sections?.en||{score:0,total:10}}};
+    save();
+  }
+  function challengeResult(){
+    const d=currentData.challenge||{},st=d.stages||{};
+    const line=(title,s)=>'<div><span>'+title+'</span><strong>'+(s?.score||0)+' / '+(s?.total||0)+'</strong></div>';
+    return header("Check Understanding · Result","Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
+      '<section class="po-challenge-panel po-challenge-result"><h3>'+(d.lastClear?'✓ ALL CLEAR!':'↻ もう一度挑戦しよう')+'</h3>'+
+      '<p>今回 '+(d.lastScore||0)+' / '+(d.lastTotal||"?")+' 正解。すべて正解した場合だけステージクリアです。</p>'+
+      '<div class="po-challenge-score">'+line("Vocabulary",st.vocabulary)+line("First Stage 日本語",st.japanese)+line("Second Stage English",st.english)+'</div>'+
+      button("retryChallenge","↻ もう一度挑戦",'',"po-challenge-start")+
+      button("progress","◉ My Progress",'',"po-course-ghost")+
+      button("close","✕ 終了",'',"po-course-ghost")+'</section>';
+  }
+
   function openDashboard(){
     cancelFeedbackTimer();refresh();view=currentData.course&&currentData.course!=="free"?"dashboard":"choose";
     if(view==="dashboard"&&currentData.lastQuizByCourse?.[currentData.course])latestResult=currentData.lastQuizByCourse[currentData.course];
@@ -213,6 +290,10 @@
       if(quizKind!=="vocabulary")currentData.lastQuizByCourse[currentData.course]={
         ...latestResult,wrong:latestResult.wrong.map(x=>({id:x.id}))
       };
+      if(challengeActive&&challengeRun){
+        if(quizKind==="vocabulary")challengeRun.vocabulary=latestResult;
+        if(quizKind==="comprehension"){challengeRun.comprehension=latestResult;finishChallenge();}
+      }
       save();
     }
     paint();
@@ -224,9 +305,9 @@
   function nextQuestion(){
     if(!quiz||quizAnswers[quizIndex]===undefined)return;
     cancelFeedbackTimer();
-    if(quizIndex===quiz.length-1){view="result";paint();return;}
+    if(quizIndex===quiz.length-1){view=challengeActive?(quizKind==="vocabulary"?"challengeGap":"challengeResult"):"result";paint();return;}
     // Never switch language mid-question. Finish the Japanese half first.
-    if(quizIndex+1===quiz.length/2){view="phaseIntro";paint();return;}
+    if(quizIndex+1===quiz.length/2){if(!challengeActive||quizKind!=="vocabulary"){view="phaseIntro";paint();return;}}
     quizIndex++;questionStartedAt=clock();pausedAt=null;paint();
   }
   function startEnglish(){
@@ -238,7 +319,7 @@
     return '<button type="button" data-action="'+action+'" '+extra+' class="'+cls+'">'+label+'</button>';
   }
   function header(title,sub){
-    return '<header class="po-course-header"><div><span>POWER ON III · LEARNING COURSES</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>';
+    return '<header class="po-course-header"><div><span>'+(challengeActive?"POWER ON III · CHECK UNDERSTANDING":"POWER ON III · LEARNING COURSES")+'</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>';
   }
   function partPicker(){
     if(![8,9,10].includes(currentContext.lesson))return "";
@@ -261,7 +342,7 @@
     if(para)para.value="full";
     if(typeof onScopeChange==="function")onScopeChange();
     refresh();quiz=null;quizAnswers=[];quizTimes=[];quizLangs=[];
-    view="choose";paint();
+    view=challengeActive?"challengeIntro":"choose";challengeRun=null;paint();
   }
   function chooser(){
     const c=currentContext;
@@ -376,7 +457,7 @@
         '<p>'+escape(q.explanation||"")+'</p><small>根拠：'+escape(q.evidence||"")+'</small>'+
         '<small>解答時間 '+quizTimes[quizIndex].toFixed(1)+'秒 · 目標目安 '+core.targetSeconds(q,lang)+'秒（時間超過は不合格にはなりません）</small></section>':"")+
       '<div class="po-course-question-footer">'+(!vocabulary&&done?button("nextQuestion",nextLabel,'',"po-course-start"):"")+
-      button("dashboard","中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
+      button(challengeActive?"backChallenge":"dashboard",challengeActive?"チャレンジを中断":"中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
       (vocabulary&&done?
         '<div class="po-course-feedback-backdrop" role="status" aria-live="polite">'+
           '<section class="po-course-answer-popup '+(answered===q.correct?'is-correct':'is-incorrect')+'" aria-label="回答の説明">'+
@@ -429,7 +510,8 @@
   function paint(){
     const root=overlay();
     root.innerHTML='<div class="po-course-inner">'+
-      (view==="choose"?chooser():view==="dashboard"?dashboard():view==="quiz"?quizScreen():view==="phaseIntro"?phaseIntro():view==="result"?resultScreen():reviewScreen())+
+      (view==="challengeIntro"?challengeIntro():view==="challengeGap"?challengeGap():view==="challengeResult"?challengeResult():
+      view==="choose"?chooser():view==="dashboard"?dashboard():view==="quiz"?quizScreen():view==="phaseIntro"?phaseIntro():view==="result"?resultScreen():reviewScreen())+
       '</div>';
     root.scrollTop=0;
   }
@@ -445,6 +527,10 @@
       case "free":choose("free");break;
       case "stage":stage(btn.dataset.step);break;
       case "selectPart":selectPart(String(btn.dataset.part));break;
+      case "beginChallenge":beginChallenge();break;
+      case "nextChallengeStage":if(challengeActive&&challengeRun?.vocabulary)newQuiz(10,"comprehension");break;
+      case "retryChallenge":beginChallenge();break;
+      case "backChallenge":cancelFeedbackTimer();quiz=null;challengeRun=null;view="challengeIntro";paint();break;
       case "newQuiz":newQuiz(Number(btn.dataset.count),quizKind);break;
       case "answer":answer(Number(btn.dataset.index));break;
       case "nextQuestion":nextQuestion();break;
@@ -453,7 +539,7 @@
       case "retry":newQuiz(quizKind==="vocabulary"?10:currentData.count,quizKind);break;
       case "review":cancelFeedbackTimer();view="review";paint();break;
       case "reviewQuiz":newQuiz(20,"review");break;
-      case "progress":hide();floatButton(true);host.PowerOnPractice?.open?.("progress");break;
+      case "progress":if(challengeActive)close();else{hide();floatButton(true);}host.PowerOnPractice?.open?.("progress");break;
     }
   }
   function change(event){
@@ -471,11 +557,11 @@
       cancelFeedbackTimer();quiz=null;quizAnswers=[];quizTimes=[];activeLearningStep=null;activeScope=null;
       refresh();
       if(host.document.getElementById("po-course-overlay")){
-        view="choose";paint();
+        view=challengeActive?"challengeIntro":"choose";challengeRun=null;paint();
       }
     }
   }
-  host.PowerOnCourses={open,openDashboard,close,dismissChooser,choose,context,launchStep:stage,
+  host.PowerOnCourses={open,openDashboard,close,dismissChooser,choose,context,launchStep:stage,launchChallenge,
     lessonChanged,scopeChanged,theaterCompleted,
     _test:{pool:()=>{refresh();return pool();},reading:checkReading,
       getData:()=>{refresh();return currentData;},status:()=>{refresh();return status();},

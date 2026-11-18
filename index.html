@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="css/style.css?v=24">
     <link rel="stylesheet" href="css/mobile.css?v=23">
     <link rel="stylesheet" href="css/lesson8Practice.css?v=3">
-    <link rel="stylesheet" href="css/practice.css?v=18">
+    <link rel="stylesheet" href="css/practice.css?v=19">
     <link rel="stylesheet" href="css/storyTheater.css?v=1">
-    <link rel="stylesheet" href="css/learningMenu.css?v=1">
-    <link rel="stylesheet" href="css/learningCourses.css?v=6">
+    <link rel="stylesheet" href="css/learningMenu.css?v=2">
+    <link rel="stylesheet" href="css/learningCourses.css?v=7">
 </head>
 <body>
 
@@ -51,46 +51,26 @@
                 </div>
 
 <nav class="po-learning-menu po-mobile-actions" aria-label="4ステップ学習メニュー">
-  <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
     <div class="po-step po-step-watch">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/><path d="m10 8 5 3-5 3z"/></svg><span class="po-step-copy"><strong>Watch & Listen</strong><small>Story Theater · 本文鑑賞</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-mobile-watch" aria-label="Step 1 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-mobile-watch" hidden>
-        <button type="button" onclick="PowerOnPractice.open('slides')"><strong>Story Slides</strong><small>画像と本文を1〜2文ずつ</small></button>
-        <button type="button" onclick="PowerOnPractice.open('listening')"><strong>Listening Mission</strong><small>段落を3回聞く</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><span class="po-step-copy"><strong>Watch &amp; Listen</strong><small>Story Theater · 本文を聞く</small></span></button>
     </div>
     <div class="po-step po-step-read">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.open('sceneReading')"><span class="po-step-num">2</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span class="po-step-copy"><strong>Read & Practice</strong><small>じっくり学習 · 音読</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-mobile-read" aria-label="Step 2 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-mobile-read" hidden>
-        <button type="button" onclick="openSpeechOverlay('reading')"><strong>Reading Check</strong><small>従来の音読チェック</small></button>
-        <button type="button" onclick="PowerOnPractice.open('reading')"><strong>Sentence Reading</strong><small>1文ずつ音読</small></button>
-        <button type="button" onclick="openSpeechOverlay('shadowing')"><strong>Shadowing</strong><small>シャドーイング</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.open('sceneReading')"><span class="po-step-num">2</span><span class="po-step-copy"><strong>Read &amp; Practice</strong><small>1シーンずつ音読する</small></span></button>
     </div>
     <div class="po-step po-step-play">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchStory()"><span class="po-step-num">3</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="5"/><path d="M7 12h4m-2-2v4m7-3h.01m2 3h.01"/></svg><span class="po-step-copy"><strong>Play & Challenge</strong><small>Story Match · ゲーム</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-mobile-play" aria-label="Step 3 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-mobile-play" hidden>
-        <button type="button" onclick="PowerOnPractice.open('puzzle')"><strong>Listening Puzzle</strong><small>聞いて英文を組み立てる</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchStory()"><span class="po-step-num">3</span><span class="po-step-copy"><strong>Play &amp; Challenge</strong><small>Story Match · いつもの4モード</small></span></button>
     </div>
     <div class="po-step po-step-check">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchKnowledge()"><span class="po-step-num">4</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="19" rx="3"/><path d="m7 9 2 2 4-4m-6 9 2 2 4-4m3-4h1m-1 7h1"/></svg><span class="po-step-copy"><strong>Check Understanding</strong><small>本文理解・語彙を確認</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-mobile-check" aria-label="Step 4 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-mobile-check" hidden>
-        <button type="button" onclick="startVocabQuiz()"><strong>Vocabulary</strong><small>単語・チャンク学習</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnCourses.launchChallenge()"><span class="po-step-num">4</span><span class="po-step-copy"><strong>Check Understanding</strong><small>語彙 → 日本語 → English · 全問正解</small></span></button>
     </div>
   </div>
-  <div class="po-menu-label po-quick-label"><span>QUICK ACCESS</span><small>教材・学習記録</small></div>
+  <div class="po-menu-label po-quick-label"><span>教材・学習記録</span></div>
   <div class="po-quick-grid">
     <button type="button" onclick="toggleTextMode('script')"><span aria-hidden="true">▤</span> Script<small>本文</small></button>
     <button type="button" onclick="toggleTextMode('japanese')"><span aria-hidden="true">文</span> Japanese<small>和訳</small></button>
-    <button type="button" class="po-progress-link" onclick="PowerOnPractice.open('progress')"><span aria-hidden="true">▥</span> My Progress<small>学習記録</small></button>
-    <button type="button" class="po-screen-reset" onclick="resetAppMode()" title="表示中の画面と再生を閉じます。学習記録は消去しません。"><span aria-hidden="true">↺</span> 画面を閉じる</button>
+    <button type="button" class="po-progress-link" onclick="PowerOnPractice.open('progress')"><span aria-hidden="true">◉</span> My Progress<small>学習記録</small></button>
+    <button type="button" class="po-screen-reset" onclick="resetAppMode()" title="画面を閉じます。記録は消えません。"><span aria-hidden="true">↺</span> 画面を閉じる</button>
   </div>
 </nav>
 
@@ -133,10 +113,6 @@
                         <div id="readingMicContainer" style="display:none;">
                             <button class="start-record-btn floating-btn" id="micBtn" onclick="toggleReadingRecording()">START</button>
                         </div>
-                        <div id="shadowingMicContainer" style="display:none;">
-                            <button class="start-record-btn floating-btn" id="bigShadowBtn" onclick="startShadowing()">START</button>
-                            <button class="start-record-btn floating-btn stop-floating-btn" id="stopShadowBtn" onclick="stopShadowing()" style="display:none;">FINISH</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -166,46 +142,26 @@
                 <button type="button" id="btnMainAudio" tabindex="-1" aria-hidden="true" onclick="toggleMainAudio()">▶ Play Audio</button>
             </div>
 <nav class="po-learning-menu" aria-label="4ステップ学習メニュー">
-  <div class="po-course-launch"><button type="button" onclick="PowerOnCourses.open()" aria-label="学習コースを選ぶ"><span class="po-course-launch-symbol" aria-hidden="true">🎓</span><span><strong>学習コースを選ぶ</strong><small>じっくり / スピード / 自由学習</small></span></button></div><div class="po-menu-label"><span>FREE STUDY</span><small>従来の4ステップ</small></div>
   <div class="po-step-grid">
     <div class="po-step po-step-watch">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/><path d="m10 8 5 3-5 3z"/></svg><span class="po-step-copy"><strong>Watch & Listen</strong><small>Story Theater · 本文鑑賞</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-desktop-watch" aria-label="Step 1 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-desktop-watch" hidden>
-        <button type="button" onclick="PowerOnPractice.open('slides')"><strong>Story Slides</strong><small>画像と本文を1〜2文ずつ</small></button>
-        <button type="button" onclick="PowerOnPractice.open('listening')"><strong>Listening Mission</strong><small>段落を3回聞く</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.openTheater()"><span class="po-step-num">1</span><span class="po-step-copy"><strong>Watch &amp; Listen</strong><small>Story Theater · 本文を聞く</small></span></button>
     </div>
     <div class="po-step po-step-read">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.open('sceneReading')"><span class="po-step-num">2</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span class="po-step-copy"><strong>Read & Practice</strong><small>じっくり学習 · 音読</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-desktop-read" aria-label="Step 2 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-desktop-read" hidden>
-        <button type="button" onclick="openSpeechOverlay('reading')"><strong>Reading Check</strong><small>従来の音読チェック</small></button>
-        <button type="button" onclick="PowerOnPractice.open('reading')"><strong>Sentence Reading</strong><small>1文ずつ音読</small></button>
-        <button type="button" onclick="openSpeechOverlay('shadowing')"><strong>Shadowing</strong><small>シャドーイング</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.open('sceneReading')"><span class="po-step-num">2</span><span class="po-step-copy"><strong>Read &amp; Practice</strong><small>1シーンずつ音読する</small></span></button>
     </div>
     <div class="po-step po-step-play">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchStory()"><span class="po-step-num">3</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="5"/><path d="M7 12h4m-2-2v4m7-3h.01m2 3h.01"/></svg><span class="po-step-copy"><strong>Play & Challenge</strong><small>Story Match · ゲーム</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-desktop-play" aria-label="Step 3 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-desktop-play" hidden>
-        <button type="button" onclick="PowerOnPractice.open('puzzle')"><strong>Listening Puzzle</strong><small>聞いて英文を組み立てる</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchStory()"><span class="po-step-num">3</span><span class="po-step-copy"><strong>Play &amp; Challenge</strong><small>Story Match · いつもの4モード</small></span></button>
     </div>
     <div class="po-step po-step-check">
-      <button type="button" class="po-step-primary" onclick="PowerOnPractice.launchKnowledge()"><span class="po-step-num">4</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="19" rx="3"/><path d="m7 9 2 2 4-4m-6 9 2 2 4-4m3-4h1m-1 7h1"/></svg><span class="po-step-copy"><strong>Check Understanding</strong><small>本文理解・語彙を確認</small></span></button>
-      <button type="button" class="po-step-expand" aria-expanded="false" aria-controls="po-desktop-check" aria-label="Step 4 のその他の学習" onclick="PowerOnMenu.toggle(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="po-step-options" id="po-desktop-check" hidden>
-        <button type="button" onclick="startVocabQuiz()"><strong>Vocabulary</strong><small>単語・チャンク学習</small></button>
-      </div>
+      <button type="button" class="po-step-primary" onclick="PowerOnCourses.launchChallenge()"><span class="po-step-num">4</span><span class="po-step-copy"><strong>Check Understanding</strong><small>語彙 → 日本語 → English · 全問正解</small></span></button>
     </div>
   </div>
-  <div class="po-menu-label po-quick-label"><span>QUICK ACCESS</span><small>教材・学習記録</small></div>
+  <div class="po-menu-label po-quick-label"><span>教材・学習記録</span></div>
   <div class="po-quick-grid">
     <button type="button" id="btnScript" onclick="toggleTextMode('script')"><span aria-hidden="true">▤</span> Script<small>本文</small></button>
     <button type="button" id="btnJapanese" onclick="toggleTextMode('japanese')"><span aria-hidden="true">文</span> Japanese<small>和訳</small></button>
-    <button type="button" class="po-progress-link" onclick="PowerOnPractice.open('progress')"><span aria-hidden="true">▥</span> My Progress<small>学習記録</small></button>
-    <button type="button" class="po-screen-reset" onclick="resetAppMode()" title="表示中の画面と再生を閉じます。学習記録は消去しません。"><span aria-hidden="true">↺</span> 画面を閉じる</button>
+    <button type="button" class="po-progress-link" onclick="PowerOnPractice.open('progress')"><span aria-hidden="true">◉</span> My Progress<small>学習記録</small></button>
+    <button type="button" class="po-screen-reset" onclick="resetAppMode()" title="画面を閉じます。記録は消えません。"><span aria-hidden="true">↺</span> 画面を閉じる</button>
   </div>
 </nav>
             </div>
@@ -253,8 +209,8 @@
     <script src="js/quiz.js?v=25"></script>
     <script src="js/lesson8Practice.js?v=3"></script>
     <script src="js/ui.js?v=24"></script>
-    <script src="js/main.js?v=24"></script>
-    <script src="js/speech.js?v=22"></script>
+    <script src="js/main.js?v=25"></script>
+    <script src="js/speech.js?v=23"></script>
     <script src="js/mobile.js?v=23"></script>
     <script src="lessons/sceneMedia.js?v=l9-p2-webp-20261118"></script>
     <script src="js/practiceCore.js?v=10"></script>
@@ -263,11 +219,11 @@
     <script src="js/storyReading.js?v=5"></script>
     <script src="lessons/comprehensionData.js?v=2"></script>
     <script src="js/storyTheater.js?v=4"></script>
-    <script src="js/practice.js?v=25"></script>
+    <script src="js/practice.js?v=26"></script>
     <script src="js/courseCore.js?v=4"></script>
     <script src="lessons/courseQuestions.js?v=1"></script>
     <script src="lessons/courseVocabGlosses.js?v=1"></script>
     <script src="js/learningMenu.js?v=1"></script>
-    <script src="js/learningCourses.js?v=6"></script>
+    <script src="js/learningCourses.js?v=7"></script>
 </body>
 </html>

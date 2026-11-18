@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 
-test('Right sidebar exposes one course menu and one Script / Progress shortcut',()=>{
+test('Right sidebar offers the four fixed activities and one Script / Progress shortcut',()=>{
   const html=read('index.html'),css=read('css/practice.css');
   const sidebar=html.slice(html.indexOf('<div class="sidebar compact-sidebar"'),html.indexOf('</body>'));
   assert.match(sidebar,/class="po-internal-selectors" aria-hidden="true"/);
@@ -11,6 +11,10 @@ test('Right sidebar exposes one course menu and one Script / Progress shortcut',
     assert.ok(sidebar.includes('id="'+id+'"'));
   }
   const menu=sidebar.slice(sidebar.indexOf('<nav class="po-learning-menu"'));
+  assert.equal((menu.match(/class="po-step-primary"/g)||[]).length,4);
+  assert.ok(menu.includes('PowerOnCourses.launchChallenge()'));
+  assert.ok(!menu.includes('po-course-launch'));
+  assert.ok(!menu.includes('po-step-expand'));
   assert.equal((menu.match(/class="po-progress-link"/g)||[]).length,1);
   assert.equal((menu.match(/id="btnScript"/g)||[]).length,1);
 });

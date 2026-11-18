@@ -936,3 +936,86 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 .th-teacher-unlock button{border:0;border-radius:8px;padding:10px 13px;background:#1f668d;color:white;cursor:pointer;font-weight:800}
 .th-teacher-unlock button[type="button"]{background:#e3edf5;color:#355c78}
 .th-teacher-unlock #po-unlock-error{color:#bd3636;font-size:12px;font-weight:800}
+
+
+/* Ensure meaningful text stays readable over every Lesson cover. */
+body.po-practice-active #targetTextDisplay{background:rgba(250,253,255,.98)!important;color:#213b55!important}
+.po-practice .po-content{background:#fff;border-color:#dae6f1;color:#243d55}
+.po-practice .po-heading{background:linear-gradient(112deg,#1f456b,#47759b);color:#fff}
+.po-practice .po-note,.po-practice .po-study-meta{color:#3a5875}
+.po-practice .po-navigation,.po-practice .po-speech-controls{background:#f6fafe;border-radius:10px}
+
+
+/* Lesson Progress: all four Parts and all four step rings visible at once on PC/iPad. */
+.po-practice.po-mode-progress{display:flex;flex-direction:column;max-width:1500px;height:100%;min-height:0;padding:2px 4px}
+.po-practice.po-mode-progress>.po-heading{display:none!important}
+.po-practice.po-mode-progress>.po-compact-nav.po-mobile-exit{flex:0 0 auto}
+.po-practice.po-mode-progress>.po-content{display:flex!important;flex:1 1 0;min-height:0;overflow:hidden!important;padding:5px!important;background:rgba(248,252,255,.97)}
+.po-practice .th-lesson-progress{width:100%;max-width:none;height:100%;min-height:0;display:flex;flex-direction:column;gap:7px;padding:3px}
+.po-practice .th-lesson-progress-hero{flex:0 0 auto;min-height:0;padding:10px 16px;gap:12px;border-radius:11px}
+.po-practice .th-lesson-progress-hero h2{font-size:clamp(19px,2.2vw,27px);margin:1px 0}
+.po-practice .th-lesson-progress-hero p{font-size:11px}
+.po-practice .th-lesson-progress-hero .th-progress-ring.large{width:82px;height:82px;flex:0 0 82px}
+.po-practice .th-lesson-progress-hero .th-progress-ring.large:before{inset:9px}
+.po-practice .th-lesson-progress-hero .th-progress-ring.large strong{font-size:28px}
+.po-practice .th-lesson-progress-hero .th-progress-ring.large span{font-size:10px}
+.po-practice .th-lesson-profile{font-size:11px;margin-top:5px}
+.po-practice .th-lesson-profile button{min-height:27px;padding:4px 9px;font-size:10px;background:#245575;color:#fff}
+.po-practice .th-analytics-register,.po-practice .th-teacher-unlock{flex:0 0 auto;padding:5px 8px;gap:5px}
+.po-practice .th-analytics-register input{padding:5px 7px}
+.po-practice .th-lesson-sections{flex:0 0 auto;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.po-practice .th-lesson-section{min-height:61px;padding:8px 10px;gap:6px;border-radius:10px}
+.po-practice .th-lesson-section strong{font-size:11px}
+.po-practice .th-lesson-section .th-progress-ring{width:43px;height:43px;flex:0 0 43px}
+.po-practice .th-lesson-section .th-progress-ring:before{inset:5px}
+.po-practice .th-lesson-section .th-progress-ring strong{font-size:13px}
+.po-practice .th-part-heading{flex:0 0 auto;font-size:14px;margin:0}
+.po-practice .th-lesson-parts{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:8px}
+.po-practice .th-lesson-part{min-width:0;min-height:0;display:flex;flex-direction:column;padding:9px;border-radius:10px}
+.po-practice .th-lesson-part-head{padding:0 0 5px;gap:4px}
+.po-practice .th-lesson-part-head strong{font-size:14px}
+.po-practice .th-lesson-part-head .th-progress-ring{width:46px;height:46px;flex:0 0 46px}
+.po-practice .th-lesson-part-head .th-progress-ring:before{inset:5px}
+.po-practice .th-lesson-part-head .th-progress-ring strong{font-size:14px}
+.po-practice .th-lesson-part-metrics{grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(0,1fr));flex:1;min-height:0;padding-top:7px;gap:5px}
+.po-practice .th-lesson-part-metrics>div{padding:5px 7px;min-height:0;gap:4px}
+.po-practice .th-lesson-part-metrics span{font-size:10px;font-weight:750}
+.po-practice .th-lesson-part-metrics .th-progress-ring{width:34px;height:34px;flex:0 0 34px}
+.po-practice .th-lesson-part-metrics .th-progress-ring:before{inset:4px}
+.po-practice .th-lesson-part-metrics .th-progress-ring strong{font-size:11px}
+.po-practice .th-lesson-part-metrics .th-progress-ring span{font-size:7px}
+.po-practice .th-progress-advanced{flex:0 0 auto;padding:5px 10px;font-size:11px;border-radius:7px}
+.po-practice .th-progress-clear{font-size:9px;color:#078458}
+@media(min-width:769px) and (max-width:1300px){
+ .po-practice .th-lesson-parts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-part-metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-sections{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(min-width:769px) and (max-height:670px){
+ .po-practice .th-lesson-progress-hero{padding:5px 10px}
+ .po-practice .th-lesson-progress-hero .th-progress-ring.large{width:65px;height:65px;flex-basis:65px}
+ .po-practice .th-lesson-section{min-height:50px;padding:5px}
+ .po-practice .th-lesson-part{padding:5px}
+ .po-practice .th-lesson-part-metrics>div{padding:3px}
+}
+@media(max-width:768px){
+ .po-practice.po-mode-progress>.po-content{overflow-y:auto!important;overscroll-behavior:contain}
+ .po-practice .th-lesson-progress{height:auto;min-height:100%;overflow:visible}
+ .po-practice .th-lesson-parts{grid-template-columns:repeat(2,minmax(0,1fr));flex:none}
+ .po-practice .th-lesson-sections{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){.po-practice .th-lesson-parts{grid-template-columns:1fr}.po-practice .th-lesson-part-metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}}
+
+
+/* Portrait iPad/tablet: keep the two-row Part overview within a single viewport.
+   Preserve overflow only on phone-sized screens or unusually short viewports. */
+@media(min-width:541px) and (max-width:768px) and (min-height:700px){
+ .po-practice.po-mode-progress>.po-content{overflow:hidden!important}
+ .po-practice .th-lesson-progress{height:100%;min-height:0;overflow:hidden}
+ .po-practice .th-lesson-parts{display:grid;flex:1 1 auto;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-part{min-height:0}
+ .po-practice .th-lesson-part-metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-sections{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .po-practice .th-lesson-section{min-height:52px}
+ .po-practice .th-lesson-section strong{font-size:10px}
+}
