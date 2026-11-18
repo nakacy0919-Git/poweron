@@ -62,6 +62,28 @@
     }
     return out;
   }
+  // Manually authored head words prevent a long relative clause from
+  // attaching its last word to a preceding antecedent. Each anchor must be
+  // contained in its own annotated source phrase; no inferred grammar parse.
+  function anchorRange(text,phrase,head){
+    const source=rangeOf(text,phrase);
+    if(!source)return null;
+    const local=head?rangeOf(phrase,head):null;
+    if(head&&!local)return null;
+    if(local)return {start:source.start+local.start,end:source.start+local.end};
+    const matches=[...String(phrase).matchAll(/[A-Za-z]+(?:['’][A-Za-z]+)?/g)];
+    if(!matches.length)return source;
+    const candidate=matches[0];
+    return {start:source.start+candidate.index,end:source.start+candidate.index+candidate[0].length};
+  }
+  function anchorRanges(text,note){
+    if(!note)return null;
+    const focus=anchorRange(text,note.focus,note.focusAnchor);
+    const target=anchorRange(text,note.target,note.targetAnchor);
+    if(!focus||!target)return null;
+    return {focus,target,curated:Boolean(note.focusAnchor&&note.targetAnchor)};
+  }
+  function overlaps(a,b){return Boolean(a&&b&&a.start<b.end&&a.end>b.start);}
   function touchingNotes(text,notes,offset){
     return (notes||[]).filter(n=>[n.focus,n.target].some(part=>{
       const r=rangeOf(text,part);return r&&offset>=r.start&&offset<r.end;
@@ -98,5 +120,5 @@
     const labelX=(x1+x2)/2,labelY=sameLine?Math.max(10,(y1+y2)/2-lift*.48):Math.max(10,control+6);
     return {path,from:{x:x1,y:y1},to:{x:x2,y:y2},label:{x:labelX,y:labelY},sameLine};
   }
-  return {rangeOf,classify,keyword,pieces,touchingNotes,nearestPair,layout};
+  return {rangeOf,classify,keyword,pieces,anchorRange,anchorRanges,overlaps,touchingNotes,nearestPair,layout};
 });
