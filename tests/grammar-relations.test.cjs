@@ -94,8 +94,13 @@ test('Sentence-anchored arrow is drawn from real DOM word rectangles; tapping a 
       const node=fakeNode(name);node.classList={toggle(){}};
       node.querySelector=s=>selected[s]||(selected[s]=fakeNode(s));
       if(name==='mark'){
-        node.getClientRects=()=>[String(node.textContent).includes('Niagara')||String(node.textContent).includes('Falls')?
-          {left:220,right:310,top:104,bottom:136}:{left:480,right:560,top:104,bottom:136}];
+        node.getClientRects=()=>{
+          const word=String(node.textContent);
+          if(word==='which')return [{left:700,right:740,top:104,bottom:136}];
+          if(word==='Falls')return [{left:210,right:250,top:104,bottom:136}];
+          if(word==='Niagara')return [{left:690,right:715,top:104,bottom:136}];
+          return [{left:230,right:280,top:104,bottom:136}];
+        };
       }
       return node;
     },createTextNode:text=>({textContent:text})};
@@ -108,6 +113,8 @@ test('Sentence-anchored arrow is drawn from real DOM word rectangles; tapping a 
     grammar.open();
     const path=selected['.po-grammar-link-path'];
     assert.ok(path.attrs.d&&path.attrs.d.startsWith('M '),'renders a real connector from word measurements');
+    assert.match(path.attrs.d,/^M 720\.0 98\.0 /,'the arrow begins at the actual which token, not an arbitrary word in its clause');
+    assert.match(path.attrs.d,/ 230\.0 98\.0$/,'the arrow lands on Falls, not the closer but wrong Niagara token');
     assert.equal(selected['.po-grammar-links'].hidden,false);
     assert.equal(selected['.po-grammar-link-caption'].textContent,'修飾先');
     const words=selected['.po-grammar-sentence'].children;
