@@ -90,6 +90,10 @@ test('Speech/exam scene uses its corrected illustration instead of the unrelated
   assert.match(media,/L09_P2_p4_s07.*L09_P2_07_speech_exam\.svg/);
   assert.match(html,/js\/practiceCore\.js\?v=12/);
   assert.match(html,/js\/sceneTranslations\.js\?v=2/);
+  const plan=JSON.parse(fs.readFileSync(path.join(__dirname,'../lessons/scene-plan.json'),'utf8'));
+  const expected=plan.scenes.find(s=>s.id==='L09_P2_p4_s07');
+  assert.equal(expected.image,'lessons/lesson9/part2/images/L09_P2_07_speech_exam.svg');
+  assert.ok(fs.existsSync(path.join(__dirname,'..',expected.image)));
 });
 test('Unknown or changed translation alignment never falls back to the full Japanese paragraph',()=>{
   const p=para('L09_P1_p2');
