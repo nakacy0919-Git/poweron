@@ -2,7 +2,7 @@ const test=require("node:test"),assert=require("node:assert/strict");
 const fs=require("node:fs"),path=require("node:path");
 const core=require("../js/courseCore.js");
 const read=pathName=>fs.readFileSync(path.join(__dirname,"..",pathName),"utf8");
-function fixture(){
+function fixture({vocabCount=10}={}){
   const dom=new Map(),timers=new Map(),stored=new Map();
   const originalScores=JSON.stringify({version:1,scopes:{"standard:L08_P1_full":{storyPuzzle:{bestSeconds:18.4},storyRandom:{bestPoints:400}}}});
   stored.set("poweron_study_progress_v1",originalScores);
@@ -19,7 +19,7 @@ function fixture(){
       focus(){doc.activeElement=this},remove(){dom.delete(this.id)},querySelectorAll(){return []}};},
     getElementById:id=>dom.get(id)||null};
   dom.set("partSelect",{value:"1"});dom.set("paraSelect",{value:"full"});dom.set("levelSelect",{value:"standard"});
-  const vocab={L08_P1:Array.from({length:10},(_,i)=>({word:"word"+i,meaning:"意味"+i})),
+  const vocab={L08_P1:Array.from({length:vocabCount},(_,i)=>({word:"word"+i,meaning:"意味"+i})),
     L08_P2:Array.from({length:10},(_,i)=>({word:"other"+i,meaning:"別の意味"+i}))};
   const questions=Array.from({length:20},(_,i)=>({
     id:"Q"+i,lesson:8,part:1,paragraph:1,difficulty:"Basic",skill:"Detail",
@@ -251,4 +251,16 @@ test("One error in any of the 40 questions prevents this run from clearing",()=>
   const saved=f.course._test.getData().challenge;
   assert.equal(saved.lastClear,false);assert.equal(saved.clear,false);assert.equal(saved.lastScore,39);
   assert.ok(saved.bestPercent<100);
+});
+
+test("Shorter Part word lists dynamically adjust question count, not block students",()=>{
+  const f=fixture({vocabCount:7});f.course.launchChallenge();
+  assert.ok(f.html().includes("34問のチャレンジを始める"));
+  f.click("beginChallenge");assert.equal(f.course._test.getQuiz().length,14);
+  for(let i=0;i<14;i++){const q=f.course._test.getQuiz()[i];f.click("answer",{index:String(q.correct)});f.click("nextQuestion");}
+  assert.equal(f.course._test.getView(),"challengeGap");
+  f.click("nextChallengeStage");
+  for(let i=0;i<20;i++){if(i===10)f.click("startEnglish");const q=f.course._test.getQuiz()[i];f.click("answer",{index:String(q.correct)});f.click("nextQuestion");}
+  const saved=f.course._test.getData().challenge;
+  assert.equal(saved.lastTotal,34);assert.equal(saved.lastScore,34);assert.equal(saved.lastClear,true);
 });
