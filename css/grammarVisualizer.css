@@ -156,3 +156,31 @@
   .story-theater .po-grammar-overlay{animation:none}
   .story-theater.po-grammar-on .theater-picture>.theater-artwork{transition:none}
 }
+
+
+/* Reviewed S/V/O/C or clause-role breakdowns, when available. */
+.story-theater .po-grammar-pattern{
+  display:flex;align-items:stretch;justify-content:center;gap:6px;
+  max-width:100%;overflow-x:auto;flex:0 1 auto;scrollbar-width:thin;padding:3px;
+}
+.story-theater .po-grammar-pattern-chip{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-width:65px;max-width:250px;padding:7px 11px;border-radius:10px;
+  border:1px solid #87bee080;background:#103147dd;
+}
+.story-theater .po-grammar-pattern-chip small{
+  font-size:clamp(10px,.92vw,13px);font-weight:900;color:#88daff;
+}
+.story-theater .po-grammar-pattern-chip strong{
+  font-size:clamp(11px,1.1vw,15px);font-weight:730;color:#fff;
+  overflow-wrap:anywhere;text-align:center;line-height:1.35;
+}
+.story-theater .po-grammar-pattern-arrow{
+  align-self:center;color:#eec57d;font-size:clamp(17px,2.5vw,27px);
+}
+@media(max-width:620px),(max-height:570px){
+ .story-theater .po-grammar-pattern{gap:3px}
+ .story-theater .po-grammar-pattern-chip{min-width:48px;padding:3px 5px}
+ .story-theater .po-grammar-pattern-chip strong{font-size:10px}
+ .story-theater .po-grammar-pattern-arrow{font-size:15px}
+}
