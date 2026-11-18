@@ -336,3 +336,93 @@
     font-size:10px;
   }
 }
+
+
+/* High-quality classroom projection: carry the subdued theater artwork behind
+   the entire available stage, including tall iPad portrait layouts. */
+.story-theater.po-grammar-on .theater-picture{
+  width:100%;
+  height:100%;
+  max-height:100%;
+  aspect-ratio:auto;
+  border:0;
+  border-radius:9px;
+  box-shadow:none;
+}
+.story-theater.po-grammar-on .theater-picture>.theater-image-fill{
+  filter:blur(20px) brightness(.52) saturate(.8);
+}
+.story-theater.po-grammar-on .theater-picture>.theater-artwork{
+  filter:brightness(.34) saturate(.67) blur(1.4px);
+}
+.story-theater.po-grammar-on .po-grammar-overlay{
+  background:linear-gradient(145deg,#07111cd2 0%,#101d32c9 55%,#10223bdf 100%);
+  width:min(96%,1200px);
+  min-width:0;
+}
+/* The content must start at its real top when it overflows; normal center
+   alignment would otherwise clip the beginning of a long English sentence. */
+.story-theater .po-grammar-center{
+  justify-content:safe center;
+  overscroll-behavior:contain;
+}
+.story-theater .po-grammar-highlight.is-both{
+  background:linear-gradient(155deg,#f1a746b0 0%,#b89a63aa 45%,#319dc8a6 100%);
+  border-bottom:3px solid #ffe29b;
+}
+.story-theater .po-grammar-comment.is-collapsed{
+  padding:5px 10px;
+}
+.story-theater .po-grammar-comment.is-collapsed .po-grammar-kind{
+  margin:0;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-center{
+  gap:4px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-sentence{
+  line-height:1.2;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-relation{
+  gap:5px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-node{
+  padding:4px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-pattern-chip{
+  padding:4px 7px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-comment{
+  padding:5px 9px;
+}
+.story-theater .po-grammar-overlay.is-dense .po-grammar-explain{
+  font-size:clamp(11px,1vw,14px);
+  line-height:1.4;
+}
+/* Touch targets and footer controls must not fall outside narrow portrait
+   viewports; point chips stay reachable via the Next Point button. */
+@media(max-width:460px){
+  .story-theater .po-grammar-bottom{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:4px;
+  }
+  .story-theater .po-grammar-steps{display:none}
+  .story-theater .po-grammar-toggle-explain{
+    justify-self:start;
+    min-width:0;
+    white-space:nowrap;
+  }
+  .story-theater .po-grammar-overlay .po-grammar-reveal{
+    justify-self:end;
+    white-space:nowrap;
+  }
+  .story-theater .po-grammar-counter{
+    min-width:0;
+    flex:1;
+  }
+  .story-theater .po-grammar-nav{gap:4px}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-theater .po-grammar-highlight{transition:none}
+}
