@@ -34,6 +34,7 @@ function changeFontSize(type, step) {
 }
 
 function toggleTextMode(mode) {
+    window.PowerOnCourses?.dismissChooser?.();
     let newScriptState = isScriptOpen;
     let newJpnState = isJapaneseOpen;
     if (mode === 'script') newScriptState = !isScriptOpen;
