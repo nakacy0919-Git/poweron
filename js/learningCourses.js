@@ -289,6 +289,10 @@
       if(quizKind!=="vocabulary")currentData.lastQuizByCourse[currentData.course]={
         ...latestResult,wrong:latestResult.wrong.map(x=>({id:x.id}))
       };
+      if(challengeActive&&challengeRun){
+        if(quizKind==="vocabulary")challengeRun.vocabulary=latestResult;
+        if(quizKind==="comprehension"){challengeRun.comprehension=latestResult;finishChallenge();}
+      }
       save();
     }
     paint();
@@ -300,9 +304,9 @@
   function nextQuestion(){
     if(!quiz||quizAnswers[quizIndex]===undefined)return;
     cancelFeedbackTimer();
-    if(quizIndex===quiz.length-1){view="result";paint();return;}
+    if(quizIndex===quiz.length-1){view=challengeActive?(quizKind==="vocabulary"?"challengeGap":"challengeResult"):"result";paint();return;}
     // Never switch language mid-question. Finish the Japanese half first.
-    if(quizIndex+1===quiz.length/2){view="phaseIntro";paint();return;}
+    if(quizIndex+1===quiz.length/2){if(!challengeActive||quizKind!=="vocabulary"){view="phaseIntro";paint();return;}}
     quizIndex++;questionStartedAt=clock();pausedAt=null;paint();
   }
   function startEnglish(){
@@ -314,7 +318,7 @@
     return '<button type="button" data-action="'+action+'" '+extra+' class="'+cls+'">'+label+'</button>';
   }
   function header(title,sub){
-    return '<header class="po-course-header"><div><span>POWER ON III · LEARNING COURSES</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>';
+    return '<header class="po-course-header"><div><span>'+(challengeActive?"POWER ON III · CHECK UNDERSTANDING":"POWER ON III · LEARNING COURSES")+'</span><h2>'+escape(title)+'</h2><p>'+escape(sub)+'</p></div>'+button("close","✕ 終了",'aria-label="コース画面を閉じる"',"po-course-exit")+'</header>';
   }
   function partPicker(){
     if(![8,9,10].includes(currentContext.lesson))return "";
@@ -452,7 +456,7 @@
         '<p>'+escape(q.explanation||"")+'</p><small>根拠：'+escape(q.evidence||"")+'</small>'+
         '<small>解答時間 '+quizTimes[quizIndex].toFixed(1)+'秒 · 目標目安 '+core.targetSeconds(q,lang)+'秒（時間超過は不合格にはなりません）</small></section>':"")+
       '<div class="po-course-question-footer">'+(!vocabulary&&done?button("nextQuestion",nextLabel,'',"po-course-start"):"")+
-      button("dashboard","中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
+      button(challengeActive?"backChallenge":"dashboard",challengeActive?"チャレンジを中断":"中断してコースへ戻る",'',"po-course-ghost")+'</div>'+
       (vocabulary&&done?
         '<div class="po-course-feedback-backdrop" role="status" aria-live="polite">'+
           '<section class="po-course-answer-popup '+(answered===q.correct?'is-correct':'is-incorrect')+'" aria-label="回答の説明">'+
@@ -505,7 +509,8 @@
   function paint(){
     const root=overlay();
     root.innerHTML='<div class="po-course-inner">'+
-      (view==="choose"?chooser():view==="dashboard"?dashboard():view==="quiz"?quizScreen():view==="phaseIntro"?phaseIntro():view==="result"?resultScreen():reviewScreen())+
+      (view==="challengeIntro"?challengeIntro():view==="challengeGap"?challengeGap():view==="challengeResult"?challengeResult():
+      view==="choose"?chooser():view==="dashboard"?dashboard():view==="quiz"?quizScreen():view==="phaseIntro"?phaseIntro():view==="result"?resultScreen():reviewScreen())+
       '</div>';
     root.scrollTop=0;
   }
@@ -521,6 +526,10 @@
       case "free":choose("free");break;
       case "stage":stage(btn.dataset.step);break;
       case "selectPart":selectPart(String(btn.dataset.part));break;
+      case "beginChallenge":beginChallenge();break;
+      case "nextChallengeStage":if(challengeActive&&challengeRun?.vocabulary)newQuiz(10,"comprehension");break;
+      case "retryChallenge":beginChallenge();break;
+      case "backChallenge":cancelFeedbackTimer();quiz=null;challengeRun=null;view="challengeIntro";paint();break;
       case "newQuiz":newQuiz(Number(btn.dataset.count),quizKind);break;
       case "answer":answer(Number(btn.dataset.index));break;
       case "nextQuestion":nextQuestion();break;
@@ -529,7 +538,7 @@
       case "retry":newQuiz(quizKind==="vocabulary"?10:currentData.count,quizKind);break;
       case "review":cancelFeedbackTimer();view="review";paint();break;
       case "reviewQuiz":newQuiz(20,"review");break;
-      case "progress":hide();floatButton(true);host.PowerOnPractice?.open?.("progress");break;
+      case "progress":if(challengeActive)close();else{hide();floatButton(true);}host.PowerOnPractice?.open?.("progress");break;
     }
   }
   function change(event){
@@ -547,11 +556,11 @@
       cancelFeedbackTimer();quiz=null;quizAnswers=[];quizTimes=[];activeLearningStep=null;activeScope=null;
       refresh();
       if(host.document.getElementById("po-course-overlay")){
-        view="choose";paint();
+        view=challengeActive?"challengeIntro":"choose";challengeRun=null;paint();
       }
     }
   }
-  host.PowerOnCourses={open,openDashboard,close,dismissChooser,choose,context,launchStep:stage,
+  host.PowerOnCourses={open,openDashboard,close,dismissChooser,choose,context,launchStep:stage,launchChallenge,
     lessonChanged,scopeChanged,theaterCompleted,
     _test:{pool:()=>{refresh();return pool();},reading:checkReading,
       getData:()=>{refresh();return currentData;},status:()=>{refresh();return status();},
