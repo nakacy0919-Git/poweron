@@ -86,3 +86,50 @@ test('Assets load in order and Story Theater passes exact sentence metadata',()=
   assert.match(theater,/grammar\?\.update\(s\.scene\)/);
   assert.match(theater,/if\(!grammar\?\.close\?\.\(\)\)session\.close\('back'\)/);
 });
+
+
+test('Compact layout collapses long explanations on small viewports, then restores them',()=>{
+  const prev=global.PowerOnGrammarNotes;
+  global.PowerOnGrammarNotes=notes;
+  try{
+    const selectors={};
+    const doc={
+      createElement:name=>{
+        const node=fakeNode(name);
+        node.classList={toggle(){}};
+        node.remove=()=>{node.removed=true;};
+        node.querySelector=s=>selectors[s]||(selectors[s]=fakeNode(s));
+        return node;
+      },
+      createTextNode:text=>({textContent:text})
+    };
+    const root=fakeNode('root'),button=fakeNode('button'),stage=fakeNode('stage');
+    root.ownerDocument=doc;root.classList={toggle(){}};
+    let width=375,height=295;
+    stage.getBoundingClientRect=()=>({width,height});
+    const grammar=visualizer.mount({root,stage,button,lesson:9,splitSentences:core.splitSentences,getScene:()=>null});
+    grammar.update({sentences:['English has a huge vocabulary.'],english:'English has a huge vocabulary.'});
+    grammar.open();
+    assert.equal(grammar.getState().compact,true);
+    assert.equal(grammar.getState().explanationVisible,false);
+    assert.equal(selectors['.po-grammar-comment'].hidden,true);
+    selectors['[data-grammar="toggleExplain"]'].click();
+    assert.equal(grammar.getState().explanationVisible,true);
+    assert.equal(selectors['.po-grammar-comment'].hidden,false);
+    assert.equal(selectors['[data-grammar="toggleExplain"]'].attrs['aria-expanded'],'true');
+    grammar.close();
+    grammar.open();
+    assert.equal(grammar.getState().explanationVisible,true,'teacher preference survives reopening');
+    grammar.destroy();
+    assert.equal(stage.children[0].removed,true);
+  }finally{if(prev===undefined)delete global.PowerOnGrammarNotes;else global.PowerOnGrammarNotes=prev;}
+});
+test('Compact classroom CSS preserves a fixed viewport and accessible fallback scroll',()=>{
+  const css=fs.readFileSync(path.join(rootPath,'css/grammarVisualizer.css'),'utf8');
+  const theater=fs.readFileSync(path.join(rootPath,'js/storyTheater.js'),'utf8');
+  assert.match(css,/\.story-theater\.po-grammar-on\s*\{[^}]*height:100dvh/s);
+  assert.match(css,/\.po-grammar-center\s*\{[^}]*overflow-y:auto/s);
+  assert.match(css,/\.po-grammar-overlay\.is-compact/s);
+  assert.match(theater,/grammar\?\.destroy\?\.\(\)/);
+  assert.match(theater,/\.po-grammar-overlay button:not\(:disabled\)/);
+});
