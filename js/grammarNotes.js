@@ -526,6 +526,406 @@
     "focus": "Because English is the most commonly used global language",
     "target": "it might be growing and changing faster than other languages",
     "explain": "because 節は理由。might be -ing は推量を含む進行形、faster than は比較です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVC",
+    "match": "St. Catharines is a small city",
+    "focus": "is",
+    "target": "St. Catharines",
+    "explain": "St. Catharines が主語、is が動詞、a small city が補語。沿岸を示す語句は修飾語です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "choose A as B",
+    "match": "the Canadian government formally chose a small chapel",
+    "focus": "chose a small chapel in St. Catharines as a National Historic Site of Canada",
+    "target": "the Canadian government",
+    "explain": "choose A as B は「AをBとして選ぶ」。A と B は同一の対象です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVC",
+    "match": "The chapel was the",
+    "focus": "was",
+    "target": "The chapel",
+    "explain": "S＋V＋C。礼拝堂が「終着駅」であったことを説明します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "because 節",
+    "match": "These white people helped the slaves because",
+    "focus": "because they did not support slavery",
+    "target": "helped the slaves",
+    "explain": "because 以下が白人たちが助けた理由です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVC",
+    "match": "Philadelphia was the symbol of freedom",
+    "focus": "was",
+    "target": "Philadelphia",
+    "explain": "Philadelphia が主語、was が動詞、the symbol of freedom が補語です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "head for",
+    "match": "Many slaves in the South headed for Philadelphia",
+    "focus": "headed for Philadelphia",
+    "target": "Many slaves in the South",
+    "explain": "head for は「〜へ向かう」。for 以下は行き先を表します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "受動態の並列",
+    "match": "escaping slaves were hidden, warmed, and fed",
+    "focus": "were hidden, warmed, and fed",
+    "target": "escaping slaves",
+    "explain": "were に続く3つの過去分詞が並列になっています。"
+  },
+  {
+    "lesson": 8,
+    "tag": "疑問文と不定詞",
+    "match": "Then how did they manage to find the routes",
+    "focus": "manage to find the routes",
+    "target": "they",
+    "explain": "manage to do は「なんとか〜する」。how は方法を尋ねる疑問詞です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "and による並列",
+    "match": "angels\" meant \"conductors",
+    "focus": "and \"Jordan\" meant \"the Ohio River",
+    "target": "angels",
+    "explain": "and が「angels は〜を意味する」と「Jordan は〜を意味する」を結びます。"
+  },
+  {
+    "lesson": 8,
+    "tag": "but による対比",
+    "match": "Slaves sang the spirituals within their families",
+    "focus": "but not in the presence of white people",
+    "target": "within their families",
+    "explain": "but は「家族の中では」と「白人の前では」を対比し、後半の sang は省略されています。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVO",
+    "match": "the slaves learned the routes to freedom",
+    "focus": "learned",
+    "target": "the slaves",
+    "explain": "the slaves（S）＋learned（V）＋the routes（O）。In this way は方法です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVO",
+    "match": "She had ten brothers and sisters",
+    "focus": "had",
+    "target": "She",
+    "explain": "She（S）＋had（V）＋ten brothers and sisters（O）の基本構造です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SV",
+    "match": "her owner died",
+    "focus": "died",
+    "target": "her owner",
+    "explain": "her owner（S）＋died（V）。A few years later は時の修飾語です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "decide to do",
+    "match": "They decided to run away together",
+    "focus": "to run away together",
+    "target": "decided",
+    "explain": "decide to do は「〜すると決める」。不定詞が決断した行動を表します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "go on",
+    "match": "She went on alone through the woods by night",
+    "focus": "went on",
+    "target": "She",
+    "explain": "go on は「進み続ける」。alone は様子、through the woods は通った場所です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SV",
+    "match": "She hid by day",
+    "focus": "hid",
+    "target": "She",
+    "explain": "She（S）＋hid（V）。by day は「昼間は」という修飾語です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "but で節を接続",
+    "match": "She had no map, but she trusted God",
+    "focus": "but she trusted God",
+    "target": "She had no map",
+    "explain": "but は地図がないことと神を信じたことを対比します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "get to",
+    "match": "At last, she got to Philadelphia",
+    "focus": "got to Philadelphia",
+    "target": "she",
+    "explain": "get to ～ は「〜へ到着する」。At last は「ついに」です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "but による対比",
+    "match": "Harriet was no longer a slave, but",
+    "focus": "but she could not feel happy",
+    "target": "Harriet was no longer a slave",
+    "explain": "but は「奴隷ではなくなったのに幸せを感じない」という対比を示します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVC",
+    "match": "All her family members were still slaves",
+    "focus": "were",
+    "target": "All her family members",
+    "explain": "all her family members（S）＋were（V）＋slaves（C）です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "keep -ing",
+    "match": "She kept thinking about them",
+    "focus": "thinking about them",
+    "target": "kept",
+    "explain": "keep -ing は「〜し続ける」。thinking が続けた行動です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "動詞の並列",
+    "match": "she went back to Maryland and met her family again",
+    "focus": "went back to Maryland and met her family again",
+    "target": "she",
+    "explain": "went と met が and で並び、どちらも she の行動です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "wish to do",
+    "match": "he did not wish to go",
+    "focus": "to go",
+    "target": "wish",
+    "explain": "wish to do は「〜したいと望む」。did not で過去の否定です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SVO",
+    "match": "she led two brothers, a sister, her children",
+    "focus": "led",
+    "target": "she",
+    "explain": "led は「導いた」。目的語には複数の人物が列挙されています。"
+  },
+  {
+    "lesson": 8,
+    "tag": "SV",
+    "match": "reputation as a fearless leader spread fast",
+    "focus": "spread fast",
+    "target": "Harriet's reputation as a fearless leader",
+    "explain": "reputation が主語、spread が動詞。fast は広まり方を表します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "受動態",
+    "match": "she was never captured by slave catchers",
+    "focus": "was never captured by slave catchers",
+    "target": "she",
+    "explain": "was captured は受動態。never は「決して〜されなかった」です。"
+  },
+  {
+    "lesson": 8,
+    "tag": "when 節",
+    "match": "when Abraham Lincoln signed the Emancipation Proclamation",
+    "focus": "when Abraham Lincoln signed the Emancipation Proclamation in 1863",
+    "target": "Harriet was over forty years old",
+    "explain": "when 以下はリンカーンが宣言に署名した時を示します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "受動態",
+    "match": "Harriet was honored by many people",
+    "focus": "was honored by many people",
+    "target": "Harriet",
+    "explain": "honor の受動態。by many people は称えた人を示します。"
+  },
+  {
+    "lesson": 8,
+    "tag": "修飾語と主節",
+    "match": "She died on March 10, 1913",
+    "focus": "on March 10, 1913",
+    "target": "She died",
+    "explain": "主節は She died。on 以下は日付、in her early nineties は年齢を示します。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "the 20-volume Oxford English Dictionary contains",
+    "focus": "contains",
+    "target": "the 20-volume Oxford English Dictionary",
+    "explain": "辞典が主語、contains が動詞、about 600,000 entries が目的語です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "否定と動詞の並列",
+    "match": "we do not sit down at a restaurant and say",
+    "focus": "do not sit down at a restaurant and say",
+    "target": "we",
+    "explain": "do not が sit down と say の両方にかかっています。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "Instead, we order beef and pork",
+    "focus": "order",
+    "target": "we",
+    "explain": "we（S）＋order（V）＋beef and pork（O）。Instead は「代わりに」です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVC の補語",
+    "match": "Most of these were from Latin and Greek",
+    "focus": "were from Latin and Greek",
+    "target": "Most of these",
+    "explain": "主語 Most of these の出所を were from ... が説明します。"
+  },
+  {
+    "lesson": 9,
+    "tag": "現在進行形 go to",
+    "match": "I'm going to a deli",
+    "focus": "going to a deli",
+    "target": "I'm",
+    "explain": "go to + 場所 の進行形。「デリに行くところ」で、未来表現の be going to＋動詞原形ではありません。"
+  },
+  {
+    "lesson": 9,
+    "tag": "現在完了の疑問文",
+    "match": "Have you seen the ad for the new smartphone",
+    "focus": "Have you seen",
+    "target": "you",
+    "explain": "Have＋主語＋過去分詞で現在完了の疑問文です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "助動詞 would",
+    "match": "native speakers would probably not use",
+    "focus": "would probably not use",
+    "target": "native speakers",
+    "explain": "would not use はこのような場合の予測・傾向を表します。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVC",
+    "match": "One popular example is scuba",
+    "focus": "is",
+    "target": "One popular example",
+    "explain": "例の1つ＝scuba の関係。第2文型です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVC",
+    "match": "Radar is another example",
+    "focus": "is",
+    "target": "Radar",
+    "explain": "Radar（S）＋is（V）＋another example（C）です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "stand for",
+    "match": "What does it stand for",
+    "focus": "stand for",
+    "target": "it",
+    "explain": "stand for は「〜を表す」。What が表す内容を尋ねています。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "It means RAdio Detection And Ranging",
+    "focus": "means",
+    "target": "It",
+    "explain": "It（S）＋means（V）＋RAdio Detection And Ranging（O）です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "Technology often offers new words",
+    "focus": "offers",
+    "target": "Technology",
+    "explain": "Technology（S）＋offers（V）＋new words（O）です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "動詞の転用",
+    "match": "I googled you",
+    "focus": "googled",
+    "target": "I",
+    "explain": "google が動詞として使われ、過去形 googled になっています。"
+  },
+  {
+    "lesson": 9,
+    "tag": "引用と助動詞",
+    "match": "would be a good example",
+    "focus": "would be",
+    "target": "a good example",
+    "explain": "この部分は直前の引用を受ける述語部分。引用された発話が「良い例だろう」と説明しています。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVC",
+    "match": "Another example of coinage is nylon",
+    "focus": "is",
+    "target": "Another example of coinage",
+    "explain": "Another example が主語、is が動詞、nylon が補語です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "Technology also brings new meanings",
+    "focus": "brings",
+    "target": "Technology",
+    "explain": "Technology（S）＋brings（V）＋new meanings（O）です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "Let's + 動詞原形",
+    "match": "let's look at borrowing",
+    "focus": "look at borrowing",
+    "target": "let's",
+    "explain": "Let's do は「〜しましょう」。borrowing は look at の目的語となる名詞的な語です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SVO",
+    "match": "Many new words entered English this way",
+    "focus": "entered",
+    "target": "Many new words",
+    "explain": "Many new words（S）＋entered（V）＋English（O）。this way は方法です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "as did ... 倒置",
+    "match": "as did many words for music",
+    "focus": "as did many words for music",
+    "target": "piano",
+    "explain": "as did ... は「音楽用語も同様に」。前にある came into English from Italian を受けます。"
+  },
+  {
+    "lesson": 9,
+    "tag": "SV と修飾語",
+    "match": "Today, words still come into English from other languages",
+    "focus": "come",
+    "target": "words",
+    "explain": "words（S）＋come（V）。into English と from other languages は移動先・出所です。"
+  },
+  {
+    "lesson": 9,
+    "tag": "指示語 these",
+    "match": "Clipping, acronyms, blending, coinage, borrowing―these happen",
+    "focus": "these happen",
+    "target": "Clipping, acronyms, blending, coinage, borrowing",
+    "explain": "ダッシュ前の列挙を these が受けます。主節は these happen です。"
   }
 ];
   const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
