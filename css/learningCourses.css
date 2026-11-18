@@ -77,13 +77,8 @@ body.po-course-open{overflow:hidden}
 @media(max-width:768px){.po-learning-menu .po-course-launch button{min-height:44px}.po-course-launch{padding:0 0 3px}}
 @media(prefers-reduced-motion:reduce){.po-course-card:hover{transform:none}}
 
-/* Guided mode: prevent the long legacy menu from competing with course choice.
-   Free Study restores every existing button; no handlers or scores are touched. */
-body.po-course-guided:not(.po-course-free-mode) .po-learning-menu .po-menu-label,
-body.po-course-guided:not(.po-course-free-mode) .po-learning-menu .po-step-grid,
-body.po-course-guided:not(.po-course-free-mode) .po-learning-menu .po-quick-grid {display:none!important}
-body.po-course-guided:not(.po-course-free-mode) .po-course-launch {padding:8px}
-body.po-course-guided:not(.po-course-free-mode) .po-course-launch button {min-height:73px}
+/* Keep the four-step sidebar visible in course mode: lesson navigation and
+   the existing Study Lab controls must never disappear behind a course choice. */
 .po-course-part-picker{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 14px;border:1px solid #7d99b178;border-radius:12px;background:#263c54;color:#f7fbff;font-size:14px;font-weight:800;max-width:370px;width:100%;margin:0 auto}
 .po-course-part-picker select{padding:8px 14px;background:#f9fbff;color:#17263a;border:1px solid #b4cbe0;border-radius:9px;font-size:15px;min-width:104px;max-width:180px}
 .po-stage-meter{height:8px;width:100%;border-radius:6px;overflow:hidden;background:#14243b;border:1px solid #2c4b65;margin:5px 0}
