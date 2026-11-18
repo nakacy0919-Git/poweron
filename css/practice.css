@@ -928,3 +928,11 @@ body.po-knowledge-active .po-knowledge>.po-content{overflow:hidden!important;min
 .po-script-tip{font-size:12px;color:#3c6883;margin:4px 8px}
 .po-tap-word{cursor:pointer;border-radius:4px;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:#8caecd;text-underline-offset:4px}
 .po-tap-word:hover,.po-tap-word:focus-visible{background:#def6ff;outline:2px solid #8dcff3;outline-offset:2px}
+
+
+.th-teacher-unlock{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#eff8ff;border:1px solid #bcdceb;border-radius:10px;padding:11px}
+.th-teacher-unlock label{display:flex;align-items:center;gap:7px;color:#205679;font-size:12px;font-weight:850}
+.th-teacher-unlock input{max-width:130px;border:1px solid #9cbfd4;border-radius:7px;padding:10px;font-size:16px;letter-spacing:4px;background:white}
+.th-teacher-unlock button{border:0;border-radius:8px;padding:10px 13px;background:#1f668d;color:white;cursor:pointer;font-weight:800}
+.th-teacher-unlock button[type="button"]{background:#e3edf5;color:#355c78}
+.th-teacher-unlock #po-unlock-error{color:#bd3636;font-size:12px;font-weight:800}
