@@ -1005,3 +1005,17 @@ body.po-practice-active #targetTextDisplay{background:rgba(250,253,255,.98)!impo
  .po-practice .th-lesson-sections{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:540px){.po-practice .th-lesson-parts{grid-template-columns:1fr}.po-practice .th-lesson-part-metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}}
+
+
+/* Portrait iPad/tablet: keep the two-row Part overview within a single viewport.
+   Preserve overflow only on phone-sized screens or unusually short viewports. */
+@media(min-width:541px) and (max-width:768px) and (min-height:700px){
+ .po-practice.po-mode-progress>.po-content{overflow:hidden!important}
+ .po-practice .th-lesson-progress{height:100%;min-height:0;overflow:hidden}
+ .po-practice .th-lesson-parts{display:grid;flex:1 1 auto;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-part{min-height:0}
+ .po-practice .th-lesson-part-metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .po-practice .th-lesson-sections{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .po-practice .th-lesson-section{min-height:52px}
+ .po-practice .th-lesson-section strong{font-size:10px}
+}
