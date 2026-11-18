@@ -217,7 +217,7 @@
     paint();
     if(quizKind==="vocabulary"){
       answerTone(quizAnswers[quizIndex]===quiz[quizIndex].correct);
-      advanceVocabularyAfterFeedback();
+      // Show the explanation until the learner taps the single clear Next button.
     }
   }
   function nextQuestion(){
@@ -333,17 +333,24 @@
       const description=vocabulary?
         "日本語で意味を確認したあと、英語の説明を選びます。両方の全問正解でクリア。":
         "日本語で内容を確認したあと、英語で同じ内容に挑戦します。";
+      const choice=(n)=>{
+        const isPractice=n===5, primary=n===10, canStart=size>=n;
+        const title=isPractice?"練習する":primary?"ミッションに挑戦":"発展に挑戦";
+        const detail=n+"問 × 日本語・英語 = "+(n*2)+"問";
+        return button("newQuiz",'<span class="po-course-choice-icon" aria-hidden="true">'+(isPractice?"✎":primary?"▶":"★")+'</span><strong>'+title+'</strong><small>'+detail+'</small>',
+          'data-count="'+n+'"'+(canStart?"":" disabled"),"po-course-choice"+(primary?" is-primary":""));
+      };
       return header(heading,"Lesson "+currentContext.lesson+" · Part "+currentContext.part)+
-        '<div class="po-course-quiz-setup"><h3>'+description+'</h3>'+
-        '<div class="po-course-phase-stages"><span class="is-next">STEP 1 日本語</span><span>→</span><span>STEP 2 English</span></div>'+
-        '<p class="po-course-two-language-note">言語切替は不要です。日本語の問題を終えると、英語ステージへ進みます。</p>'+
-        '<div class="po-course-count"><span>各言語の問題数</span>'+(vocabulary?
-          button("newQuiz",size+"問 × 2言語 = "+size*2+"問",'data-count="10"'+(!size?' disabled':"")):
-          [5,10,20].map(n=>button("newQuiz",n+"問 × 2言語 = "+n*2+"問",'data-count="'+n+'"'+(size<n?' disabled':""))).join(""))+'</div>'+
-        (currentContext.level!=="standard"?'<p class="po-course-warning">現在の問題はStandard本文に対応しています。</p>':"")+
+        '<section class="po-course-quiz-setup po-course-setup-guided">'+
+        '<div class="po-setup-heading"><span class="po-setup-kicker">STEP 1 · START</span><h3>'+heading+'</h3>'+
+        '<p>'+(vocabulary?"単語の意味を確認し、次に英語で挑戦。":"本文の内容を日本語で確認し、次に英語で挑戦。")+'</p></div>'+
+        '<div class="po-setup-roadmap" aria-label="学習の流れ"><div><b>①</b><strong>日本語で答える</strong></div><span aria-hidden="true">→</span><div><b>②</b><strong>Englishで答える</strong></div><span aria-hidden="true">→</span><div><b>✓</b><strong>結果を確認</strong></div></div>'+
+        '<h4 class="po-setup-prompt">下のボタンを選んでスタート</h4>'+
+        '<div class="po-course-choice-grid">'+(vocabulary?choice(size===10?10:size):[5,10,20].map(choice).join(""))+'</div>'+
+        (currentContext.level!=="standard"?'<p class="po-course-warning">問題はStandard本文に対応しています。</p>':"")+
         (!size?'<p class="po-course-warning">このPartの問題は準備中です。</p>':
-         '<p>出題候補 '+size+'問。内容理解は各言語10問以上で全問正解するとミッションクリア。5問×2は練習用です。</p>')+
-        button("dashboard","← コースへ戻る",'',"po-course-ghost")+'</div><p id="po-course-message" role="status" hidden></p>';
+          '<p class="po-setup-footnote">'+(vocabulary?"日英両方の全問正解でクリア":"各言語10問以上の全問正解でクリア。5問は練習用")+' · 出題候補 '+size+'問</p>')+
+        button("dashboard","← コースへ戻る",'',"po-course-ghost po-setup-back")+'</section><p id="po-course-message" role="status" hidden></p>';
     }
     const q=quiz[quizIndex],lang=q.phase,locale=q[lang],answered=quizAnswers[quizIndex],done=answered!==undefined;
     const half=quiz.length/2,partIndex=quizIndex%half+1,vocabulary=quizKind==="vocabulary";
@@ -378,10 +385,8 @@
           '<p class="po-course-popup-explanation">'+escape(q.explanation||'')+'</p>'+
           '<small>'+escape(q.evidence||'')+'</small>'+
           '<div class="po-course-popup-actions">'+
-          (feedbackPaused?'<span>説明を確認したら次へ進んでください</span>':
-            '<span>まもなく自動で'+(quizIndex===quiz.length-1?'結果画面':quizIndex+1===half?'英語ステージ':'次の問題')+'へ進みます</span>')+
+          '<span>解説を確認したら次へ進んでください</span>'+
           button("nextQuestion",nextLabel,'',"po-course-popup-next")+
-          (!feedbackPaused?button("pauseFeedback","説明を読む",'',"po-course-popup-pause"):"")+
           '</div></section></div>':"")+'</div>';
   }
   function resultScreen(){
