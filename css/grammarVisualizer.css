@@ -184,3 +184,155 @@
  .story-theater .po-grammar-pattern-chip strong{font-size:10px}
  .story-theater .po-grammar-pattern-arrow{font-size:15px}
 }
+
+
+/* One-screen classroom presentation: preserve scene controls, reclaim height from
+   narration-only controls when grammar is open (iPad portrait/landscape and phones). */
+.story-theater.po-grammar-on{
+  height:100dvh;
+  max-height:100dvh;
+  overflow:hidden;
+}
+.story-theater.po-grammar-on .theater-stage{
+  min-height:0;
+}
+.story-theater.po-grammar-on .theater-controls{
+  flex-wrap:nowrap;
+  min-height:42px;
+  padding:3px 7px;
+  gap:6px;
+}
+.story-theater.po-grammar-on .theater-controls>div:nth-child(2),
+.story-theater.po-grammar-on .theater-controls [data-action="jp"],
+.story-theater.po-grammar-on .theater-controls select,
+.story-theater.po-grammar-on .theater-controls .theater-finish{
+  display:none;
+}
+.story-theater.po-grammar-on .theater-header{
+  min-height:36px;
+}
+.story-theater.po-grammar-on .theater-picture .theater-caption{
+  visibility:hidden;
+}
+.story-theater .po-grammar-overlay{
+  height:96%;
+  min-width:0;
+  overflow:hidden;
+}
+.story-theater .po-grammar-center{
+  min-width:0;
+  scrollbar-width:thin;
+  scrollbar-color:#8bb6d3b0 transparent;
+}
+.story-theater .po-grammar-bottom{
+  min-width:0;
+  flex-wrap:nowrap;
+}
+.story-theater .po-grammar-steps{
+  flex:1 1 auto;
+  overflow-x:auto;
+  overflow-y:hidden;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+  padding-bottom:2px;
+  scrollbar-width:thin;
+  max-width:none;
+}
+.story-theater .po-grammar-toggle-explain{
+  background:#17364a;
+  border-color:#79b5d0;
+  flex:0 0 auto;
+}
+.story-theater .po-grammar-overlay .po-grammar-reveal{
+  flex:0 0 auto;
+}
+.story-theater .po-grammar-pattern{
+  flex-wrap:wrap;
+  overflow:visible;
+}
+.story-theater .po-grammar-pattern-arrow{
+  font-size:clamp(14px,1.5vw,25px);
+}
+.story-theater .po-grammar-overlay.is-compact{
+  padding:clamp(5px,1.2vw,10px);
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-nav{
+  margin:0;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-center{
+  gap:4px;
+  padding:2px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-sentence{
+  font-size:clamp(15px,2.7vw,26px);
+  line-height:1.26;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-relation,
+.story-theater .po-grammar-overlay.is-compact .po-grammar-pattern{
+  gap:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-node{
+  padding:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-node strong{
+  font-size:clamp(10px,1vw,13px);
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-comment{
+  padding:5px 8px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-explain{
+  font-size:clamp(11px,1.05vw,13px);
+  line-height:1.34;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-bottom{
+  min-height:31px;
+  margin-top:3px;
+  padding-top:4px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-kicker{
+  font-size:9px;
+}
+.story-theater .po-grammar-overlay.is-compact .po-grammar-top h2{
+  display:none;
+}
+.story-theater .po-grammar-overlay.is-compact button{
+  min-height:29px;
+  padding:4px 7px;
+}
+.story-theater .po-grammar-sentence.is-long{
+  font-size:clamp(18px,2.2vw,29px);
+  line-height:1.32;
+}
+.story-theater .po-grammar-sentence.is-very-long{
+  font-size:clamp(16px,1.7vw,23px);
+  line-height:1.26;
+}
+@media(max-width:620px){
+  .story-theater .po-grammar-sentence.is-long{font-size:clamp(16px,3.7vw,22px)}
+  .story-theater .po-grammar-sentence.is-very-long{font-size:clamp(15px,3.2vw,19px)}
+  .story-theater .po-grammar-bottom{gap:3px}
+  .story-theater .po-grammar-steps{max-width:100%;max-height:none}
+  .story-theater .po-grammar-overlay .po-grammar-reveal,
+  .story-theater .po-grammar-overlay .po-grammar-toggle-explain{
+    font-size:10px;
+    padding:4px 6px;
+  }
+}
+@media(max-height:430px){
+  .story-theater.po-grammar-on{gap:3px;padding:4px max(7px,env(safe-area-inset-right)) 4px max(7px,env(safe-area-inset-left))}
+  .story-theater.po-grammar-on .theater-header{min-height:28px}
+  .story-theater.po-grammar-on .theater-header>div>span{display:none}
+  .story-theater.po-grammar-on .theater-header strong{font-size:12px}
+  .story-theater.po-grammar-on .theater-header output{font-size:11px}
+  .story-theater.po-grammar-on .theater-controls{min-height:32px}
+  .story-theater.po-grammar-on .theater-controls button{min-height:30px;padding:4px 8px}
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-sentence{
+    font-size:clamp(14px,2.6vw,20px);
+  }
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-pattern-chip strong{
+    font-size:9px;
+  }
+  .story-theater .po-grammar-overlay.is-compact .po-grammar-explain{
+    font-size:10px;
+  }
+}
