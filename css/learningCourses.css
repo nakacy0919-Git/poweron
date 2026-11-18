@@ -264,3 +264,45 @@ body.po-course-open{overflow:hidden}
 .po-course-popup-actions>span{color:#c4dcf0}
 .po-course-popup-next{min-height:50px!important;padding:10px 32px;font-size:15px;background:#167858;border:2px solid #83efc9}
 @media(max-width:620px){.po-course-choice-grid{grid-template-columns:1fr}.po-course-choice{min-height:75px!important;display:grid;grid-template-columns:35px 1fr;align-items:center;text-align:left}.po-course-choice small{grid-column:2}.po-course-choice-icon{grid-row:1/3}.po-setup-roadmap>div{padding:6px}.po-setup-roadmap strong{font-size:11px}}
+
+
+/* A light, legible single-purpose Step 4 challenge. */
+.po-course-overlay.po-challenge-mode{color:#1e3e58!important}
+.po-challenge-mode .po-course-inner{background:rgba(255,255,255,.97);color:#213c54;max-width:1060px;gap:12px;box-shadow:0 12px 30px #1c3f5b27}
+.po-challenge-mode .po-course-header{border-bottom:1px solid #dae7f3}
+.po-challenge-mode .po-course-header span{color:#307391}
+.po-challenge-mode .po-course-header h2{color:#143d5c}
+.po-challenge-mode .po-course-header p{color:#486882}
+.po-challenge-mode .po-course-exit{background:#f0f7fd;color:#244966;border:1px solid #a8c5da}
+.po-challenge-panel{max-width:860px;margin:0 auto;display:grid;justify-items:center;gap:17px;text-align:center;width:100%;padding:15px}
+.po-challenge-panel h3{font-size:clamp(22px,3vw,31px);color:#194361;margin:0}
+.po-challenge-panel p{color:#355670;line-height:1.6;margin:0}
+.po-challenge-tag{color:#137f93;font-size:12px;font-weight:900;letter-spacing:2px}
+.po-challenge-steps,.po-challenge-score{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:12px}
+.po-challenge-steps article{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:146px;padding:20px 12px;background:#eaf5ff;border:1px solid #cbdfe9;border-radius:15px}
+.po-challenge-steps b{font-size:20px;display:grid;place-items:center;background:#137da2;color:white;width:38px;height:38px;border-radius:100%}
+.po-challenge-steps strong{font-size:18px;color:#1c4867}
+.po-challenge-steps small{font-size:12px;color:#50718b}
+.po-challenge-rule{font-weight:800;color:#9a5036!important}
+.po-challenge-saved{font-weight:800;color:#087852!important}
+.po-challenge-start{display:block;background:#157ca5!important;color:white!important;font-size:18px!important;padding:13px 25px!important;min-height:58px!important;width:min(100%,450px);box-shadow:0 4px 0 #0b5874}
+.po-challenge-mode .po-course-ghost{background:#f0f6fb;color:#345b77;border-color:#b5cddf}
+.po-challenge-score>div{display:flex;flex-direction:column;gap:9px;background:#ebf6fd;border-radius:12px;padding:16px}
+.po-challenge-score>div span{color:#245d7c;font-size:13px;font-weight:850}
+.po-challenge-score>div strong{color:#153e5c;font-size:23px}
+.po-challenge-mode .po-course-question{background:#fff;border:1px solid #ccdeec;color:#213e5b;box-shadow:0 6px 22px #19475b16}
+.po-challenge-mode .po-course-question h3{color:#173d5b}
+.po-challenge-mode .po-course-question-top{color:#466b8c}
+.po-challenge-mode .po-course-answer{background:#f0f7ff;border:1px solid #bdd5e5;color:#1d405d}
+.po-challenge-mode .po-course-answer b{background:#d9e9f5;color:#174b6e}
+.po-challenge-mode .po-course-answer.correct{background:#d6fae6;color:#125f3b;border-color:#21a97a}
+.po-challenge-mode .po-course-answer.incorrect{background:#ffe4e1;color:#8a2225;border-color:#dd8a84}
+.po-challenge-mode .po-course-feedback{background:#f0f8fd;color:#244966;border-color:#a4cfdf}
+.po-challenge-mode .po-course-feedback small{color:#406e86}
+.po-challenge-mode .po-course-phase-stages span{color:#345f78}
+.po-challenge-mode .po-course-phase-stages span.is-next{background:#d5eff8;color:#0f6075}
+.po-challenge-mode .po-course-phase-intro{background:#f7fbff;color:#234960}
+.po-challenge-mode .po-course-phase-intro h3,.po-challenge-mode .po-course-phase-intro p{color:#27536b}
+.po-challenge-mode .po-course-answer-popup{color:#eafaff}
+.po-challenge-mode .po-course-answer-popup p,.po-challenge-mode .po-course-answer-popup small{color:inherit}
+@media(max-width:640px){.po-challenge-steps,.po-challenge-score{grid-template-columns:1fr}.po-challenge-steps article{min-height:82px;padding:9px}.po-challenge-panel{gap:10px;padding:4px}}
