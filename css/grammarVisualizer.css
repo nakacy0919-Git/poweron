@@ -670,3 +670,6 @@
   .story-theater .po-grammar-highlight{transition:none}
   .story-theater .po-grammar-link-path{animation:none;transition:none}
 }
+
+/* Long linked phrases wrap cleanly in compact classroom viewports. */
+.story-theater .po-grammar-word-lens{overflow-wrap:anywhere;border-radius:16px}
