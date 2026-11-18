@@ -173,7 +173,25 @@
     "match": "She used the North Star to guide her",
     "focus": "to guide her",
     "target": "used the North Star",
-    "explain": "to guide her は「彼女を導くために」。北極星を使った目的です。"
+    "explain": "to guide her は「彼女を導くために」。北極星を使った目的です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "She"
+      },
+      {
+        "role": "V",
+        "text": "used"
+      },
+      {
+        "role": "O",
+        "text": "the North Star"
+      },
+      {
+        "role": "目的",
+        "text": "to guide her"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -205,7 +223,25 @@
     "match": "made it dangerous for runaways to stop anywhere",
     "focus": "to stop anywhere in the U.S.",
     "target": "made it dangerous",
-    "explain": "it は形式目的語。本当の内容は「逃亡者が米国内で立ち止まること」です。"
+    "explain": "it は形式目的語。本当の内容は「逃亡者が米国内で立ち止まること」です。",
+    "blocks": [
+      {
+        "role": "V",
+        "text": "made"
+      },
+      {
+        "role": "O",
+        "text": "it"
+      },
+      {
+        "role": "C",
+        "text": "dangerous"
+      },
+      {
+        "role": "真の内容",
+        "text": "to stop anywhere in the U.S."
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -269,7 +305,21 @@
     "match": "English has a huge vocabulary",
     "focus": "has",
     "target": "English",
-    "explain": "English（S）＋has（V）＋a huge vocabulary（O）の第3文型です。"
+    "explain": "English（S）＋has（V）＋a huge vocabulary（O）の第3文型です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "English"
+      },
+      {
+        "role": "V",
+        "text": "has"
+      },
+      {
+        "role": "O",
+        "text": "a huge vocabulary"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -285,7 +335,21 @@
     "match": "English has been influenced by many languages",
     "focus": "has been influenced",
     "target": "English",
-    "explain": "has + been + 過去分詞は現在完了の受動態。長い期間受けてきた影響を表します。"
+    "explain": "has + been + 過去分詞は現在完了の受動態。長い期間受けてきた影響を表します。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "English"
+      },
+      {
+        "role": "V",
+        "text": "has been influenced"
+      },
+      {
+        "role": "M",
+        "text": "by many languages and cultures"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -293,7 +357,21 @@
     "match": "English and German were similar languages",
     "focus": "were",
     "target": "English and German",
-    "explain": "English and German（S）＋were（V）＋similar languages（C）の第2文型です。"
+    "explain": "English and German（S）＋were（V）＋similar languages（C）の第2文型です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "English and German"
+      },
+      {
+        "role": "V",
+        "text": "were"
+      },
+      {
+        "role": "C",
+        "text": "similar languages"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -429,7 +507,21 @@
     "match": "An acronym is made from a set of existing words",
     "focus": "is made from",
     "target": "An acronym",
-    "explain": "be made from ～ で「〜から作られる」。素材を示します。"
+    "explain": "be made from ～ で「〜から作られる」。素材を示します。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "An acronym"
+      },
+      {
+        "role": "V",
+        "text": "is made"
+      },
+      {
+        "role": "M",
+        "text": "from a set of existing words"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -525,7 +617,17 @@
     "match": "Because English is the most commonly used global language",
     "focus": "Because English is the most commonly used global language",
     "target": "it might be growing and changing faster than other languages",
-    "explain": "because 節は理由。might be -ing は推量を含む進行形、faster than は比較です。"
+    "explain": "because 節は理由。might be -ing は推量を含む進行形、faster than は比較です。",
+    "blocks": [
+      {
+        "role": "理由",
+        "text": "Because English is the most commonly used global language"
+      },
+      {
+        "role": "主節",
+        "text": "it might be growing and changing faster than other languages"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -533,7 +635,21 @@
     "match": "St. Catharines is a small city",
     "focus": "is",
     "target": "St. Catharines",
-    "explain": "St. Catharines が主語、is が動詞、a small city が補語。沿岸を示す語句は修飾語です。"
+    "explain": "St. Catharines が主語、is が動詞、a small city が補語。沿岸を示す語句は修飾語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "St. Catharines"
+      },
+      {
+        "role": "V",
+        "text": "is"
+      },
+      {
+        "role": "C",
+        "text": "a small city"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -549,7 +665,21 @@
     "match": "The chapel was the",
     "focus": "was",
     "target": "The chapel",
-    "explain": "S＋V＋C。礼拝堂が「終着駅」であったことを説明します。"
+    "explain": "S＋V＋C。礼拝堂が「終着駅」であったことを説明します。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "The chapel"
+      },
+      {
+        "role": "V",
+        "text": "was"
+      },
+      {
+        "role": "C",
+        "text": "the \"terminal station\""
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -565,7 +695,21 @@
     "match": "Philadelphia was the symbol of freedom",
     "focus": "was",
     "target": "Philadelphia",
-    "explain": "Philadelphia が主語、was が動詞、the symbol of freedom が補語です。"
+    "explain": "Philadelphia が主語、was が動詞、the symbol of freedom が補語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Philadelphia"
+      },
+      {
+        "role": "V",
+        "text": "was"
+      },
+      {
+        "role": "C",
+        "text": "the symbol of freedom"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -613,7 +757,21 @@
     "match": "the slaves learned the routes to freedom",
     "focus": "learned",
     "target": "the slaves",
-    "explain": "the slaves（S）＋learned（V）＋the routes（O）。In this way は方法です。"
+    "explain": "the slaves（S）＋learned（V）＋the routes（O）。In this way は方法です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "the slaves"
+      },
+      {
+        "role": "V",
+        "text": "learned"
+      },
+      {
+        "role": "O",
+        "text": "the routes to freedom"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -621,7 +779,21 @@
     "match": "She had ten brothers and sisters",
     "focus": "had",
     "target": "She",
-    "explain": "She（S）＋had（V）＋ten brothers and sisters（O）の基本構造です。"
+    "explain": "She（S）＋had（V）＋ten brothers and sisters（O）の基本構造です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "She"
+      },
+      {
+        "role": "V",
+        "text": "had"
+      },
+      {
+        "role": "O",
+        "text": "ten brothers and sisters"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -629,7 +801,17 @@
     "match": "her owner died",
     "focus": "died",
     "target": "her owner",
-    "explain": "her owner（S）＋died（V）。A few years later は時の修飾語です。"
+    "explain": "her owner（S）＋died（V）。A few years later は時の修飾語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "her owner"
+      },
+      {
+        "role": "V",
+        "text": "died"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -653,7 +835,21 @@
     "match": "She hid by day",
     "focus": "hid",
     "target": "She",
-    "explain": "She（S）＋hid（V）。by day は「昼間は」という修飾語です。"
+    "explain": "She（S）＋hid（V）。by day は「昼間は」という修飾語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "She"
+      },
+      {
+        "role": "V",
+        "text": "hid"
+      },
+      {
+        "role": "M",
+        "text": "by day"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -685,7 +881,21 @@
     "match": "All her family members were still slaves",
     "focus": "were",
     "target": "All her family members",
-    "explain": "all her family members（S）＋were（V）＋slaves（C）です。"
+    "explain": "all her family members（S）＋were（V）＋slaves（C）です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "All her family members"
+      },
+      {
+        "role": "V",
+        "text": "were"
+      },
+      {
+        "role": "C",
+        "text": "still slaves"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -693,7 +903,21 @@
     "match": "She kept thinking about them",
     "focus": "thinking about them",
     "target": "kept",
-    "explain": "keep -ing は「〜し続ける」。thinking が続けた行動です。"
+    "explain": "keep -ing は「〜し続ける」。thinking が続けた行動です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "She"
+      },
+      {
+        "role": "V",
+        "text": "kept"
+      },
+      {
+        "role": "-ing",
+        "text": "thinking about them"
+      }
+    ]
   },
   {
     "lesson": 8,
@@ -765,7 +989,21 @@
     "match": "the 20-volume Oxford English Dictionary contains",
     "focus": "contains",
     "target": "the 20-volume Oxford English Dictionary",
-    "explain": "辞典が主語、contains が動詞、about 600,000 entries が目的語です。"
+    "explain": "辞典が主語、contains が動詞、about 600,000 entries が目的語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "the 20-volume Oxford English Dictionary"
+      },
+      {
+        "role": "V",
+        "text": "contains"
+      },
+      {
+        "role": "O",
+        "text": "about 600,000 entries"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -781,7 +1019,21 @@
     "match": "Instead, we order beef and pork",
     "focus": "order",
     "target": "we",
-    "explain": "we（S）＋order（V）＋beef and pork（O）。Instead は「代わりに」です。"
+    "explain": "we（S）＋order（V）＋beef and pork（O）。Instead は「代わりに」です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "we"
+      },
+      {
+        "role": "V",
+        "text": "order"
+      },
+      {
+        "role": "O",
+        "text": "beef and pork"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -821,7 +1073,21 @@
     "match": "One popular example is scuba",
     "focus": "is",
     "target": "One popular example",
-    "explain": "例の1つ＝scuba の関係。第2文型です。"
+    "explain": "例の1つ＝scuba の関係。第2文型です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "One popular example"
+      },
+      {
+        "role": "V",
+        "text": "is"
+      },
+      {
+        "role": "C",
+        "text": "scuba"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -829,7 +1095,21 @@
     "match": "Radar is another example",
     "focus": "is",
     "target": "Radar",
-    "explain": "Radar（S）＋is（V）＋another example（C）です。"
+    "explain": "Radar（S）＋is（V）＋another example（C）です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Radar"
+      },
+      {
+        "role": "V",
+        "text": "is"
+      },
+      {
+        "role": "C",
+        "text": "another example"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -845,7 +1125,21 @@
     "match": "It means RAdio Detection And Ranging",
     "focus": "means",
     "target": "It",
-    "explain": "It（S）＋means（V）＋RAdio Detection And Ranging（O）です。"
+    "explain": "It（S）＋means（V）＋RAdio Detection And Ranging（O）です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "It"
+      },
+      {
+        "role": "V",
+        "text": "means"
+      },
+      {
+        "role": "O",
+        "text": "RAdio Detection And Ranging"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -853,7 +1147,21 @@
     "match": "Technology often offers new words",
     "focus": "offers",
     "target": "Technology",
-    "explain": "Technology（S）＋offers（V）＋new words（O）です。"
+    "explain": "Technology（S）＋offers（V）＋new words（O）です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Technology"
+      },
+      {
+        "role": "V",
+        "text": "offers"
+      },
+      {
+        "role": "O",
+        "text": "new words"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -861,7 +1169,21 @@
     "match": "I googled you",
     "focus": "googled",
     "target": "I",
-    "explain": "google が動詞として使われ、過去形 googled になっています。"
+    "explain": "google が動詞として使われ、過去形 googled になっています。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "I"
+      },
+      {
+        "role": "V",
+        "text": "googled"
+      },
+      {
+        "role": "O",
+        "text": "you"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -877,7 +1199,21 @@
     "match": "Another example of coinage is nylon",
     "focus": "is",
     "target": "Another example of coinage",
-    "explain": "Another example が主語、is が動詞、nylon が補語です。"
+    "explain": "Another example が主語、is が動詞、nylon が補語です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Another example of coinage"
+      },
+      {
+        "role": "V",
+        "text": "is"
+      },
+      {
+        "role": "C",
+        "text": "nylon"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -885,7 +1221,21 @@
     "match": "Technology also brings new meanings",
     "focus": "brings",
     "target": "Technology",
-    "explain": "Technology（S）＋brings（V）＋new meanings（O）です。"
+    "explain": "Technology（S）＋brings（V）＋new meanings（O）です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Technology"
+      },
+      {
+        "role": "V",
+        "text": "brings"
+      },
+      {
+        "role": "O",
+        "text": "new meanings"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -901,7 +1251,21 @@
     "match": "Many new words entered English this way",
     "focus": "entered",
     "target": "Many new words",
-    "explain": "Many new words（S）＋entered（V）＋English（O）。this way は方法です。"
+    "explain": "Many new words（S）＋entered（V）＋English（O）。this way は方法です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "Many new words"
+      },
+      {
+        "role": "V",
+        "text": "entered"
+      },
+      {
+        "role": "O",
+        "text": "English"
+      }
+    ]
   },
   {
     "lesson": 9,
@@ -917,7 +1281,21 @@
     "match": "Today, words still come into English from other languages",
     "focus": "come",
     "target": "words",
-    "explain": "words（S）＋come（V）。into English と from other languages は移動先・出所です。"
+    "explain": "words（S）＋come（V）。into English と from other languages は移動先・出所です。",
+    "blocks": [
+      {
+        "role": "S",
+        "text": "words"
+      },
+      {
+        "role": "V",
+        "text": "come"
+      },
+      {
+        "role": "M",
+        "text": "into English"
+      }
+    ]
   },
   {
     "lesson": 9,
