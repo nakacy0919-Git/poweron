@@ -1,4 +1,4 @@
-/* Teacher-reviewed grammar commentary anchored to exact Power On III Lesson 8/9 wording.
+/* Draft, sentence-matched grammar commentary for Power On III Lessons 8/9; teacher review pending.
    A missing note is shown honestly; never guess a grammar role from a regex. */
 (function(root,factory){
   const api=factory();
