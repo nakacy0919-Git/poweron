@@ -523,13 +523,14 @@
             // A missing alignment must NOT fall back to the whole paragraph.
             const japanese=window.PowerOnSceneTranslations?.forScene?.(
                 scene,app.paragraphs,core.splitSentences);
-            return {english:scene.english,
+            return {english:scene.english,sentences:scene.sentences,
+                id:scene.id,paragraphKey:scene.paragraphKey,
                 japanese:japanese||'この英文の和訳は準備中です。',
                 paragraph:scene.paragraph,
                 image:media.image||'img/L'+Number(currentLesson)+'.webp',
                 isCover:!media.image,audio:media.audio};
         });
-        window.PowerOnStoryTheater.open({scenes,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
+        window.PowerOnStoryTheater.open({scenes,lesson:Number(currentLesson),splitSentences:core.splitSentences,title:'LESSON '+currentLesson+' · PART '+currentKey.split('_')[1].slice(1),rate:app.rate,recordedAudio:theaterPartAudio(),
             play:(scene,speed,end,error)=>speakModel(scene.english,scene.audio,end,error,undefined,speed),stop:stopSpeech,
             onComplete:()=>{
                 // Credit only after the full Part audio has actually completed.
