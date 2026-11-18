@@ -43,7 +43,7 @@
       compact=Boolean((height&&height<380)||(width&&width<460));
       panel.classList?.toggle?.('is-compact',compact);
       root.classList.toggle('po-grammar-compact',showing&&compact);
-      if(!explanationOverridden)explanationVisible=!(height&&height<320);
+      if(!explanationOverridden)explanationVisible=!((height&&height<380)||(width&&width<520));
       updateExplanationButton();
     }
     function updateExplanationButton(){
@@ -52,6 +52,7 @@
       if(!control)return;
       control.textContent=explanationVisible?'解説を隠す':'解説を見る';
       control.setAttribute('aria-pressed',String(explanationVisible));
+      control.setAttribute('aria-expanded',String(explanationVisible));
       panel.querySelector('.po-grammar-comment').hidden=!explanationVisible;
     }
     const sentences=()=>Array.isArray(scene?.sentences)&&scene.sentences.length?scene.sentences:
@@ -85,6 +86,13 @@
       button.textContent=showing?'✦ 文法 ON':'✦ 文法解説';
       root.classList.toggle('po-grammar-on',showing);
       panel.hidden=!showing;
+      // The original caption remains visually available when the grammar
+      // layer is closed but never receives hidden keyboard focus.
+      const caption=root.querySelector?.('.theater-caption');
+      if(caption){
+        caption.tabIndex=showing?-1:0;
+        caption.setAttribute('aria-hidden',String(showing));
+      }
     }
     function paint(){
       if(!showing||!scene)return;
@@ -96,7 +104,12 @@
       q('.po-grammar-counter').textContent='LESSON '+lesson+'  ·  文 '+(sentenceIndex+1)+' / '+ss.length;
       b('prevSentence').disabled=sentenceIndex===0;
       b('nextSentence').disabled=sentenceIndex>=ss.length-1;
-      sentenceText(q('.po-grammar-sentence'),sentence,selected);
+      const sentenceNode=q('.po-grammar-sentence');
+      sentenceNode.classList?.toggle?.('is-long',sentence.length>145&&sentence.length<=220);
+      sentenceNode.classList?.toggle?.('is-very-long',sentence.length>220);
+      sentenceText(sentenceNode,sentence,selected);
+      // Avoid returning users to the previous sentence's scrolled position.
+      q('.po-grammar-center').scrollTop=0;
       const pattern=q('.po-grammar-pattern');
       pattern.replaceChildren();
       pattern.hidden=!selected?.blocks?.length;
