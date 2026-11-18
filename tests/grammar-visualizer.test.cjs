@@ -80,7 +80,8 @@ test('Assets load in order and Story Theater passes exact sentence metadata',()=
   assert.ok(index.includes('css/grammarVisualizer.css'));
   assert.ok(index.indexOf('js/grammarNotes.js')<index.indexOf('js/grammarVisualizer.js'));
   assert.ok(index.indexOf('js/grammarVisualizer.js')<index.indexOf('js/storyTheater.js'));
-  assert.match(practice,/lesson:Number\(currentLesson\),splitSentences:core\.splitSentences/);
+  assert.match(practice,/lesson:Number\(currentLesson\),grammarEnabled:currentLevel==='standard'/);
+  assert.match(practice,/splitSentences:core\.splitSentences/);
   assert.match(practice,/sentences:scene\.sentences/);
   assert.match(theater,/grammar\?\.update\(s\.scene\)/);
   assert.match(theater,/if\(!grammar\?\.close\?\.\(\)\)session\.close\('back'\)/);
