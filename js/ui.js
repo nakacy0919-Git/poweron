@@ -307,7 +307,7 @@ function showVocab(event, displayWord, dictWord) {
     let vocabData = null;
     if (Array.isArray(currentVocab)) {
         vocabData = currentVocab.find(v => v.word && v.word.toLowerCase() === dictWord.toLowerCase());
-    } else {
+    } else if (currentVocab && typeof currentVocab==='object') {
         vocabData = currentVocab[dictWord] || currentVocab[dictWord.toLowerCase()];
     }
 
