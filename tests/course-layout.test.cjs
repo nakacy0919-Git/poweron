@@ -205,3 +205,50 @@ test("A wrong Japanese answer remains pending after a correct English answer to 
   assert.ok(!data.pendingWrong.speed.includes(questions[0].id+"::en"));
   assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
 });
+
+
+test("Fixed Check Understanding starts from Vocabulary, then Japanese and English",()=>{
+  const f=fixture();f.course.launchChallenge();
+  assert.equal(f.course._test.getView(),"challengeIntro");
+  assert.ok(f.html().includes("40問のチャレンジを始める"));
+  f.click("beginChallenge");
+  assert.equal(f.course._test.getQuizKind(),"vocabulary");
+  for(let i=0;i<20;i++){
+    const q=f.course._test.getQuiz()[i];
+    f.tick(2000);f.click("answer",{index:String(q.correct)});f.click("nextQuestion");
+  }
+  assert.equal(f.course._test.getView(),"challengeGap");
+  f.click("nextChallengeStage");
+  assert.equal(f.course._test.getQuizKind(),"comprehension");
+  for(let i=0;i<20;i++){
+    if(i===10){assert.equal(f.course._test.getView(),"phaseIntro");f.click("startEnglish");}
+    const q=f.course._test.getQuiz()[i];
+    assert.equal(q.phase,i<10?"ja":"en");
+    f.tick(2000);f.click("answer",{index:String(q.correct)});f.click("nextQuestion");
+  }
+  assert.equal(f.course._test.getView(),"challengeResult");
+  assert.ok(f.html().includes("ALL CLEAR!"));
+  const saved=f.course._test.getData().challenge;
+  assert.equal(saved.lastClear,true);assert.equal(saved.clear,true);
+  assert.equal(saved.lastScore,40);assert.equal(saved.stages.japanese.score,10);assert.equal(saved.stages.english.score,10);
+  assert.equal(f.stored.get("poweron_study_progress_v1"),f.originalScores);
+});
+test("One error in any of the 40 questions prevents this run from clearing",()=>{
+  const f=fixture();f.course.launchChallenge();f.click("beginChallenge");
+  for(let i=0;i<20;i++){
+    const q=f.course._test.getQuiz()[i];
+    f.click("answer",{index:String(i===0?(q.correct+1)%4:q.correct)});
+    f.click("nextQuestion");
+  }
+  assert.equal(f.course._test.getView(),"challengeGap");
+  f.click("nextChallengeStage");
+  for(let i=0;i<20;i++){
+    if(i===10)f.click("startEnglish");
+    const q=f.course._test.getQuiz()[i];f.click("answer",{index:String(q.correct)});f.click("nextQuestion");
+  }
+  assert.equal(f.course._test.getView(),"challengeResult");
+  assert.ok(!f.html().includes("ALL CLEAR!"));
+  const saved=f.course._test.getData().challenge;
+  assert.equal(saved.lastClear,false);assert.equal(saved.clear,false);assert.equal(saved.lastScore,39);
+  assert.ok(saved.bestPercent<100);
+});
