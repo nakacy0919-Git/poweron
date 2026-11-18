@@ -154,7 +154,7 @@ test('Overlapping focus and target are both highlighted, without corrupting sent
     grammar.open();
     const parts=selectors['.po-grammar-sentence'].children;
     assert.equal(parts.map(item=>item.textContent).join(''),sentence);
-    assert.ok(parts.some(item=>item.className.includes('is-both')),'the overlapping phrase shows both relationships');
+    assert.ok(parts.some(item=>typeof item.className==='string'&&item.className.includes('is-both')),'the overlapping phrase shows both relationships');
     grammar.destroy();
   }finally{if(old===undefined)delete global.PowerOnGrammarNotes;else global.PowerOnGrammarNotes=old;}
 });
@@ -174,6 +174,7 @@ test('Constrained height keeps grammar label and collapses commentary before cli
     stage.getBoundingClientRect=()=>({width:1024,height:640});
     const grammar=visualizer.mount({root,stage,button,lesson:9,getScene:()=>null});
     grammar.update({sentences:['English has a huge vocabulary.'],english:'English has a huge vocabulary.'});
+    selectors['.po-grammar-center']=fakeNode('div');
     selectors['.po-grammar-center'].clientHeight=90;
     selectors['.po-grammar-center'].scrollHeight=350;
     grammar.open();
