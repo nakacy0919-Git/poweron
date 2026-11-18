@@ -6,6 +6,10 @@
   else root.PowerOnGrammarVisualizer=api;
 })(typeof window!=='undefined'?window:globalThis,function(host){
   'use strict';
+  const relations=host.PowerOnGrammarRelations||{
+    pieces:(text)=>[{text,start:0,end:text.length,space:false,focus:false,target:false,keyword:false}],
+    classify:()=>({kind:'relation',title:'語句のつながり',focusLabel:'注目する表現',targetLabel:'関連する語句',lineLabel:'関連'}),
+    touchingNotes:()=>[],layout:()=>null,keyword:()=>''};
   const trim=s=>String(s||'').replace(/\s+/g,' ').trim();
   const shorten=(s,n=72)=>trim(s).length>n?trim(s).slice(0,n-1)+'…':trim(s);
   const staticMarkup=
@@ -14,12 +18,12 @@
     '<div class="po-grammar-nav"><button type="button" data-grammar="prevSentence" aria-label="前の英文">‹ 前の文</button>'+
     '<span class="po-grammar-counter" aria-live="polite"></span>'+
     '<button type="button" data-grammar="nextSentence" aria-label="次の英文">次の文 ›</button></div>'+
-    '<div class="po-grammar-center"><p class="po-grammar-sentence" aria-label="解析する英文"></p>'+ 
+    '<div class="po-grammar-center"><div class="po-grammar-sentence-map"><svg class="po-grammar-links" aria-hidden="true" focusable="false" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><marker id="poGrammarArrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#f9bb6b"/></marker></defs><path class="po-grammar-link-path" marker-end="url(#poGrammarArrowhead)"></path><circle class="po-grammar-link-from" r="4"></circle><circle class="po-grammar-link-to" r="4"></circle><text class="po-grammar-link-caption" text-anchor="middle"></text></svg><p class="po-grammar-sentence" aria-label="解析する英文"></p></div><p class="po-grammar-word-lens" role="status" hidden></p>'+ 
     '<div class="po-grammar-pattern" aria-label="文型・句の構造" hidden></div>'+
     '<div class="po-grammar-relation" hidden><div class="po-grammar-node po-grammar-node-focus"><small>注目する表現</small><strong data-grammar-field="focus"></strong></div>'+
     '<span class="po-grammar-arrow" aria-hidden="true">→</span>'+
     '<div class="po-grammar-node po-grammar-node-target"><small>つながる語句</small><strong data-grammar-field="target"></strong></div></div>'+
-    '<article class="po-grammar-comment" aria-live="polite"><span class="po-grammar-kind"></span>'+
+    '<article class="po-grammar-comment" aria-live="polite"><div class="po-grammar-tagline"><span class="po-grammar-kind"></span><span class="po-grammar-relation-title"></span><span class="po-grammar-keyword" hidden></span></div>'+
     '<p class="po-grammar-explain"></p></article></div>'+
     '<footer class="po-grammar-bottom"><div class="po-grammar-steps" aria-label="文法ポイントの切り替え"></div>'+ 
     '<button type="button" class="po-grammar-toggle-explain" data-grammar="toggleExplain" aria-pressed="true">解説を隠す</button>'+
@@ -34,7 +38,8 @@
     const q=s=>panel.querySelector(s),b=n=>q('[data-grammar="'+n+'"]');
     let showing=false,scene=null,sentenceIndex=0,pointIndex=0;
     let explanationVisible=true,explanationOverridden=false,compact=false;
-    let observer=null,disposed=false;
+    let observer=null,disposed=false,paintGeneration=0,spanElements={focus:[],target:[]},wordFocus=null;
+    const prefersReducedMotion=()=>host.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches===true;
     function adapt(){
       if(disposed)return;
       const bounds=typeof stage.getBoundingClientRect==='function'?stage.getBoundingClientRect():null;
@@ -64,29 +69,85 @@
     const sentences=()=>Array.isArray(scene?.sentences)&&scene.sentences.length?scene.sentences:
       (typeof splitSentences==='function'?splitSentences(scene?.english||''):[trim(scene?.english||'')]).filter(Boolean);
     const notesFor=s=>host.PowerOnGrammarNotes?.forSentence?.(lesson,s)||[];
-    function sentenceText(node,text,note){
-      const ranges=[];
-      if(note){
-        for(const spec of [{value:note.focus,kind:'focus'},{value:note.target,kind:'target'}]){
-          if(!spec.value)continue;
-          const start=text.toLowerCase().indexOf(spec.value.toLowerCase());
-          if(start>=0)ranges.push({start,end:start+spec.value.length,kind:spec.kind});
-        }
-      }
-      // Split at every boundary so overlapping modifier/dependency spans
-      // remain visible instead of one silently hiding the other.
-      const cuts=[...new Set([0,text.length,...ranges.flatMap(r=>[r.start,r.end])])].sort((a,b)=>a-b);
+    function sentenceText(node,text,note,points){
+      const segments=relations.pieces(text,note);
       node.replaceChildren();
-      for(let i=0;i<cuts.length-1;i++){
-        const a=cuts[i],b=cuts[i+1],piece=text.slice(a,b);
-        if(!piece)continue;
-        const focus=ranges.some(r=>r.kind==='focus'&&r.start<=a&&b<=r.end);
-        const target=ranges.some(r=>r.kind==='target'&&r.start<=a&&b<=r.end);
-        if(!focus&&!target){node.appendChild(doc.createTextNode(piece));continue;}
+      spanElements={focus:[],target:[]};
+      for(const part of segments){
+        if(part.space||(!part.focus&&!part.target)){
+          node.appendChild(doc.createTextNode(part.text));
+          continue;
+        }
         const mark=doc.createElement('mark');
-        mark.className='po-grammar-highlight '+(focus&&target?'is-both':focus?'is-focus':'is-target');
-        mark.textContent=piece;node.appendChild(mark);
+        mark.className='po-grammar-highlight '+(part.focus&&part.target?'is-both':part.focus?'is-focus':'is-target')+(part.keyword?' is-keyword':'');
+        mark.textContent=part.text;
+        mark.tabIndex=0;
+        mark.setAttribute('role','button');
+        const role=relations.classify(note);
+        const label=(part.focus&&part.target?'関連する両方の語句':part.focus?role.focusLabel:role.targetLabel);
+        mark.setAttribute('aria-label',part.text+' · '+label+'。押すとこの語句の関係を確認します');
+        mark.title=label+'｜タップすると語句に注目';
+        if(part.focus)spanElements.focus.push(mark);
+        if(part.target)spanElements.target.push(mark);
+        const activate=()=>{
+          const current=relations.touchingNotes(text,points,part.start);
+          if(current.length){
+            const next=current.find(n=>n!==points[pointIndex])||current[0];
+            const selectedIndex=points.indexOf(next);
+            if(selectedIndex>=0)pointIndex=selectedIndex;
+          }
+          wordFocus={text:part.text.replace(/\s+/g,' ').trim(),label,offset:part.start};
+          paint();
+        };
+        mark.addEventListener('click',activate);
+        mark.addEventListener('keydown',event=>{
+          if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}
+        });
+        node.appendChild(mark);
       }
+    }
+    function hideArc(){
+      const svg=q('.po-grammar-links');
+      if(svg)svg.hidden=true;
+    }
+    function drawArc(expected){
+      if(!showing||disposed||expected!==paintGeneration)return;
+      const svg=q('.po-grammar-links'),map=q('.po-grammar-sentence-map');
+      if(!svg||!map||typeof map.getBoundingClientRect!=='function'){hideArc();return;}
+      const focusRects=spanElements.focus.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
+      const targetRects=spanElements.target.flatMap(el=>typeof el.getClientRects==='function'?[...el.getClientRects()]:[]);
+      const bounds=map.getBoundingClientRect();
+      const curve=relations.layout(focusRects,targetRects,bounds);
+      if(!curve||bounds.width<=0||bounds.height<=0){hideArc();return;}
+      svg.hidden=false;
+      svg.setAttribute('viewBox','0 0 '+bounds.width+' '+bounds.height);
+      const path=q('.po-grammar-link-path');
+      path?.setAttribute('d',curve.path);
+      const start=q('.po-grammar-link-from'),end=q('.po-grammar-link-to');
+      start?.setAttribute('cx',curve.from.x);start?.setAttribute('cy',curve.from.y);
+      end?.setAttribute('cx',curve.to.x);end?.setAttribute('cy',curve.to.y);
+      const descriptor=relations.classify(notesFor(sentences()[sentenceIndex]||'')[pointIndex]);
+      const caption=q('.po-grammar-link-caption');
+      if(caption){
+        caption.textContent=descriptor.lineLabel;
+        caption.setAttribute('x',curve.label.x);
+        caption.setAttribute('y',curve.label.y);
+      }
+      if(path?.style){
+        path.style.transition='none';
+        if(typeof path.getTotalLength==='function'&&!prefersReducedMotion()){
+          const length=path.getTotalLength();
+          path.style.strokeDasharray=length;
+          path.style.strokeDashoffset=length;
+          const reveal=()=>{if(expected===paintGeneration&&showing&&!disposed){path.style.transition='stroke-dashoffset .55s ease';path.style.strokeDashoffset='0';}};
+          if(host.requestAnimationFrame)host.requestAnimationFrame(reveal);else reveal();
+        }else{path.style.strokeDasharray='none';path.style.strokeDashoffset='0';}
+      }
+    }
+    function scheduleArc(){
+      const generation=++paintGeneration;
+      if(host.requestAnimationFrame)host.requestAnimationFrame(()=>drawArc(generation));
+      else drawArc(generation);
     }
     function updateButtons(){
       button.setAttribute('aria-pressed',String(showing));
@@ -141,7 +202,16 @@
       const sentenceNode=q('.po-grammar-sentence');
       sentenceNode.classList?.toggle?.('is-long',sentence.length>145&&sentence.length<=220);
       sentenceNode.classList?.toggle?.('is-very-long',sentence.length>220);
-      sentenceText(sentenceNode,sentence,selected);
+      sentenceText(sentenceNode,sentence,selected,points);
+      const relationType=relations.classify(selected);
+      panel.setAttribute('data-grammar-relation',relationType.kind);
+      const wordLens=q('.po-grammar-word-lens');
+      if(wordLens){
+        wordLens.hidden=!wordFocus;
+        if(wordFocus)wordLens.textContent='語句に注目：'+wordFocus.text+'　｜　'+wordFocus.label;
+      }
+      const linkCaption=q('.po-grammar-link-caption');
+      if(linkCaption)linkCaption.textContent=relationType.lineLabel;
       // Avoid returning users to the previous sentence's scrolled position.
       q('.po-grammar-center').scrollTop=0;
       const pattern=q('.po-grammar-pattern');
@@ -164,7 +234,14 @@
       }
       const relation=q('.po-grammar-relation');
       relation.hidden=!selected||!!selected?.blocks?.length;
+      q('.po-grammar-relation-title').textContent=selected?relationType.title:'';
+      const keyword=q('.po-grammar-keyword');
+      const keywordText=relations.keyword(selected);
+      keyword.hidden=!keywordText;
+      if(keywordText)keyword.textContent='関係詞 '+keywordText;
       if(selected){
+        q('.po-grammar-node-focus small').textContent=relationType.focusLabel;
+        q('.po-grammar-node-target small').textContent=relationType.targetLabel;
         q('[data-grammar-field="focus"]').textContent=shorten(selected.focus);
         q('[data-grammar-field="focus"]').title=selected.focus;
         q('[data-grammar-field="target"]').textContent=shorten(selected.target);
@@ -188,11 +265,12 @@
       b('nextPoint').disabled=!points.length||(pointIndex===points.length-1&&sentenceIndex===ss.length-1);
       b('nextPoint').textContent=points.length&&pointIndex<points.length-1?'次のポイント →':sentenceIndex<ss.length-1?'次の英文 →':'解説を確認';
       fitContent();
+      scheduleArc();
     }
-    function changeSentence(delta){const ss=sentences();sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex+delta));pointIndex=0;paint();}
+    function changeSentence(delta){const ss=sentences();sentenceIndex=Math.max(0,Math.min(ss.length-1,sentenceIndex+delta));pointIndex=0;wordFocus=null;paint();}
     function nextPoint(){
       const ss=sentences(),points=notesFor(ss[sentenceIndex]||'');
-      if(pointIndex+1<points.length){pointIndex++;paint();}
+      if(pointIndex+1<points.length){pointIndex++;wordFocus=null;paint();}
       else if(sentenceIndex+1<ss.length)changeSentence(1);
     }
     function open(){
@@ -203,7 +281,7 @@
     }
     function close(){
       if(!showing)return false;
-      showing=false;updateButtons();root.classList.toggle('po-grammar-compact',false);
+      showing=false;++paintGeneration;hideArc();updateButtons();root.classList.toggle('po-grammar-compact',false);
       button.focus();
       return true;
     }
@@ -224,7 +302,7 @@
     }
     updateButtons();updateExplanationButton();
     return {
-      update(next){if(next!==scene){scene=next;sentenceIndex=0;pointIndex=0;}paint();},
+      update(next){if(next!==scene){scene=next;sentenceIndex=0;pointIndex=0;wordFocus=null;}paint();},
       toggle,close,isOpen:()=>showing,open,
       previousSentence:()=>changeSentence(-1),nextSentence:()=>changeSentence(1),
       destroy(){
@@ -234,7 +312,7 @@
         button.removeEventListener?.('click',toggle);
         panel.remove();
       },
-      getState:()=>({showing,sentenceIndex,pointIndex,compact,explanationVisible,sentences:sentences().length})
+      getState:()=>({showing,sentenceIndex,pointIndex,compact,explanationVisible,sentences:sentences().length,wordFocus})
     };
   }
   return {mount};
