@@ -3,7 +3,9 @@
 // ==========================================
 function updateAudioButtonUI(isPlaying) {
     const btn = document.getElementById('btnMainAudio');
-    if (btn) btn.innerHTML = isPlaying ? "⏸ Pause Audio" : "▶ Play Audio";
+    if (btn) btn.textContent = isPlaying ? "⏸ Pause Audio" : "▶ Play Audio";
+    const scriptBtn=document.getElementById('btnScriptAudio');
+    if(scriptBtn) scriptBtn.textContent=isPlaying?"⏸ 一時停止":"▶ 再生";
 }
 
 function toggleMainAudio() {

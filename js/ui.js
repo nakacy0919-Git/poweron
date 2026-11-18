@@ -34,6 +34,7 @@ function changeFontSize(type, step) {
 }
 
 function toggleTextMode(mode) {
+    window.PowerOnCourses?.dismissChooser?.();
     let newScriptState = isScriptOpen;
     let newJpnState = isJapaneseOpen;
     if (mode === 'script') newScriptState = !isScriptOpen;
@@ -107,10 +108,27 @@ function getVocabMatches(collection) {
     });
     return matches.sort((a,b)=>b.phrase.length-a.phrase.length);
 }
-function highlightVocabText(rawText, collection) {
+// When rendering the Script, every ordinary English word can open the same
+// pronunciation popup as a registered vocabulary word. Matched phrases stay intact.
+function scriptWordButtons(raw) {
+    const text=String(raw||'');
+    const re=/[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
+    let out='',pos=0;
+    for(const match of text.matchAll(re)){
+        const word=match[0],i=match.index;
+        out+=escapeTextHtml(text.slice(pos,i));
+        out+='<span class="po-tap-word" tabindex="0" role="button" data-word="'+encodeURIComponent(word)+
+          '" onclick="showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))"'+
+          ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showVocab(event,this.textContent,decodeURIComponent(this.dataset.word))}">'+
+          escapeTextHtml(word)+'</span>';
+        pos=i+word.length;
+    }
+    return out+escapeTextHtml(text.slice(pos));
+}
+function highlightVocabText(rawText, collection, clickAll=false) {
     const text = String(rawText);
     const candidates = getVocabMatches(collection);
-    const safe = part => escapeTextHtml(part).replace(/\n/g,'<br>');
+    const safe = part => (clickAll?scriptWordButtons(part):escapeTextHtml(part)).replace(/\n/g,'<br>');
     if (!candidates.length) return safe(text);
     const alternatives = candidates.map(v => escapeVocabRegExp(v.phrase).replace(/\s+/g, '\\s+')).join('|');
     const regex = new RegExp('(^|[^A-Za-z0-9])(' + alternatives + ')(?=$|[^A-Za-z0-9])','gi');
@@ -181,6 +199,11 @@ function renderDualText() {
     // ...（この下の if (isScriptOpen) { ... 等はそのまま残します）
 
     if (isScriptOpen) {
+        const parts=Object.keys((typeof lessonStructure!=='undefined'&&lessonStructure[currentLesson])||{});
+        const partNumber=Number((currentKey.match(/_P(\d+)_/)||[])[1]||1);
+        html += '<div class="po-script-part-nav"><strong>Lesson '+currentLesson+' · 本文</strong><div class="po-script-part-list">'+
+            parts.map(part=>'<button type="button" class="'+(Number(part)===partNumber?'is-active':'')+
+             '" aria-pressed="'+(Number(part)===partNumber)+'" onclick="selectScriptPart('+Number(part)+')">Part '+part+'</button>').join('')+'</div></div>';
         // Separate sentences before generating spans; never split HTML attributes.
         const engSentences = splitEnglishSentences(rawEng);
 
@@ -197,9 +220,15 @@ function renderDualText() {
             <div id="engContainer" style="font-size:${engFontSize}px; line-height:1.8; color:#333; transition: font-size 0.2s ease;">`;
         
         engSentences.forEach((s, i) => { 
-            html += `<span class="eng-sentence" id="eng-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${highlightVocabText(s, currentVocab)}</span>`; 
+            html += `<span class="eng-sentence" id="eng-s-${i}" onclick="highlightSentence(event, ${i})" style="cursor:pointer; border-radius:4px; transition:0.2s;">${highlightVocabText(s, currentVocab, true)}</span>`; 
         });
         html += `</div></div>`;
+        html += `<div class="po-script-audio" role="group" aria-label="本文音声">
+            <button type="button" class="po-script-audio-main" id="btnScriptAudio" onclick="toggleMainAudio()">▶ 再生</button>
+            <button type="button" onclick="seekAudio(-5)">⏪ 5秒戻る</button>
+            <button type="button" onclick="stopAudio()">■ 停止</button>
+            <button type="button" onclick="seekAudio(5)">5秒進む ⏩</button>
+        </div><p class="po-script-tip">単語を押すと意味・発音練習ができます。未登録語は発音のみ対応します。</p>`;
     }
 
     if (isJapaneseOpen) {
@@ -224,6 +253,21 @@ function renderDualText() {
     }
     html += `</div>`;
     display.innerHTML = html;
+    const audioButton=document.getElementById('btnScriptAudio');
+    if(audioButton&&typeof audioPlayer!=='undefined'&&audioPlayer&&!audioPlayer.paused)
+        audioButton.textContent='⏸ 一時停止';
+}
+
+// Part selection is in Script, not duplicated in the right sidebar.
+function selectScriptPart(part) {
+    const select=document.getElementById('partSelect');
+    if(!select||!Object.keys((typeof lessonStructure!=='undefined'&&lessonStructure[currentLesson])||{}).includes(String(part)))return;
+    select.value=String(part);
+    if(typeof updateParaSelect==='function')updateParaSelect();
+    const paragraph=document.getElementById('paraSelect');
+    if(paragraph)paragraph.value='full';
+    if(typeof onScopeChange==='function')onScopeChange();
+    if(isScriptOpen||isJapaneseOpen)renderDualText();
 }
 
 // 1文のハイライト（単語のタップと競合しないように修正）
@@ -258,17 +302,28 @@ function showVocab(event, displayWord, dictWord) {
     const baseKey = currentKey.split('_').slice(0, 2).join('_');
     const currentVocab = safeVocab[currentKey] || safeVocab[baseKey] ||
         (typeof lessonVocab !== 'undefined' && (lessonVocab[currentKey] || lessonVocab[baseKey]));
-    if (!currentVocab) return;
-    // ...（この下はそのまま残します）
+    // Words not in the local glossary still support model audio and microphone practice.
     
     let vocabData = null;
     if (Array.isArray(currentVocab)) {
         vocabData = currentVocab.find(v => v.word && v.word.toLowerCase() === dictWord.toLowerCase());
-    } else {
+    } else if (currentVocab && typeof currentVocab==='object') {
         vocabData = currentVocab[dictWord] || currentVocab[dictWord.toLowerCase()];
     }
 
-    if (!vocabData) return;
+    // Reuse entries from other Parts before showing the pronunciation-only fallback.
+    if(!vocabData && safeVocab && typeof safeVocab==='object'){
+        const needle=String(dictWord||'').toLowerCase();
+        for(const entries of Object.values(safeVocab)){
+            if(Array.isArray(entries)){
+                vocabData=entries.find(entry=>entry?.word?.toLowerCase()===needle) || null;
+            }else if(entries && typeof entries==='object'){
+                vocabData=entries[dictWord]||entries[needle]||null;
+            }
+            if(vocabData)break;
+        }
+    }
+    if (!vocabData) vocabData={meaning:'この単語の意味は教材辞書に未登録です。',pronunciation:''};
     
     document.getElementById('popupWord').innerText = displayWord;
     document.getElementById('popupPron').innerText = vocabData.pronunciation || vocabData.pron || "";
@@ -278,12 +333,12 @@ function showVocab(event, displayWord, dictWord) {
     const popup = document.getElementById('vocabPopup');
     popup.style.display = 'block';
     
-    let x = event.pageX;
-    let y = event.pageY + 25;
+    let x = Number(event?.pageX)||Math.round(window.innerWidth/2);
+    let y = (Number(event?.pageY)||Math.round(window.innerHeight/3)) + 25;
     if (x + popup.offsetWidth > window.innerWidth) x = window.innerWidth - popup.offsetWidth - 10;
     
-    popup.style.left = x + 'px';
-    popup.style.top = y + 'px';
+    popup.style.left = Math.max(8,x) + 'px';
+    popup.style.top = Math.max(8,Math.min(y,window.innerHeight-popup.offsetHeight-12)) + 'px';
 
     playWordAudio(displayWord);
 }
@@ -340,11 +395,11 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         }
 
         if (isMatch) {
-            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${rawTranscript}</span> (OK!)`;
+            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${escapeTextHtml(rawTranscript)}</span> (OK!)`;
             let success = document.getElementById('successSound');
             if(success) success.play().catch(err=>{});
         } else {
-            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${rawTranscript}</span> (Try again)`;
+            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${escapeTextHtml(rawTranscript)}</span> (Try again)`;
         }
     };
     

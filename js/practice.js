@@ -8,12 +8,62 @@
     try { storage = window.localStorage; } catch (_) {}
     const PROFILE_KEY = 'poweron_study_learner_v1';
     function readProfile(){try {const x=JSON.parse(storage.getItem(PROFILE_KEY));return x&&typeof x.name==='string'&&typeof x.class==='string'&&typeof x.number==='string'&&x.name.trim()&&x.class.trim()&&x.number.trim()?x:null;}catch(_){return null;}}
-    let learner=readProfile(), editing=false;
+    let learner=readProfile(), editing=false, teacherChallenge=false;
     function learnerStore(){return core.createProgressStore(storage,learner?'poweron_study_progress_v1:'+JSON.stringify([learner.class,learner.number,learner.name]):undefined);}
     let store=learnerStore();
-    function register(event){event.preventDefault();if(app.mode!=='progress')return;const form=event.currentTarget||event.target;const next={class:form.elements.namedItem('class').value.trim(),number:form.elements.namedItem('number').value.trim(),name:form.elements.namedItem('name').value.trim()};if(!next.class||!next.number||!next.name)return;try{storage.setItem(PROFILE_KEY,JSON.stringify(next));}catch(_){const msg=document.getElementById('po-register-error');if(msg)msg.textContent='この端末では保存できません。';return;} stopSpeech();learner=next;store=learnerStore();editing=false;render();}
-    function switchLearner(){if(app.mode!=='progress')return;editing=true;render();}
-    function anonymous(){if(app.mode!=='progress')return;try{storage.removeItem(PROFILE_KEY);}catch(_){}stopSpeech();learner=null;store=learnerStore();editing=false;render();}
+    // Local classroom PIN is a UI guard, not server-side authentication. Do not
+    // call it a secure identity system: learners can clear browser storage.
+    function register(event){
+        event.preventDefault();
+        if(app.mode!=='progress'||(learner&&!editing))return;
+        const form=event.currentTarget||event.target;
+        const next={class:form.elements.namedItem('class').value.trim(),
+            number:form.elements.namedItem('number').value.trim(),name:form.elements.namedItem('name').value.trim()};
+        if(!next.class||!next.number||!next.name)return;
+        try {
+            if(learner&&editing&&storage){
+                const oldStoreKey=store.key;
+                const nextStoreKey='poweron_study_progress_v1:'+JSON.stringify([next.class,next.number,next.name]);
+                if(oldStoreKey!==nextStoreKey&&!storage.getItem(nextStoreKey)){
+                    storage.setItem(nextStoreKey,JSON.stringify(store.snapshot()));
+                }
+                const cc=window.PowerOnCourseCore;
+                if(cc&&JSON.stringify(learner)!==JSON.stringify(next)){
+                    for(let lesson=1;lesson<=10;lesson++){
+                        for(const part of Object.keys((typeof lessonStructure!=='undefined'&&lessonStructure[lesson])||{})){
+                            const scope=cc.scope({lesson,part,level:'standard'});
+                            const oldKey=cc.storageKey(learner,scope),newKey=cc.storageKey(next,scope);
+                            const previous=storage.getItem(oldKey);
+                            if(previous&&!storage.getItem(newKey))storage.setItem(newKey,previous);
+                        }
+                    }
+                }
+            }
+            storage.setItem(PROFILE_KEY,JSON.stringify(next));
+        }catch(_){
+            const msg=document.getElementById('po-register-error');
+            if(msg)msg.textContent='この端末では保存できません。';
+            return;
+        }
+        stopSpeech();learner=next;store=learnerStore();editing=false;teacherChallenge=false;render();
+    }
+    function switchLearner(){
+        if(app.mode!=='progress'||!learner)return;
+        teacherChallenge=!teacherChallenge;
+        render();
+    }
+    function unlockLearner(event){
+        event.preventDefault();
+        if(app.mode!=='progress'||!learner||!teacherChallenge)return;
+        const code=String(event.currentTarget?.elements?.namedItem('code')?.value||'');
+        if(code!=='9999'){
+            const label=document.getElementById('po-unlock-error');
+            if(label)label.textContent='確認コードが違います。先生に確認してください。';
+            return;
+        }
+        editing=true;teacherChallenge=false;render();
+    }
+    function anonymous(){return false;} // No learner reset without teacher approval.
     const games=window.PowerOnStoryGameCore,readingTools=window.PowerOnReadingScore;
     const READING_PASS=core.READING_PASS||75;
     const GAME_MODES=['storyPuzzle','storyRandom','storyListen'];
@@ -139,6 +189,7 @@
         if(QUESTION_MODES.includes(mode))startKnowledgeRun(mode);
     }
     function open(mode) {
+        window.PowerOnCourses?.dismissChooser?.();
         if (!Object.prototype.hasOwnProperty.call(MODES, mode)) return;
         if(GAME_MODES.includes(mode)&&!games)return;
         if (typeof resetAppMode === 'function') resetAppMode();
@@ -529,11 +580,7 @@
         else currentKey='L'+String(currentLesson).padStart(2,'0')+'_P'+part+'_full';
         open('storyHub');
     }
-    function compactNav(){
-        const parts=Object.keys(lessonStructure[currentLesson]||{}),part=currentKey.split('_')[1]?.slice(1),para=currentKey.split('_')[2],nums=(lessonStructure[currentLesson]||{})[part]||[];
-        return '<div class="po-compact-nav"><button onclick="PowerOnPractice.open(\'progress\')">▦ Progress</button><select aria-label="Part" onchange="PowerOnPractice.scopeControl(\'part\',this.value)">'+parts.map(x=>'<option value="'+x+'" '+(x===part?'selected':'')+'>Part '+x+'</option>').join('')+'</select><select aria-label="段落" onchange="PowerOnPractice.scopeControl(\'para\',this.value)">'+['full',...nums.map(n=>'p'+n)].map(x=>'<option value="'+x+'" '+(x===para?'selected':'')+'>'+(x==='full'?'Full Text':x.toUpperCase())+'</option>').join('')+'</select><select aria-label="Level" onchange="PowerOnPractice.scopeControl(\'level\',this.value)">'+['standard','pre1','grade1'].map(x=>'<option '+(x===currentLevel?'selected':'')+'>'+x+'</option>').join('')+'</select><select aria-label="活動を変更" onchange="PowerOnPractice.open(this.value)">'+Object.keys(MODES).map(x=>'<option value="'+x+'" '+(x===app.mode?'selected':'')+'>'+esc(MODES[x])+'</option>').join('')+'</select><button onclick="PowerOnPractice.close()">✕ メニュー</button></div>';
-    }
-
+    function compactNav(){return '<div class="po-compact-nav po-mobile-exit"><button type="button" onclick="PowerOnPractice.close()">✕ 閉じる</button></div>';}
 
     function questionBank(mode){
         const key=String(currentKey||'').split('_').slice(0,2).join('_');
@@ -679,48 +726,94 @@
        return '<section class="reading-studio"><div class="reading-top"><span>Scene '+(app.index+1)+' / '+total+'</span>'+(app.recognizer?'<span class="po-mic-ready '+(micReady&&micPhase!=='scoring'?'is-ready':'')+'" role="status">'+(micPhase==='scoring'?'判定中…':micReady?'● Speak now! 音読開始':'◌ マイク準備中・まだ読まないで')+'</span>':'')+'<span class="badge '+(passed?'complete':'')+'">'+(passed?'✓ CLEAR':'Accuracy 75%以上で合格')+'</span></div><div class="po-track"><div style="width:'+percent(r)+'%"></div></div><div class="reading-main"><figure class="reading-image"><img id="po-scene-image" src="'+esc(media.image||cover)+'" alt="Scene '+(app.index+1)+'"><figcaption id="po-scene-caption">'+(media.image?'Scene '+(app.index+1):'Lessonカバー · 場面画像は未登録')+'</figcaption></figure><div class="reading-text"><div class="po-reading-model"><button onclick="PowerOnPractice.play()" '+(app.recognizer?'disabled':'')+'>🔊 お手本を聞く</button><label>再生速度 <select aria-label="再生速度" onchange="PowerOnPractice.rate(this.value)">'+[0.65,0.85,1].map(v=>'<option value="'+v+'" '+(app.rate===v?'selected':'')+'>'+v+'×</option>').join('')+'</select></label></div><p class="po-audio-status" id="po-audio-status" role="status"></p><p class="reading-english">'+esc(s.english)+'</p><p class="reading-japanese"><small>Paragraph '+s.paragraph+' の和訳（段落全体）</small><br>'+esc(jp)+'</p></div></div><div class="reading-evaluation"><div class="accuracy '+(passed?'pass':'')+'"><span>Accuracy</span><strong>'+(app.result===null?'—':app.result)+'<small>%</small></strong><span>Scene Best '+best+'%</span>'+(r.bestAccuracy!=null?'<small>Part過去最高 '+r.bestAccuracy+'%</small>':'')+'</div><div class="transcript"><span>認識した英文</span><p id="po-live-transcript">'+esc(app.hearing||'音読すると、ここに英文が表示されます。')+'</p><small id="po-mic-status" role="status">'+esc(app.feedback||'音読スタートを押してください。')+'</small></div><div class="po-mic-tools"><button onclick="PowerOnPractice.reconnect()">マイクを再接続</button><button onclick="PowerOnPractice.toggleMicStyle()" '+(app.recognizer?'disabled':'')+'>'+(naturalMic()?'自動判定モード':'通常モード')+' ⇄</button></div></div><div class="reading-controls"><button onclick="PowerOnPractice.go(-1)" '+(app.index===0||app.recognizer?'disabled':'')+'>◀ 前へ</button><button class="po-primary" onclick="PowerOnPractice.microphone()" '+(app.recognizer&&(!micReady||micPhase==='scoring')?'disabled':'')+'>'+(app.recognizer?(micPhase==='scoring'?'判定中…':!micReady?'マイク準備中…':naturalMic()?'音読中・自動判定':'■ 終了・判定'):'🎙 音読スタート')+'</button><button onclick="PowerOnPractice.sceneNext(true)" '+(passed||app.recognizer?'disabled':'')+'>スキップ（未クリア）</button><button class="po-primary po-reading-next" onclick="PowerOnPractice.sceneNext(false)" '+(!passed||app.recognizer?'disabled':'')+'>'+(app.index===total-1?'✓ 学習進捗へ':'次のシーンへ ▶')+'</button></div><p class="po-note">'+(naturalMic()?'緑の Speak now! で音読開始。読み終えたら静かにして自動判定。固有名詞は対象外。':'緑の Speak now! で音読開始。固有名詞は採点対象外。')+'</p></section>';
     }
 
-    function progressDashboard() {
-        const all = store.snapshot().scopes;
-        const lessonItems = [];
-        const activeLevel = String(currentLevel) + ':';
-        for (let num = 1; num <= 10; num++) {
-            const parts = Object.keys((typeof lessonStructure !== 'undefined' && lessonStructure[num]) || {});
-            let score = 0, cells = 0;
-            const partLabels = parts.map(function (part) {
-                const prefix = activeLevel + 'L' + String(num).padStart(2,'0') + '_P' + part + '_';
-                const matching = Object.keys(all).filter(function (key) {return key.indexOf(prefix) === 0;});
-                const values = ['reading','deep','puzzle'].map(function (mode) {
-                    return matching.reduce(function (best, key) {
-                        const row = all[key] && all[key][mode];
-                        if (!row || !row.total) return best;
-                        const valid = Object.keys(row.completed || {}).filter(function (k) {
-                            return row.completed[k] && Number(k) >= 0 && Number(k) < row.total;
-                        }).length;
-                        return Math.max(best, Math.round(valid / row.total * 100));
-                    }, 0);
-                });
-                const average = Math.round(values.reduce(function (a,b) {return a+b;},0) / 3);
-                score += average; cells++;
-                return '<span>Part ' + esc(part) + ' <b>' + average + '%</b></span>';
+    // Aggregate the current Lesson across every Part rather than showing only
+    // whichever Part happens to be selected in the hidden internal controls.
+    function lessonProgress(){
+        const all=store.snapshot().scopes||{};
+        const num=Number(currentLesson);
+        const parts=Object.keys((typeof lessonStructure!=='undefined'&&lessonStructure[num])||{});
+        const cc=window.PowerOnCourseCore;
+        const groups=[
+          {name:'内容・語彙',tone:'teal',modes:['compEn','compJa','contextVocab','vocabEnJa','vocabJaEn','vocabVoice'],courses:['vocabulary','comprehension']},
+          {name:'音読・発音',tone:'sky',modes:['reading','sceneReading','readingcheck','shadowing'],courses:['reading']},
+          {name:'リスニング',tone:'sky',modes:['listening','storyListen'],courses:[]},
+          {name:'Story Match・スライド',tone:'violet',modes:['slides','storyPuzzle','storyRandom'],courses:['theater']}
+        ];
+        const scoreRow=(row,mode)=>{
+            if(!row||typeof row!=='object')return 0;
+            const total=Number(row.total)||0;
+            const n=Object.entries(row.completed||{}).filter(([key,yes])=>yes&&/^\d+$/.test(key)&&Number(key)<total).length;
+            let value=total?100*n/total:0;
+            if(mode==='listening'&&total){
+                value=100*Array.from({length:total},(_,i)=>Math.min(3,Number(row.counts?.[i])||0))
+                    .reduce((a,b)=>a+b,0)/(total*3);
+            }else if(Number.isFinite(row.bestAccuracy))value=Math.max(value,row.bestAccuracy);
+            return Math.max(0,Math.min(100,value));
+        };
+        const round=n=>Math.max(0,Math.min(100,Math.round(n||0)));
+        const results=parts.map(part=>{
+            const prefix='standard:L'+String(num).padStart(2,'0')+'_P'+part+'_';
+            const keys=Object.keys(all).filter(key=>key.startsWith(prefix));
+            let course={};
+            if(cc&&storage){
+                const scope=cc.scope({lesson:num,part,level:'standard'});
+                const data=cc.read(storage,cc.storageKey(learner,scope));
+                course={
+                    vocabulary:data.done?.mastery?.vocabulary?100:(Number(data.latest?.mastery?.vocabulary?.mastery)||0),
+                    comprehension:data.done?.mastery?.comprehension||data.done?.speed?.comprehension?100:Math.max(Number(data.latest?.mastery?.comprehension?.mastery)||0,Number(data.latest?.speed?.comprehension?.mastery)||0),
+                    reading:data.done?.mastery?.reading||data.done?.speed?.reading?100:0,
+                    theater:data.done?.mastery?.theater?100:0
+                };
+            }
+            const metrics=groups.map(g=>{
+                const allValues=g.modes.map(mode=>keys.reduce((max,key)=>Math.max(max,scoreRow(all[key]?.[mode],mode)),0));
+                const courseValues=g.courses.map(name=>course[name]||0);
+                return round([...allValues,...courseValues].reduce((a,b)=>a+b,0)/(allValues.length+courseValues.length||1));
             });
-            const overall = cells ? Math.round(score/cells) : 0;
-            lessonItems.push('<article class="po-lesson-card' + (num === Number(currentLesson) ? ' is-current' : '') +
-                '"><div><strong>Lesson ' + num + '</strong><strong>' + overall + '%</strong></div>' +
-                '<div class="po-track"><div style="width:' + overall + '%"></div></div>' +
-                '<div class="po-parts">' + partLabels.join('') + '</div></article>');
-        }
-        return dashboardCards() + '<details class="po-history"><summary>Lesson 1–10・従来の学習履歴・CSV</summary><p class="po-note">選択中：Lesson ' + currentLesson + ' · ' +
-            esc(currentKey.split('_')[1] || '') + ' · ' + esc(currentLevel) +
-            '。各モードの進捗は端末内に保存します。</p>' +
-            '<div class="po-stats">' + scopeBar('1文ずつ音読','reading') +
-            scopeBar('じっくり','deep') + scopeBar('リスニングパズル','puzzle') + scopeBar('Story Slides（Part全体）','slides') + '</div>' +
-            '<h3>Lesson 1–10 の進捗 <small>各Partの最高進捗を集計</small></h3>' +
-            '<div class="po-lessons">' + lessonItems.join('') + '</div>' + legacySummary() +
-            '<div class="po-action-row"><button onclick="PowerOnPractice.exportCSV()">📥 進捗CSVを保存</button><button onclick="PowerOnPractice.exportBackup()">💾 全成績バックアップ（JSON）</button></div>' +
-            '<p class="po-note">' + (store.isPersistent() ?
-                '保存先：この端末のブラウザ（別端末や教師画面との自動同期はまだありません）。' :
-                '注意：ブラウザの保存が利用できないため、記録はこの画面を開いている間だけ保持されます。') +
-            ' Lesson 8 の既存ポイント制度は変更しません。進捗は学習操作の記録で、成績や発音の厳密な評価ではありません。</p></details>';
+            return {part,metrics,overall:round(metrics.reduce((a,b)=>a+b,0)/groups.length)};
+        });
+        const groupTotals=groups.map((group,i)=>round(results.reduce((a,p)=>a+p.metrics[i],0)/(results.length||1)));
+        const overall=round(results.reduce((a,p)=>a+p.overall,0)/(results.length||1));
+        return {groups,results,groupTotals,overall};
+    }
+    function progressDashboard(){
+        const progress=lessonProgress();
+        const profile=learner?
+            '<div class="th-lesson-profile"><span>🔒 '+esc(learner.name)+' · '+esc(learner.class)+' · '+esc(learner.number)+'番</span><button type="button" onclick="PowerOnPractice.switchLearner()">先生に変更を依頼</button></div>':
+            '<p class="th-lesson-profile-note">学習記録を保存するには一度だけ氏名を登録してください。</p>';
+        const fields=(key,placeholder,value,max)=>'<input name="'+key+'" aria-label="'+placeholder+'" placeholder="'+placeholder+'" maxlength="'+max+'" required value="'+esc(value||'')+'">';
+        const form=(!learner||editing)?
+            '<form class="th-analytics-register" onsubmit="PowerOnPractice.register(event)" aria-label="学習者を登録"><strong>'+(editing?'登録情報を更新':'学習記録を開始')+'</strong>'+
+            fields('class','クラス',editing?learner?.class:'',40)+fields('number','番号',editing?learner?.number:'',12)+
+            fields('name','氏名',editing?learner?.name:'',50)+
+            '<button type="submit">'+(editing?'保存する':'登録して記録を開始')+'</button><small id="po-register-error" role="alert"></small></form>':
+            '<p id="po-register-error" class="th-profile-message" role="alert"></p>';
+        const teacherForm=(learner&&teacherChallenge&&!editing)?
+            '<form class="th-teacher-unlock" onsubmit="PowerOnPractice.unlockLearner(event)" aria-label="先生用編集コード">'+
+            '<label>先生用コード <input type="password" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="4" required autofocus aria-label="先生用4桁コード"></label>'+
+            '<button type="submit">編集を解除</button>'+
+            '<button type="button" onclick="PowerOnPractice.switchLearner()">キャンセル</button>'+
+            '<span id="po-unlock-error" role="alert"></span></form>':'';
+        return '<section class="th-lesson-progress">'+
+            '<header class="th-lesson-progress-hero"><div><span class="th-analytics-kicker">LEARNING PROGRESS · LESSON '+currentLesson+'</span>'+
+            '<h2>Lesson '+currentLesson+' の学習記録</h2><p>全 '+progress.results.length+' Partの学習達成度を集計しています。</p>'+
+            profile+'</div>'+ring(progress.overall,true)+'</header>'+teacherForm+form+
+            '<div class="th-lesson-sections">'+progress.groups.map((g,i)=>
+                '<article class="th-lesson-section" data-tone="'+g.tone+'">'+
+                '<div><strong>'+g.name+'</strong><small>Lesson 全体</small></div>'+ring(progress.groupTotals[i])+'</article>'
+            ).join('')+'</div>'+
+            '<h3 class="th-part-heading">Part別の達成度</h3>'+
+            '<div class="th-lesson-parts">'+progress.results.map(p=>
+                '<article class="th-lesson-part"><div class="th-lesson-part-head"><strong>Part '+p.part+'</strong>'+ring(p.overall)+'</div>'+
+                '<div class="th-lesson-part-metrics">'+progress.groups.map((g,i)=>
+                    '<div><span>'+g.name+'</span>'+ring(p.metrics[i])+'</div>'
+                ).join('')+'</div></article>'
+            ).join('')+'</div>'+
+            '<details class="th-progress-advanced"><summary>データの保存・エクスポート</summary>'+
+            '<p>学習記録はこのブラウザ内に保存され、端末間の自動同期はありません。数値は各活動の達成度・最高記録を集計した学習目安です。</p>'+
+            '<div class="po-action-row"><button onclick="PowerOnPractice.exportCSV()">CSVを保存</button>'+
+            '<button onclick="PowerOnPractice.exportBackup()">学習記録バックアップ</button></div></details>'+
+            '</section>';
     }
     function sceneMedia(scene) {
         // Only registered media is loaded; missing images never masquerade as scene-specific art.
@@ -892,6 +985,6 @@
         go:go, sceneJump:sceneJump, play:play, rate:rate, microphone:microphone, markRead:markRead,
         switchJapanese:switchJapanese, chooseCard:chooseCard, undoCard:undoCard,
         checkPuzzle:checkPuzzle, retryPuzzle:retryPuzzle, exportCSV:exportCSV, exportBackup:exportBackup,
-        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect,toggleMicStyle:toggleMicStyle, getProgress:function () {return store.snapshot();}
+        gameHint:gameHint,closeHint:closeHint,launchKnowledge:launchKnowledge,knowledgeLesson8:knowledgeLesson8,knowledgeStandard:knowledgeStandard,knowledgeAnswer:knowledgeAnswer,knowledgeNext:knowledgeNext,knowledgeRetry:knowledgeRetry,knowledgeReview:knowledgeReview,knowledgeReviewPage:knowledgeReviewPage,knowledgeExplanationPage:knowledgeExplanationPage,knowledgeLesson:knowledgeLesson,storyPart:storyPart,launchStory:launchStory,storyScene:storyScene,storyLesson8:storyLesson8,gameStart:gameStart,gamePick:gamePick,gamePlace:gamePlace,gamePage:gamePage,gameAnswer:gameAnswer,gameSkip:gameSkip,gameSpeak:gameSpeak,scopeControl:scopeControl,captureLegacy:captureLegacy, register:register,switchLearner:switchLearner,unlockLearner:unlockLearner,anonymous:anonymous,openActivity:openActivity,cancelPracticeAudio:cancelPracticeAudio,sceneNext:sceneNext,reconnect:reconnect,toggleMicStyle:toggleMicStyle, getProgress:function () {return store.snapshot();}
     };
 })();
