@@ -224,7 +224,7 @@ function renderDualText() {
         });
         html += `</div></div>`;
         html += `<div class="po-script-audio" role="group" aria-label="本文音声">
-            <button type="button" class="po-script-audio-main" id="btnScriptAudio" onclick="toggleMainAudio()">▶ 再生 / Pause</button>
+            <button type="button" class="po-script-audio-main" id="btnScriptAudio" onclick="toggleMainAudio()">▶ 再生</button>
             <button type="button" onclick="seekAudio(-5)">⏪ 5秒戻る</button>
             <button type="button" onclick="stopAudio()">■ 停止</button>
             <button type="button" onclick="seekAudio(5)">5秒進む ⏩</button>
@@ -253,6 +253,9 @@ function renderDualText() {
     }
     html += `</div>`;
     display.innerHTML = html;
+    const audioButton=document.getElementById('btnScriptAudio');
+    if(audioButton&&typeof audioPlayer!=='undefined'&&audioPlayer&&!audioPlayer.paused)
+        audioButton.textContent='⏸ 一時停止';
 }
 
 // Part selection is in Script, not duplicated in the right sidebar.
@@ -380,7 +383,7 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         }
 
         if (isMatch) {
-            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${rawTranscript}</span> (OK!)`;
+            recDisplay.innerHTML = `認識: <span style="color:#4caf50; font-weight:bold;">${escapeTextHtml(rawTranscript)}</span> (OK!)`;
             let success = document.getElementById('successSound');
             if(success) success.play().catch(err=>{});
         } else {
