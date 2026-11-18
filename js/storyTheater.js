@@ -186,7 +186,7 @@
     const seats=[0,1].map(row=>'<g opacity="'+(row===0?.65:1)+'" transform="'+(row===0?'translate(0 0)':'translate(-70 65) scale(1.12)')+'">'+Array.from({length:11},(_,i)=>'<g transform="translate('+(i*122-55)+' 0)"><path d="M8 99V48Q8 12 39 12H79Q110 12 110 48V99Z" fill="url(#poCinemaSeat)" stroke="#633039" stroke-width="1.4"/><path d="M18 51Q18 23 42 23H76Q100 23 100 51" fill="none" stroke="#9a5055" stroke-opacity=".24" stroke-width="2"/><rect x="0" y="73" width="118" height="26" rx="12" fill="#120e14"/></g>').join('')+'</g>').join('');
     const markup='<div class="theater-auditorium" aria-hidden="true"><div class="theater-curtain left"></div><div class="theater-curtain right"></div><div class="theater-wall-light left"></div><div class="theater-wall-light right"></div><svg class="theater-seats" viewBox="0 0 1200 190" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="poCinemaSeat" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#49232a"/><stop offset=".45" stop-color="#24141a"/><stop offset="1" stop-color="#08070c"/></linearGradient></defs>'+seats+'</svg></div>'+
         '<header class="theater-header"><div><span data-title></span><strong>Step 1　本文を読む・聞く</strong></div><output aria-live="polite" data-count></output><button type="button" class="theater-close" data-action="close" aria-label="紙芝居を閉じる">×</button></header>'+
-        '<div class="theater-progress" aria-hidden="true"><i></i></div><div class="theater-stage"><div class="theater-picture"><img class="theater-image-fill" alt="" aria-hidden="true"><img class="theater-artwork" alt=""><span class="theater-cover-note" hidden>Lessonカバー · 場面画像は未登録</span><div class="theater-caption" tabindex="0"><p class="theater-en"></p><small class="theater-ja-label" hidden></small><p class="theater-ja" hidden></p></div></div></div>'+
+        '<div class="theater-progress" aria-hidden="true"><i></i></div><div class="theater-stage"><div class="theater-picture"><img class="theater-image-fill" alt="" aria-hidden="true"><img class="theater-artwork" alt=""><span class="theater-cover-note" hidden>Lessonカバー · 場面画像は未登録</span><div class="theater-caption" tabindex="0"><p class="theater-en"></p><p class="theater-ja" hidden></p></div></div></div>'+
         '<p class="theater-message" role="status" hidden></p><footer class="theater-controls"><div><button type="button" data-action="prev" aria-label="前のシーン">◀</button><button type="button" data-action="next" aria-label="次のシーン">▶</button></div><div><button type="button" class="theater-manual" data-action="manual">🔊 このシーン</button><button type="button" class="theater-auto" data-action="auto">▶ 自動再生</button></div><div><button type="button" data-action="jp" aria-pressed="false">和訳 OFF</button><button type="button" data-action="grammar" aria-pressed="false">✦ 文法解説</button><select aria-label="紙芝居の音声速度"><option value="0.65">0.65×</option><option value="0.85">0.85×</option><option value="1">1×</option></select></div><button type="button" class="theater-finish" data-action="finish">⏭ スキップして音読へ進む</button></footer>';
     function open(config){
         dismiss();if(!config.scenes?.length)return;
@@ -219,12 +219,11 @@
                 q('.theater-cover-note').hidden=!s.scene.isCover;
                 q('.theater-en').textContent=s.scene.english;
                 q('.theater-ja').textContent=s.scene.japanese;
-                q('.theater-ja-label').textContent='表示中の英文の和訳';
                 q('.theater-caption').scrollTop=0;
                 frame.classList.remove('theater-transition');void frame.offsetWidth;frame.classList.add('theater-transition');
                 const next=config.scenes[s.index+1];if(next&&host.Image){const preload=new host.Image();preload.src=next.image;}
             }
-            showJa=s.japanese;q('.theater-ja').hidden=!showJa;q('.theater-ja-label').hidden=!showJa;
+            showJa=s.japanese;q('.theater-ja').hidden=!showJa;
             q('[data-count]').textContent='Scene '+(s.index+1)+' / '+s.total;
             q('.theater-progress i').style.width=((s.index+1)/s.total*100)+'%';
             grammar?.update(s.scene);
