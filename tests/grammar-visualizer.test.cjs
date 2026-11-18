@@ -16,7 +16,7 @@ function corpus(){
   }
   return rows;
 }
-test('Every Lesson 8/9 sentence has teacher-curated explanation',()=>{
+test('Every Lesson 8/9 sentence has a sentence-matched draft explanation',()=>{
   const sentences=corpus();
   assert.ok(sentences.length>=100);
   assert.ok(notes.entries.length>=100);
