@@ -265,7 +265,7 @@
         }
         active={session,remove};
         // Optional Lesson 8/9 grammar layer: never changes audio/progress/session data.
-        if([8,9].includes(Number(config.lesson))){
+        if([8,9].includes(Number(config.lesson))&&config.grammarEnabled===true){
             grammar=host.PowerOnGrammarVisualizer?.mount?.({
                 root,stage:q('.theater-stage'),button:button('grammar'),
                 lesson:Number(config.lesson),splitSentences:config.splitSentences,
