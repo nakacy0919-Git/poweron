@@ -34,6 +34,13 @@ test('Only explicit grammar relationships are identified as modifier, relative, 
   assert.equal(relations.classify({tag:'because による理由'}).kind,'context');
   assert.equal(relations.classify({tag:'SVO の文型'}).kind,'relation','SVO must not be mislabeled as a modifier');
 });
+test('SVOC role diagram is never mislabeled as a modification arrow',()=>{
+  const template=notes.entries.find(n=>n.match==='English has a huge vocabulary');
+  assert.ok(template?.blocks?.length);
+  assert.equal(relations.classify(template).kind,'structure');
+  assert.equal(relations.classify(template).lineLabel,'');
+  assert.equal(relations.classify({tag:'関係代名詞の省略'}).title,'省略された関係詞節が先行詞を説明');
+});
 test('When highlights overlap, both relationships remain attached to correct words',()=>{
   const text='The boy who plays soccer is my brother.';
   const note={tag:'関係代名詞 who',focus:'who plays soccer',target:'boy who plays'};
