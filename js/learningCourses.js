@@ -75,22 +75,19 @@
     if(!root){
       root=host.document.createElement("section");
       root.id="po-course-overlay";root.className="po-course-overlay";
-      root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");
+      // The chooser stays inside the Lesson canvas; sidebar and tabs remain available.
+      root.setAttribute("role","region");
       root.setAttribute("aria-label","PowerOn 学習コース");
       root.setAttribute("tabindex","-1");
       root.addEventListener("click",click);
       root.addEventListener("change",change);
       root.addEventListener("keydown",e=>{
         if(e.key==="Escape"){e.preventDefault();close();}
-        if(e.key==="Tab"){
-          const focusable=[...root.querySelectorAll("button:not([disabled]),select:not([disabled])")];
-          if(!focusable.length)return;
-          if(e.shiftKey&&host.document.activeElement===focusable[0]){e.preventDefault();focusable.at(-1).focus();}
-          else if(!e.shiftKey&&host.document.activeElement===focusable.at(-1)){e.preventDefault();focusable[0].focus();}
-        }
       });
-      host.document.body.appendChild(root);
+      (host.document.getElementById("mainScreen")||host.document.body).appendChild(root);
     }
+    // Use the selected Lesson illustration, not an opaque navy page background.
+    root.style.backgroundImage="linear-gradient(rgba(242,248,255,.18),rgba(242,248,255,.30)),url('img/L"+(currentContext?.lesson||1)+".webp')";
     host.document.body.classList.add("po-course-open");
     return root;
   }
@@ -457,11 +454,10 @@
     if(event.target?.matches?.('[data-course-part]'))selectPart(String(event.target.value));
   }
   function lessonChanged(num){
-    if([8,9,10].includes(Number(num)))open();
-    else{
-      close();
-      host.document.body.classList.remove("po-course-guided","po-course-free-mode");
-    }
+    // A Lesson tab changes only the background; courses launch from the dedicated button.
+    close();
+    host.document.body.classList.toggle("po-course-guided",[8,9,10].includes(Number(num)));
+    host.document.body.classList.remove("po-course-free-mode");
   }
   function scopeChanged(){
     if(!currentContext)return;
