@@ -43,6 +43,7 @@ function fakeNode(name='div'){
     appendChild(child){this.children.push(child);return child;},
     replaceChildren(...children){this.children=children;},
     focus(){this.focused=true;},
+    remove(){this.removed=true;},
     click(){this.listeners.click?.();}
   };
 }
