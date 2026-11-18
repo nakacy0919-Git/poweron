@@ -399,7 +399,7 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
             let success = document.getElementById('successSound');
             if(success) success.play().catch(err=>{});
         } else {
-            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${rawTranscript}</span> (Try again)`;
+            recDisplay.innerHTML = `認識: <span style="color:#d32f2f; font-weight:bold;">${escapeTextHtml(rawTranscript)}</span> (Try again)`;
         }
     };
     
