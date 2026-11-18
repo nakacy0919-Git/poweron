@@ -1,7 +1,7 @@
 # PowerOn Grammar Visualizer — Lesson 8/9 pilot
 
 ## Scope
-- **Standard** level only for Lessons 8 and 9 (the exact approved textbook sentences).
+- **Standard** level only for Lessons 8 and 9 (the existing textbook sentences stored in the repository).
 - Works inside the existing **Story Theater** via the “✦ 文法解説” button.
 - Keeps each current scene image as a subdued background. Original playback, narration, aligned Japanese captions, progress tracking and Step 2 navigation remain separate and unchanged.
 - Scene groups containing multiple sentences let the learner choose which sentence to inspect.
@@ -18,7 +18,7 @@
 
 ## Data contract
 `js/grammarNotes.js` exports `{ entries, forSentence(lesson, sentence) }`.
-Each approved record provides:
+Each draft annotation record provides:
 
 - `lesson`: 8 or 9
 - `match`: a unique anchor that must be in the actual sentence
@@ -26,9 +26,21 @@ Each approved record provides:
 - `focus`: exact text to highlight in amber
 - `target`: exact related phrase to highlight in blue
 - `explain`: Japanese commentary for the specific sentence
-- `blocks` (optional): reviewed S/V/O/C or clause breakdown `[{role, text}]`
+- `blocks` (optional): manually specified S/V/O/C or clause breakdown `[{role, text}]`
 
 The viewer uses `textContent` for textbook and notes, never injected HTML. Unrecognized texts never receive unverified parsing labels. Other lessons and non-Standard levels do not expose the grammar button.
+
+## Responsive classroom layout (development pilot)
+- Grammar mode uses a dynamic viewport-constrained stage on phones and iPads; while visible it temporarily hides narration-specific controls to prioritize the English sentence and structure diagram.
+- Short/narrow screens collapse the Japanese explanation by default. The **解説を見る / 解説を隠す** control restores it without changing the scene.
+- Very long sentences use reduced type sizes with an internal scroll fallback, rather than scrolling the whole theater.
+- ArrowLeft/ArrowRight switch sentences while the overlay is open; Escape closes only the grammar layer. Keyboard focus stays within visible grammar controls and original captions are removed from the tab order.
+- Cleanup disconnects the grammar ResizeObserver when exiting.
+
+## Verification status
+- 104 / 104 source sentences matched an annotation; 115 explanations and 27 structural diagrams.
+- Five focused in-memory JavaScript tests passed, including compact screen behavior. This is not equivalent to Safari/iPad visual inspection or the full project's Node test suite.
+- **Teacher review of all grammar explanations is still required before production**.
 
 ## Review checklist before any production merge
 - [ ] Verify grammar definitions and intended dependencies against publisher content, especially multi-clause examples and quoted speech.
