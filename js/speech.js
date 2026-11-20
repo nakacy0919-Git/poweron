@@ -274,6 +274,7 @@ function openSpeechOverlay(mode) {
                             <button onclick="if(typeof changeFontSize==='function') changeFontSize('eng', 2); recalculateMatch();" style="padding:4px 12px; border:1px solid #81d4fa; border-radius:6px; background:#e1f5fe; color:#0288d1; font-weight:bold; cursor:pointer; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">A +</button>
                         </div>
                     </div>
+                    ${/^L08_/i.test(String(activeKey)) ? '<p style="font-size:12px;color:#37627a;margin:0 0 6px;">判定基準：固有名詞とその所有格は採点対象外。その他の語を順序どおりに評価（75%以上で合格）。</p>' : ''}
                     <div id="staticTargetText" style="flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; line-height: 1.8; color: #333; font-size: ${engFontSize}px;">${targetText}</div>
                 </div>`;
         }
@@ -371,6 +372,14 @@ function processSpeechMatch(spokenText) {
     const count = matched.size;
     const total = target.length;
     currentScore = total ? Math.min(100,Math.round(count/total*100)) : 0;
+    // Lesson 8 uses the same reviewed proper-name/possessive exclusions as
+    // Read & Practice (Story Match).  Preserve the legacy score elsewhere.
+    const lesson8Reading = /^L08_/i.test(String(typeof currentKey !== 'undefined' ? currentKey : ''));
+    const readingScorer = typeof window !== 'undefined' ? window.PowerOnReadingScore : null;
+    // Score only at completion; live transcripts can update many times per second on iPad.
+    if (lesson8Reading && !isMainRecording && !speechStopping && readingScorer && typeof readingScorer.score === 'function') {
+        currentScore = readingScorer.score(plainText, String(spokenText || '')).percent;
+    }
     const safe = str => String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const box = document.getElementById('dynamicVoiceText');
     if (box) {

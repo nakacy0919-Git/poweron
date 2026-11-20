@@ -21,6 +21,19 @@ test('registered audio failure falls back to speech, no premature answer',()=>{c
 test('scene mic reconnects and accumulates speech; explicit stop; old callback ignored',()=>{const {p,html,run,mic}=harness();p.open('sceneReading');p.microphone();assert.match(html(),/マイク準備中/);let a=mic();a.onresult({results:[Object.assign([{transcript:'We learn'}],{isFinal:true})]});a.onend();run(250);let b=mic();b.onresult({results:[Object.assign([{transcript:'English today'}],{isFinal:true})]});p.microphone();assert.equal(p.getProgress().scopes['standard:L08_P1_full'].sceneReading.scores[0],100);p.microphone();const stale=mic().onend;p.open('storyHub');stale();assert.equal(p.mode(),'storyHub');});
 test('score names/numbers, extra words and all-name transcripts',()=>{assert.equal(reading.score('Harriet Tubman was born in 1820.','Harriet was born in eighteen twenty').percent,100);assert.equal(reading.score('We have 70 books.','We have seventy books.').percent,100);assert.ok(reading.score('We learn English today.','We learn English today extra extra extra').percent<80);assert.equal(reading.score('Harriet Tubman','Harriet Tubman').percent,0);});
 
+test('Lesson 8 Read & Practice excludes possessives while evaluating meaningful words',()=>{
+ const {p,ctx,mic}=harness();
+ ctx.lessonStructure[8][1]=[1];
+ ctx.lessonScripts.L08_P1_p1="Harriet's reputation spread fast.";
+ ctx.lessonScripts.L08_P1_full=ctx.lessonScripts.L08_P1_p1;
+ p.open('sceneReading');p.microphone();
+ mic().onresult({results:[Object.assign([{transcript:'reputation spread fast'}],{isFinal:true})]});
+ p.microphone();
+ assert.equal(p.getProgress().scopes['standard:L08_P1_full'].sceneReading.scores[0],100);
+ const result=reading.score("Harriet's reputation spread fast.",'reputation');
+ assert.ok(result.percent<75,'Ordinary words cannot be silently ignored');
+ assert.equal(reading.score('Queen Victoria helped Harriet Tubman today.','helped today').percent,100);
+});
 test('consecutive scenes use fresh recognition and never leak earlier transcripts',()=>{
  const {p,html,mic,nodes}=harness();p.open('sceneReading');
  for(let i=0;i<sentences.length;i++){
