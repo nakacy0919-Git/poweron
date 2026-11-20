@@ -376,7 +376,8 @@ function processSpeechMatch(spokenText) {
     // Read & Practice (Story Match).  Preserve the legacy score elsewhere.
     const lesson8Reading = /^L08_/i.test(String(typeof currentKey !== 'undefined' ? currentKey : ''));
     const readingScorer = typeof window !== 'undefined' ? window.PowerOnReadingScore : null;
-    if (lesson8Reading && readingScorer && typeof readingScorer.score === 'function') {
+    // Score only at completion; live transcripts can update many times per second on iPad.
+    if (lesson8Reading && !isMainRecording && !speechStopping && readingScorer && typeof readingScorer.score === 'function') {
         currentScore = readingScorer.score(plainText, String(spokenText || '')).percent;
     }
     const safe = str => String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
