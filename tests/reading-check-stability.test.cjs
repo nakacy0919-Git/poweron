@@ -24,7 +24,7 @@ function app(){
   loopState:{active:false},checkCelebration(){},alert(msg){throw Error(msg)}
  };
  x.window=x;vm.createContext(x);
- for(const file of ['lessons/lessonData.js','js/state.js','js/speech.js']){
+ for(const file of ['lessons/lessonData.js','js/state.js','js/speech.js','js/storyReading.js']){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),x,{filename:file});
  }
  vm.runInContext("function resetAppMode(){if(typeof abortSpeechSession==='function')abortSpeechSession();document.body.classList.remove('speech-active');currentMode='';}",x);
@@ -70,6 +70,20 @@ test('permission denial supports retry and scope switches stop stale microphones
  run("currentKey='L08_P2_p4';openSpeechOverlay('reading')");
  assert.equal(run('lastSpokenText'),'');
  assert.equal(old.onresult,null);
+});
+test('Lesson 8 Reading Check excludes named people and their possessives, not ordinary words',()=>{
+ const a=app(),{run,recognizers,speak}=a;
+ run("currentKey='L08_P3_p8';openSpeechOverlay('reading');targetText=\"Harriet's reputation spread fast.\";toggleReadingRecording()");
+ speak(recognizers[0],'reputation spread fast');a.advance(2000);run('toggleReadingRecording()');
+ assert.equal(run('currentScore'),100,'Harriet\'s is excluded from the score');
+ run('toggleReadingRecording()');speak(recognizers[1],'reputation spread');a.advance(2000);run('toggleReadingRecording()');
+ assert.ok(run('currentScore')<100,'Missing fast still counts as an error');
+});
+test('Lesson 8 Reading Check handles multiword proper names at both ends',()=>{
+ const a=app(),{run,recognizers,speak}=a;
+ run("currentKey='L08_P4_p9';openSpeechOverlay('reading');targetText='Queen Victoria helped Harriet Tubman today.';toggleReadingRecording()");
+ speak(recognizers[0],'helped today');a.advance(2000);run('toggleReadingRecording()');
+ assert.equal(run('currentScore'),100);
 });
 test('scrambled words are not counted as a perfect reading',()=>{
  const a=app(),{run,recognizers,speak}=a;
