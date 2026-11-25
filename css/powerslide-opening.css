@@ -1,0 +1,35 @@
+/* Isolated PowerSlide cinematic opening. Only the overlay is animated. */
+#ps-intro {position:fixed;inset:0;z-index:2147483647;isolation:isolate;overflow:hidden;display:grid;place-items:center;color:#fff;background:#050919;font-family:Inter,"Segoe UI",Arial,"Noto Sans JP",sans-serif;box-sizing:border-box;animation:ps-opening-exit 5.6s ease-in-out both;touch-action:none;}
+#ps-intro *,#ps-intro *::before,#ps-intro *::after{box-sizing:border-box}
+#ps-intro .ps-nebula{position:absolute;inset:-20%;pointer-events:none;background:radial-gradient(ellipse at 48% 47%,#235eb1 0%,transparent 43%),radial-gradient(ellipse at 22% 78%,#0e7b91 0%,transparent 35%),radial-gradient(ellipse at 78% 24%,#58258b 0%,transparent 32%),linear-gradient(135deg,#030716,#101539 60%,#030717);animation:ps-nebula-drift 5.6s ease-out both}
+#ps-intro .ps-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;perspective:650px}
+#ps-intro .ps-star{position:absolute;display:block;border-radius:50%;background:#d9faff;box-shadow:0 0 8px #6bcfff;animation:ps-star-fly 5.6s ease-out both}
+#ps-intro .ps-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 28%,rgba(1,4,17,.75) 100%);pointer-events:none}
+#ps-intro .ps-orbit{position:absolute;width:min(74vmin,600px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(133,222,255,.26);border-top-color:#a9e9ff;border-bottom-color:#a178fa;box-shadow:0 0 30px #3880da33;pointer-events:none;animation:ps-orbit-spin 5.6s ease-out both}
+#ps-intro .ps-orbit.ps-orbit-two{width:min(84vmin,720px);border-color:rgba(180,163,255,.14);border-right-color:#a783ff;animation-direction:reverse}
+#ps-intro .ps-sweep{position:absolute;left:50%;top:50%;height:2px;width:150vw;background:linear-gradient(90deg,transparent,#72d5ff,#e7eeff,#b994ff,transparent);box-shadow:0 0 34px 7px #5477ff66;transform:translate(-50%,-50%) rotate(-12deg);opacity:0;pointer-events:none;animation:ps-sweep 1.55s 1.95s ease-in-out both}
+#ps-intro .ps-logo-stage{position:absolute;display:grid;justify-items:center;gap:clamp(12px,2.8vh,25px);text-align:center;animation:ps-logo-reveal 3.15s cubic-bezier(.17,.7,.2,1) both}
+#ps-intro .ps-logo-disc{width:clamp(120px,42vmin,286px);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(145deg,#fff,#e6f3ff);box-shadow:0 0 0 1px #ddf9ff,0 0 38px #6dcfff80,0 0 110px #8056fd55}
+#ps-intro .ps-logo-disc img{display:block;width:100%;height:100%;object-fit:contain;border-radius:50%}
+#ps-intro .ps-logo-disc.ps-logo-fallback{background:#edf5ff;color:#183f98;font-size:clamp(14px,4vmin,30px);font-weight:900;letter-spacing:-.06em}
+#ps-intro .ps-overline{font-size:clamp(10px,1.75vmin,16px);letter-spacing:.38em;font-weight:700;color:#c7deff;text-shadow:0 0 16px #428eff;text-transform:uppercase}
+#ps-intro .ps-title-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:clamp(10px,2.5vmin,24px);text-align:center;padding:24px;opacity:0;pointer-events:none;animation:ps-title-reveal 2.72s 2.5s cubic-bezier(.2,.75,.2,1) both}
+#ps-intro .ps-title{margin:0;color:#f7faff;font-size:clamp(38px,10.4vmin,120px);font-style:italic;line-height:1.04;letter-spacing:.015em;font-weight:900;white-space:nowrap;text-shadow:0 4px 14px #06122e,0 0 48px #63a3ff80}
+#ps-intro .ps-title em{font:inherit;color:#a7ddff}
+#ps-intro .ps-rule{height:2px;width:min(66vw,540px);background:linear-gradient(90deg,transparent,#54caff,#fafaff,#af88ff,transparent);box-shadow:0 0 22px #87a5ff}
+#ps-intro .ps-subtitle{font-size:clamp(10px,1.9vmin,18px);letter-spacing:.27em;color:#e8efff;font-weight:650}
+#ps-intro .ps-skip{position:absolute;z-index:2;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));border:1px solid #b6d9ff70;background:#0b1939bd;color:white;border-radius:999px;padding:11px 18px;font:600 13px/1.2 "Segoe UI","Noto Sans JP",sans-serif;cursor:pointer;min-height:44px;min-width:90px;touch-action:manipulation}
+#ps-intro .ps-skip:hover,#ps-intro .ps-skip:focus-visible{outline:2px solid #a7ddff;outline-offset:4px;background:#203f75}
+#ps-intro .ps-progress{position:absolute;bottom:max(18px,env(safe-area-inset-bottom));width:min(220px,45vw);height:2px;background:#ffffff25;border-radius:4px;overflow:hidden;pointer-events:none}
+#ps-intro .ps-progress::after{content:"";display:block;height:100%;width:100%;transform-origin:left;background:linear-gradient(90deg,#29cef2,#b394ff);animation:ps-progress-fill 5.6s linear both}
+@keyframes ps-nebula-drift{from{transform:scale(1.08) rotate(-5deg)}to{transform:scale(1.27) rotate(4deg)}}
+@keyframes ps-star-fly{0%{opacity:0;transform:scale(.6)}22%{opacity:.65}85%{opacity:.45}100%{opacity:0;transform:translate(var(--ps-dx),var(--ps-dy)) scale(1.4)}}
+@keyframes ps-orbit-spin{0%{opacity:0;transform:rotate(-50deg) scale(.65)}25%{opacity:.9}60%{opacity:.48}100%{opacity:0;transform:rotate(80deg) scale(1.28)}}
+@keyframes ps-logo-reveal{0%{opacity:0;transform:scale(.72);filter:blur(12px)}25%{opacity:1;filter:blur(0)}55%{opacity:1;transform:scale(1)}72%{opacity:1;transform:scale(1.06)}100%{opacity:0;transform:scale(1.55);filter:blur(8px)}}
+@keyframes ps-sweep{0%,100%{opacity:0;transform:translate(-50%,-50%) rotate(-12deg) scaleX(.3)}45%{opacity:.75;transform:translate(-50%,-50%) rotate(-12deg) scaleX(1)}}
+@keyframes ps-title-reveal{0%{opacity:0;transform:scale(.91) translateY(12px);filter:blur(9px)}30%{opacity:1;filter:blur(0);transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1.025)}}
+@keyframes ps-progress-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ps-opening-exit{0%,89%{opacity:1}100%{opacity:0}}
+@media (max-width:600px){#ps-intro .ps-title{font-size:clamp(34px,10.5vw,65px)}#ps-intro .ps-overline{letter-spacing:.23em}#ps-intro .ps-subtitle{letter-spacing:.12em}}
+@media (max-height:400px){#ps-intro .ps-logo-disc{width:clamp(105px,39vmin,190px)}#ps-intro .ps-logo-stage{gap:9px}#ps-intro .ps-title-stage{gap:9px}}
+@media (prefers-reduced-motion:reduce){#ps-intro,#ps-intro *,#ps-intro *::after{animation:none!important}#ps-intro .ps-orbit,#ps-intro .ps-sweep,#ps-intro .ps-stars,#ps-intro .ps-title-stage{display:none}}
